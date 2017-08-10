@@ -1,10 +1,39 @@
 #include "CPU.h"
 
-CPU::CPU() : mem(MEM_SIZE), pc(RESET_VECTOR)
+CPU::CPU() : mem(MEM_SIZE)
+{
+	
+}
+
+CPU::CPU(uint16_t _rst) : rst(_rst)
 {
 }
 
 CPU::~CPU()
+{
+}
+
+void CPU::Tick()
+{
+	Execute();
+}
+
+void CPU::Execute()
+{
+	switch (mem[pc])
+	{
+		case 0x69:
+			SetA(a + mem[pc + 1]);
+			break;
+	}
+}
+
+uint8_t & CPU::operator[](const int index)
+{
+	
+}
+
+uint8_t & CPU::operator[](const int index) const
 {
 }
 

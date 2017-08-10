@@ -19,11 +19,21 @@ class CPU
 
 	// Instructions
 	constexpr static int RESET_VECTOR = 0x0000;
+	uint16_t rst;
 	std::vector<uint8_t> instr;
 
 public:
 	CPU();
+	CPU(uint16_t);
 	~CPU();
+
+	void Tick();
+	void Execute();
+
+
+	// Memory map
+	uint8_t& operator[](const int index);
+	uint8_t& operator[](const int index) const;
 
 	void SetA(uint8_t);
 	void SetX(uint8_t);

@@ -12,7 +12,6 @@ public:
 	FileHandler();
 	~FileHandler();
 
-
 	ROM LoadCartridge(const std::string &fileName);
 };
 

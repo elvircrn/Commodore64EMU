@@ -32,8 +32,6 @@ public:
 
 
 	// Memory map
-	uint8_t& operator[](const int index);
-	uint8_t& operator[](const int index) const;
 
 	void SetA(uint8_t);
 	void SetX(uint8_t);

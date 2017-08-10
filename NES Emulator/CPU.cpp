@@ -28,15 +28,6 @@ void CPU::Execute()
 	}
 }
 
-uint8_t & CPU::operator[](const int index)
-{
-	
-}
-
-uint8_t & CPU::operator[](const int index) const
-{
-}
-
 void CPU::SetA(uint8_t _a)
 {
 	a = _a;

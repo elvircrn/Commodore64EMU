@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.15
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NES Emulator", "NES Emulator\NES Emulator.vcxproj", "{484AC8D8-5FA3-4D04-B781-3429F6F1E3D5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NESEmulatorTest", "NESEmulatorTest\NESEmulatorTest.vcxproj", "{FE407CE7-136E-4730-9BDA-5FE54A67D1C9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{484AC8D8-5FA3-4D04-B781-3429F6F1E3D5}.Debug|x64.ActiveCfg = Debug|x64
+		{484AC8D8-5FA3-4D04-B781-3429F6F1E3D5}.Debug|x64.Build.0 = Debug|x64
+		{484AC8D8-5FA3-4D04-B781-3429F6F1E3D5}.Debug|x86.ActiveCfg = Debug|Win32
+		{484AC8D8-5FA3-4D04-B781-3429F6F1E3D5}.Debug|x86.Build.0 = Debug|Win32
+		{484AC8D8-5FA3-4D04-B781-3429F6F1E3D5}.Release|x64.ActiveCfg = Release|x64
+		{484AC8D8-5FA3-4D04-B781-3429F6F1E3D5}.Release|x64.Build.0 = Release|x64
+		{484AC8D8-5FA3-4D04-B781-3429F6F1E3D5}.Release|x86.ActiveCfg = Release|Win32
+		{484AC8D8-5FA3-4D04-B781-3429F6F1E3D5}.Release|x86.Build.0 = Release|Win32
+		{FE407CE7-136E-4730-9BDA-5FE54A67D1C9}.Debug|x64.ActiveCfg = Debug|x64
+		{FE407CE7-136E-4730-9BDA-5FE54A67D1C9}.Debug|x64.Build.0 = Debug|x64
+		{FE407CE7-136E-4730-9BDA-5FE54A67D1C9}.Debug|x86.ActiveCfg = Debug|Win32
+		{FE407CE7-136E-4730-9BDA-5FE54A67D1C9}.Debug|x86.Build.0 = Debug|Win32
+		{FE407CE7-136E-4730-9BDA-5FE54A67D1C9}.Release|x64.ActiveCfg = Release|x64
+		{FE407CE7-136E-4730-9BDA-5FE54A67D1C9}.Release|x64.Build.0 = Release|x64
+		{FE407CE7-136E-4730-9BDA-5FE54A67D1C9}.Release|x86.ActiveCfg = Release|Win32
+		{FE407CE7-136E-4730-9BDA-5FE54A67D1C9}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

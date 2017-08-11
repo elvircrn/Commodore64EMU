@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
+#include "../NES Emulator/CPU.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -9,9 +10,12 @@ namespace NESEmulatorTest
 	{
 	public:
 		
-		TEST_METHOD(TestMethod1)
+		TEST_METHOD(CPUTestFlags)
 		{
-			// TODO: Your test code here
+			CPU cpu;
+			cpu.AND();
+			cpu.SetFlag(Flags::V, 1);
+			Assert::AreEqual(cpu.GetFlag(Flags::V), true, L"V test failed", LINE_INFO());
 		}
 
 	};

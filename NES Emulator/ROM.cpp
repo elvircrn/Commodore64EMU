@@ -9,7 +9,7 @@ ROM::ROM()
 ROM::ROM(const std::vector<uint8_t>& _data) : data(_data)
 {
 	unsigned offset = 0x8000;
-	rst = static_cast<uint16_t>(data[0xfffd - offset] << 8 + data[0xfffc - offset]);
+	rst = static_cast<uint16_t>((data[0xfffd - offset] << 8) + data[0xfffc - offset]);
 }
 
 ROM::~ROM()

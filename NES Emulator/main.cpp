@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include "CPU.h"
 #include "FileHandler.h"
 
 void print_vector()
@@ -44,6 +44,8 @@ int main()
 
 	print_vector();
 	printVector(rom);
+
+	CPU cpu;
 
 	std::getchar();
 	return 0;

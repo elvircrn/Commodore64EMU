@@ -3,15 +3,22 @@
 #include <stdint.h>
 #include <vector>
 
+#include "core.h"
+
+// Flags
+enum Flags { C = 0, Z, I, D, B, _, V, N };
+
 class CPU
 {
+
 	// Registers
-	uint8_t  a; // Accumulator
-	uint8_t  x; // General purpose
-	uint8_t  y;
-	uint8_t  s; // Stack pointer
-	uint8_t  p; // Flags | N | V |   | B | D | I | Z | C |
-	uint16_t pc;
+	uint8_t  a = 0; // Accumulator
+	uint8_t  x = 0; // General purpose
+	uint8_t  y = 0;
+	uint8_t  s = 0; // Stack pointer
+	uint8_t  p = 0; // Flags | N | V |   | B | D | I | Z | C |
+	uint16_t pc = 0;
+
 
 	// Memory
 	std::vector<uint8_t> mem;
@@ -23,6 +30,25 @@ class CPU
 	std::vector<uint8_t> instr;
 
 public:
+	inline void SetFlag(Flags, bool);
+	inline bool GetFlag(Flags) const;
+
+	// Adressing modes
+	enum class AddressingMode
+	{ 
+		ACCUMULATOR,
+		IMMEDIATE,
+		IMPLIED,
+		RELATIVE,
+		ABSOLUTE,
+		ZERO_PAGE,
+		INDIRECT,
+		ABSOLUTE_INDEXED,
+		ZERO_PAGE_INDEXED,
+		INDEXED_INDIRECT,
+		INDIRECT_INDEXED
+	};
+
 	CPU();
 	CPU(uint16_t);
 	~CPU();
@@ -30,9 +56,7 @@ public:
 	void Tick();
 	void Execute();
 
-
 	// Memory map
-
 	void SetA(uint8_t);
 	void SetX(uint8_t);
 	void SetY(uint8_t);
@@ -47,7 +71,11 @@ public:
 	uint8_t GetP() const;
 	uint16_t GetPC() const;
 
+
+	// Instructions
 	void ADC();	//....	add with carry
+	void ADC(AddressingMode mode);	//....	add with carry
+
 	void AND();	//....	and (with accumulator)
 	void ASL();	//....	arithmetic shift left
 	void BCC();	//....	branch on carry clear
@@ -105,3 +133,15 @@ public:
 	void TYA();	//....	transfer Y to accumulator
 };
 
+// Inlined functions
+
+// Flags
+inline void CPU::SetFlag(Flags f, bool bit)
+{
+	p ^= (-(static_cast<int>(bit)) ^ p) & (1 << f);
+}
+
+inline bool CPU::GetFlag(Flags f) const
+{
+	return (p & (1 << f)) > 0;
+}

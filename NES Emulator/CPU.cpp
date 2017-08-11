@@ -1,5 +1,6 @@
 #include "CPU.h"
 
+
 CPU::CPU() : mem(MEM_SIZE)
 {
 	
@@ -20,10 +21,13 @@ void CPU::Tick()
 
 void CPU::Execute()
 {
-	switch (mem[pc])
+	switch (mem[pc++])
 	{
+		// Arithmetic expressions
+
+		// ADC
 		case 0x69:
-			SetA(a + mem[pc + 1]);
+			ADC(AddressingMode::IMMEDIATE);
 			break;
 	}
 }
@@ -87,11 +91,20 @@ uint16_t CPU::GetPC() const
 {
 	return pc;
 }
-//....	add with carry  
-void CPU::ADC()
-{
 
+//.... add with carry
+void CPU::ADC(AddressingMode mode)
+{
+	switch (mode)
+	{
+		case AddressingMode::IMMEDIATE:
+			a += mem[pc];
+			break;
+			
+
+	}
 }
+
 //....	and (with accumulator)  
 void CPU::AND()
 {

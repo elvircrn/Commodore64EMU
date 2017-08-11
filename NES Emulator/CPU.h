@@ -8,6 +8,26 @@
 // Flags
 enum Flags { C = 0, Z, I, D, B, _, V, N };
 
+// Adressing modes
+enum AddressingModes
+{
+	ACCUMULATOR,
+	IMMEDIATE,
+	IMPLIED,
+	RELATIVE,
+	ABSOLUTE,
+	ZERO_PAGE,
+	INDIRECT, // Only used by the JMP instruction
+	ABSOLUTE_INDEXED_X,
+	ABSOLUTE_INDEXED_Y,
+	ZERO_PAGE_INDEXED,
+	ZERO_PAGE_X,
+	ZERO_PAGE_Y,
+	INDEXED_INDIRECT,
+	INDIRECT_INDEXED
+};
+
+
 class CPU
 {
 
@@ -21,8 +41,11 @@ class CPU
 
 
 	// Memory
-	std::vector<uint8_t> mem;
-	constexpr static int MEM_SIZE = 0x10000;
+	constexpr static int INSTR_MEM_SIZE = 0x10000;
+	std::vector<u8> instrs;
+
+	constexpr static int RAM_SIZE = 0x800;
+	std::vector<u8> ram;
 
 	// Instructions
 	constexpr static int RESET_VECTOR = 0x0000;
@@ -30,9 +53,9 @@ class CPU
 	std::vector<uint8_t> instr;
 
 	// Addressing helpers
-	inline u8 Imm() { return mem[pc++]; }
-	inline u16 Abs() { u16 res = (mem[pc] << 8) | mem[pc + 1]; pc += 2; return res; }
-	inline u8 Zp() { Abs() & 0xff; }
+	inline u8 Imm() { return instrs[pc++]; }
+	inline u16 Abs() { u16 res = (instrs[pc] << 8) | instrs[pc + 1]; pc += 2; return res; }
+	inline u8 Zp(u8 addr) { return ram[addr]; }
 
 
 	// Flag helpers
@@ -45,14 +68,14 @@ class CPU
 	inline bool C() { return GetFlag(Flags::C); }
 
 public:
-	#pragma region Memory
+#pragma region Memory
+	//inline Read(u16) { }
+#pragma endregion
 
-	#pragma endregion
-
-	#pragma region Flags
+#pragma region Flags
 	inline void SetFlag(Flags, bool);
 	inline bool GetFlag(Flags) const;
-	
+
 	inline void UpdC(u8, u8, u16);
 	inline void UpdV(u8, u8, u16);
 	inline void UpdCV(u8, u8, u16);
@@ -60,24 +83,8 @@ public:
 	inline void UpdN(u8);
 	inline void UpdZ(u8);
 	inline void UpdNZ(u8);
-	#pragma endregion
+#pragma endregion
 
-	// Adressing modes
-	enum class AddressingModes
-	{ 
-		ACCUMULATOR,
-		IMMEDIATE,
-		IMPLIED,
-		RELATIVE,
-		ABSOLUTE,
-		ZERO_PAGE,
-		INDIRECT,
-		ABSOLUTE_INDEXED_X,
-		ABSOLUTE_INDEXED_Y,
-		ZERO_PAGE_INDEXED,
-		INDEXED_INDIRECT,
-		INDIRECT_INDEXED
-	};
 
 	CPU();
 	CPU(uint16_t);
@@ -86,7 +93,7 @@ public:
 	void Tick();
 	void Execute();
 
-	#pragma region Register getters and setters
+#pragma region Register getters and setters
 	void SetA(uint8_t);
 	void SetX(uint8_t);
 	void SetY(uint8_t);
@@ -100,11 +107,11 @@ public:
 	uint8_t GetS() const;
 	uint8_t GetP() const;
 	uint16_t GetPC() const;
-	#pragma endregion
+#pragma endregion
 
-	#pragma region Instructions
+#pragma region Instructions
+	template<AddressingModes mode>
 	void ADC();	//....	add with carry
-	void ADC(AddressingModes mode);	//....	add with carry
 
 	void AND();	//....	and (with accumulator)
 	void ASL();	//....	arithmetic shift left
@@ -161,7 +168,7 @@ public:
 	void TXA();	//....	transfer X to accumulator
 	void TXS();	//....	transfer X to stack pointer
 	void TYA();	//....	transfer Y to accumulator
-	#pragma endregion
+#pragma endregion
 };
 
 // Inlined functions
@@ -171,7 +178,6 @@ inline void CPU::SetFlag(Flags f, bool bit)
 {
 	p ^= (-(static_cast<int>(bit)) ^ p) & (1 << f);
 }
-
 
 inline bool CPU::GetFlag(Flags f) const
 {

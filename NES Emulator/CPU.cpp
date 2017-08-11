@@ -1,9 +1,9 @@
 #include "CPU.h"
 
 
-CPU::CPU() : mem(MEM_SIZE)
+CPU::CPU() : instrs(INSTR_MEM_SIZE)
 {
-	
+
 }
 
 CPU::CPU(uint16_t _rst) : rst(_rst)
@@ -21,12 +21,12 @@ void CPU::Tick()
 
 void CPU::Execute()
 {
-	switch (mem[pc++])
+	switch (instrs[pc++])
 	{
 		// Arithmetic expressions
 
 		// ADC
-		case 0x69: return ADC(AddressingModes::IMMEDIATE);
+		case 0x69: ADC<AddressingModes::IMMEDIATE>(); break;
 	}
 }
 
@@ -95,26 +95,31 @@ uint16_t CPU::GetPC() const
 #pragma endregion
 
 //.... add with carry
-void CPU::ADC(CPU::AddressingModes mode)
+template<AddressingModes mode>
+void CPU::ADC()
 {
 	u16 lhs;
 	u16 rhs;
 	u16 res;
 
+	// TODO: Use constexpr-if after VS update
 	switch (mode)
 	{
+		// OK
 		case AddressingModes::IMMEDIATE:
 			lhs = a;
 			rhs = Imm();
 			res = lhs + rhs + C();
 			a = res;
 			break;
+		// OK
 		case AddressingModes::ABSOLUTE:
 			lhs = a;
 			rhs = Abs();
 			res = lhs + rhs + C();
 			a = res;
 			break;
+		// OK
 		case AddressingModes::ABSOLUTE_INDEXED_X:
 			lhs = x;
 			rhs = Abs();
@@ -129,8 +134,63 @@ void CPU::ADC(CPU::AddressingModes mode)
 			break;
 		case AddressingModes::ZERO_PAGE:
 			lhs = y;
+			rhs = Zp(Imm());
+			a = lhs + rhs + C();
+			break;
+		case AddressingModes::INDEXED_INDIRECT:
+
 			break;
 	}
+
+
+	/*
+	if constexpr (mode == AddressingModes::IMMEDIATE)
+	{
+		lhs = a;
+		rhs = Imm();
+		res = lhs + rhs + C();
+		a = res;
+	}
+	if constexpr (mode == AddressingModes::ABSOLUTE)
+	{
+		lhs = a;
+		rhs = Abs();
+		res = lhs + rhs + C();
+		a = res;
+	}
+	if constexpr (mode == AddressingModes::ABSOLUTE)
+	{
+		lhs = x;
+		rhs = Abs();
+		res = lhs + rhs + C();
+		x = res;
+	}
+	if constexpr (mode == AddressingModes::ABSOLUTE_INDEXED_X)
+	{
+		lhs = x;
+		rhs = Abs();
+		res = lhs + rhs + C();
+		x = res;
+	}
+	else if constexpr (mode == AddressingModes::ABSOLUTE_INDEXED_Y)
+	{
+		lhs = y;
+		rhs = Abs();
+		res = lhs + rhs + C();
+		y = res;
+	}
+	if constexpr (mode == AddressingModes::ZERO_PAGE)
+	{
+		lhs = y;
+		rhs = Zp(Imm());
+		a = lhs + rhs + C();
+	}
+	if constexpr (mode == AddressingModes::INDEXED_INDIRECT)
+	{
+
+	}
+
+	*/
 
 	UpdCV(lhs, rhs, res);
 	UpdNZ(res);

@@ -32,6 +32,14 @@ class CPU
 public:
 	inline void SetFlag(Flags, bool);
 	inline bool GetFlag(Flags) const;
+	
+	inline void UpdC(u8, u8, u16);
+	inline void UpdV(u8, u8, u16);
+	inline void UpdCV(u8, u8, u16);
+
+	inline void UpdN(u8);
+	inline void UpdZ(u8);
+	inline void UpdNZ(u8);
 
 	// Adressing modes
 	enum class AddressingMode
@@ -56,7 +64,7 @@ public:
 	void Tick();
 	void Execute();
 
-	// Memory map
+	#pragma region Register getters and setters
 	void SetA(uint8_t);
 	void SetX(uint8_t);
 	void SetY(uint8_t);
@@ -70,9 +78,9 @@ public:
 	uint8_t GetS() const;
 	uint8_t GetP() const;
 	uint16_t GetPC() const;
+	#pragma endregion
 
-
-	// Instructions
+	#pragma region Instructions
 	void ADC();	//....	add with carry
 	void ADC(AddressingMode mode);	//....	add with carry
 
@@ -131,6 +139,7 @@ public:
 	void TXA();	//....	transfer X to accumulator
 	void TXS();	//....	transfer X to stack pointer
 	void TYA();	//....	transfer Y to accumulator
+	#pragma endregion
 };
 
 // Inlined functions
@@ -141,7 +150,40 @@ inline void CPU::SetFlag(Flags f, bool bit)
 	p ^= (-(static_cast<int>(bit)) ^ p) & (1 << f);
 }
 
+
 inline bool CPU::GetFlag(Flags f) const
 {
 	return (p & (1 << f)) > 0;
+}
+
+inline void CPU::UpdV(u8 x, u8 y, u16 r)
+{
+	SetFlag(Flags::V, ~(x ^ y)  & (r ^ x) & 0x80);
+}
+
+inline void CPU::UpdC(u8 x, u8 y, u16 r)
+{
+	SetFlag(Flags::C, 0xff < r);
+}
+
+inline void CPU::UpdCV(u8 x, u8 y, u16 r)
+{
+	UpdV(x, y, r);
+	UpdC(x, y, r);
+}
+
+inline void CPU::UpdN(u8 x)
+{
+	SetFlag(Flags::N, x & 0x80);
+}
+
+inline void CPU::UpdZ(u8 x)
+{
+	SetFlag(Flags::Z, !x);
+}
+
+inline void CPU::UpdNZ(u8 x)
+{
+	UpdN(x);
+	UpdZ(x);
 }

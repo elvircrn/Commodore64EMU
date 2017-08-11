@@ -26,11 +26,11 @@ void CPU::Execute()
 		// Arithmetic expressions
 
 		// ADC
-		case 0x69:
-			ADC(AddressingMode::IMMEDIATE);
-			break;
+		case 0x69: return ADC(AddressingMode::IMMEDIATE);
 	}
 }
+
+#pragma region Register getters and setters
 
 void CPU::SetA(uint8_t _a)
 {
@@ -92,16 +92,18 @@ uint16_t CPU::GetPC() const
 	return pc;
 }
 
+#pragma endregion
+
 //.... add with carry
 void CPU::ADC(AddressingMode mode)
 {
 	switch (mode)
 	{
 		case AddressingMode::IMMEDIATE:
-			a += mem[pc];
+			a += mem[pc] + GetFlag(Flags::C);
+			UpdCV(a, mem[pc], a + mem[pc] + GetFlag(Flags::C));
+			pc++;
 			break;
-			
-
 	}
 }
 

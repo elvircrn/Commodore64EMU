@@ -29,7 +29,27 @@ class CPU
 	uint16_t rst;
 	std::vector<uint8_t> instr;
 
+	// Addressing helpers
+	inline u8 Imm() { return mem[pc++]; }
+	inline u16 Abs() { u16 res = (mem[pc] << 8) | mem[pc + 1]; pc += 2; return res; }
+	inline u8 Zp() { Abs() & 0xff; }
+
+
+	// Flag helpers
+	inline bool N() { return GetFlag(Flags::N); }
+	inline bool V() { return GetFlag(Flags::V); }
+	inline bool B() { return GetFlag(Flags::B); }
+	inline bool D() { return GetFlag(Flags::D); }
+	inline bool I() { return GetFlag(Flags::I); }
+	inline bool Z() { return GetFlag(Flags::Z); }
+	inline bool C() { return GetFlag(Flags::C); }
+
 public:
+	#pragma region Memory
+
+	#pragma endregion
+
+	#pragma region Flags
 	inline void SetFlag(Flags, bool);
 	inline bool GetFlag(Flags) const;
 	
@@ -40,9 +60,10 @@ public:
 	inline void UpdN(u8);
 	inline void UpdZ(u8);
 	inline void UpdNZ(u8);
+	#pragma endregion
 
 	// Adressing modes
-	enum class AddressingMode
+	enum class AddressingModes
 	{ 
 		ACCUMULATOR,
 		IMMEDIATE,
@@ -51,7 +72,8 @@ public:
 		ABSOLUTE,
 		ZERO_PAGE,
 		INDIRECT,
-		ABSOLUTE_INDEXED,
+		ABSOLUTE_INDEXED_X,
+		ABSOLUTE_INDEXED_Y,
 		ZERO_PAGE_INDEXED,
 		INDEXED_INDIRECT,
 		INDIRECT_INDEXED
@@ -82,7 +104,7 @@ public:
 
 	#pragma region Instructions
 	void ADC();	//....	add with carry
-	void ADC(AddressingMode mode);	//....	add with carry
+	void ADC(AddressingModes mode);	//....	add with carry
 
 	void AND();	//....	and (with accumulator)
 	void ASL();	//....	arithmetic shift left

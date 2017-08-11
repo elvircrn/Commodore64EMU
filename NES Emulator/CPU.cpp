@@ -26,7 +26,7 @@ void CPU::Execute()
 		// Arithmetic expressions
 
 		// ADC
-		case 0x69: return ADC(AddressingMode::IMMEDIATE);
+		case 0x69: return ADC(AddressingModes::IMMEDIATE);
 	}
 }
 
@@ -95,16 +95,45 @@ uint16_t CPU::GetPC() const
 #pragma endregion
 
 //.... add with carry
-void CPU::ADC(AddressingMode mode)
+void CPU::ADC(CPU::AddressingModes mode)
 {
+	u16 lhs;
+	u16 rhs;
+	u16 res;
+
 	switch (mode)
 	{
-		case AddressingMode::IMMEDIATE:
-			a += mem[pc] + GetFlag(Flags::C);
-			UpdCV(a, mem[pc], a + mem[pc] + GetFlag(Flags::C));
-			pc++;
+		case AddressingModes::IMMEDIATE:
+			lhs = a;
+			rhs = Imm();
+			res = lhs + rhs + C();
+			a = res;
+			break;
+		case AddressingModes::ABSOLUTE:
+			lhs = a;
+			rhs = Abs();
+			res = lhs + rhs + C();
+			a = res;
+			break;
+		case AddressingModes::ABSOLUTE_INDEXED_X:
+			lhs = x;
+			rhs = Abs();
+			res = lhs + rhs + C();
+			x = res;
+			break;
+		case AddressingModes::ABSOLUTE_INDEXED_Y:
+			lhs = y;
+			rhs = Abs();
+			res = lhs + rhs + C();
+			y = res;
+			break;
+		case AddressingModes::ZERO_PAGE:
+			lhs = y;
 			break;
 	}
+
+	UpdCV(lhs, rhs, res);
+	UpdNZ(res);
 }
 
 //....	and (with accumulator)  

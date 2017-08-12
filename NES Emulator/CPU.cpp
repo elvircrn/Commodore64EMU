@@ -249,13 +249,52 @@ void CPU::ROR()
 	UpdNZ(res);
 }
 
-// TODO: Figure out how to update C properly
 template<AddressingModes mode>
 void CPU::SBC()
 {
+	u16 lhs = a ^ 0xff;
+	u16 rhs = GetOperand<mode>() + C();
+	u16 res = lhs + rhs;
+	a = res;
+	UpdCV(lhs, rhs, res);
+	UpdNZ(res);
 }
 
+template<AddressingModes mode>
+void CPU::SEC() { C(1); }
 
+template<AddressingModes mode>
+void CPU::SED() { D(1); }
+
+template<AddressingModes mode>
+void CPU::SEI() { I(1); }
+
+template<AddressingModes mode>
+void CPU::STA() { GetOperand<mode>() = a; }
+
+template<AddressingModes mode>
+void CPU::STX() { GetOperand<mode>() = x; }
+
+template<AddressingModes mode>
+void CPU::STY() { GetOperand<mode>() = y; }
+
+template<AddressingModes mode>
+void CPU::TAX() { x = a; UpdNZ(x); }
+
+template<AddressingModes mode>
+void CPU::TAY() { y = a; UpdNZ(y); }
+
+template<AddressingModes mode>
+void CPU::TSX() { s = x; UpdNZ(s); }
+
+template<AddressingModes mode>
+void CPU::TXA() { x = a; UpdNZ(x); }
+
+template<AddressingModes mode>
+void CPU::TXS() { x = s; UpdNZ(x); }
+
+template<AddressingModes mode>
+void CPU::TYA() { y = a; UpdNZ(y); }
 
 
 

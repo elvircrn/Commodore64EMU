@@ -23,10 +23,9 @@ enum AddressingModes
 	ZERO_PAGE_INDEXED,
 	ZERO_PAGE_X,
 	ZERO_PAGE_Y,
-	INDEXED_INDIRECT,
+	INDEXED_INDIRECT_X,
 	INDIRECT_INDEXED
 };
-
 
 class CPU
 {
@@ -55,8 +54,10 @@ class CPU
 	// Addressing helpers
 	inline u8 Imm() { return instrs[pc++]; }
 	inline u16 Abs() { u16 res = (instrs[pc] << 8) | instrs[pc + 1]; pc += 2; return res; }
+	inline u16 AbsX() { u16 res = (instrs[pc] << 8) | instrs[pc + 1]; pc += 2; return res + x; }
+	inline u16 AbsY() { u16 res = (instrs[pc] << 8) | instrs[pc + 1]; pc += 2; return res + y; }
 	inline u8 Zp(u8 addr) { return ram[addr]; }
-
+	inline bool CrossesZp(u16 addr) { return addr > 0xff; }
 
 	// Flag helpers
 	inline bool N() { return GetFlag(Flags::N); }
@@ -69,7 +70,7 @@ class CPU
 
 public:
 #pragma region Memory
-	//inline Read(u16) { }
+	inline u8 Read(u16 addr) { return ram[addr]; }
 #pragma endregion
 
 #pragma region Flags
@@ -169,6 +170,9 @@ public:
 	void TXS();	//....	transfer X to stack pointer
 	void TYA();	//....	transfer Y to accumulator
 #pragma endregion
+
+	template<AddressingModes m>
+	u16 GetOperand();
 };
 
 // Inlined functions

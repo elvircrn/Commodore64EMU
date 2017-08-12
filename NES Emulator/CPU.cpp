@@ -1,7 +1,7 @@
 #include "CPU.h"
 
 
-CPU::CPU() : instrs(INSTR_MEM_SIZE)
+CPU::CPU() : instrs(INSTR_MEM_SIZE), ram(RAM_SIZE)
 {
 
 }
@@ -98,102 +98,89 @@ uint16_t CPU::GetPC() const
 template<AddressingModes mode>
 void CPU::ADC()
 {
-	u16 lhs;
-	u16 rhs;
-	u16 res;
+	u16 lhs = a;
+	u16 rhs = GetOperand<mode>() + C();
+	u16 res = lhs + rhs;
+	a = res;
+
+	rhs = GetOperand<mode>();
 
 	// TODO: Use constexpr-if after VS update
 	switch (mode)
 	{
-		// OK
+		// ADC #2 -> A + #2
 		case AddressingModes::IMMEDIATE:
-			lhs = a;
-			rhs = Imm();
-			res = lhs + rhs + C();
+			rhs = Imm() + C();
+			res = lhs + rhs;
 			a = res;
 			break;
-		// OK
+		// ADC $3420 -> A + contents of memory $3420
 		case AddressingModes::ABSOLUTE:
-			lhs = a;
-			rhs = Abs();
-			res = lhs + rhs + C();
+			rhs = Abs() + C();
+			res = lhs + rhs;
 			a = res;
 			break;
-		// OK
+		// ADC $3420,X -> A + contents of memory $3420 + X
 		case AddressingModes::ABSOLUTE_INDEXED_X:
-			lhs = x;
-			rhs = Abs();
-			res = lhs + rhs + C();
-			x = res;
+			rhs = Read(AbsX()) + C();
+			res = lhs + rhs;
+			a = res;
 			break;
+		// ADC $3420,Y	-> A + contents of memory $3420 + Y
 		case AddressingModes::ABSOLUTE_INDEXED_Y:
-			lhs = y;
-			rhs = Abs();
-			res = lhs + rhs + C();
-			y = res;
+			rhs = Read(AbsY()) + C();
+			res = lhs + rhs;
+			a = res;
 			break;
+		// ADC $F6 -> A + contents of memory $F6
 		case AddressingModes::ZERO_PAGE:
-			lhs = y;
-			rhs = Zp(Imm());
-			a = lhs + rhs + C();
+			rhs = Read(Zp(Imm())) + C();
+			res = lhs + rhs;
+			a = res;
 			break;
-		case AddressingModes::INDEXED_INDIRECT:
-
+		// ADC ($F6,X) -> A + contents of address at [$F6 + X]
+		case AddressingModes::INDEXED_INDIRECT_X:
+			rhs = Zp(Imm() + x) + C();
+			res = lhs + rhs;
+			a = res;
+			break;
+		// ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
+		case AddressingModes::INDIRECT_INDEXED:
+			rhs = Zp(Imm()) + y + C();
+			res = lhs + rhs;
 			break;
 	}
-
-
-	/*
-	if constexpr (mode == AddressingModes::IMMEDIATE)
-	{
-		lhs = a;
-		rhs = Imm();
-		res = lhs + rhs + C();
-		a = res;
-	}
-	if constexpr (mode == AddressingModes::ABSOLUTE)
-	{
-		lhs = a;
-		rhs = Abs();
-		res = lhs + rhs + C();
-		a = res;
-	}
-	if constexpr (mode == AddressingModes::ABSOLUTE)
-	{
-		lhs = x;
-		rhs = Abs();
-		res = lhs + rhs + C();
-		x = res;
-	}
-	if constexpr (mode == AddressingModes::ABSOLUTE_INDEXED_X)
-	{
-		lhs = x;
-		rhs = Abs();
-		res = lhs + rhs + C();
-		x = res;
-	}
-	else if constexpr (mode == AddressingModes::ABSOLUTE_INDEXED_Y)
-	{
-		lhs = y;
-		rhs = Abs();
-		res = lhs + rhs + C();
-		y = res;
-	}
-	if constexpr (mode == AddressingModes::ZERO_PAGE)
-	{
-		lhs = y;
-		rhs = Zp(Imm());
-		a = lhs + rhs + C();
-	}
-	if constexpr (mode == AddressingModes::INDEXED_INDIRECT)
-	{
-
-	}
-
-	*/
 
 	UpdCV(lhs, rhs, res);
 	UpdNZ(res);
+}
+
+template<AddressingModes mode>
+u16 CPU::GetOperand()
+{
+	switch (mode)
+	{
+		case AddressingModes::IMMEDIATE:
+			return Imm();
+		// ADC $3420 -> A + contents of memory $3420
+		case AddressingModes::ABSOLUTE:
+			return Abs() + C();
+		// ADC $3420,X -> A + contents of memory $3420 + X
+		case AddressingModes::ABSOLUTE_INDEXED_X:
+			return Read(AbsX());
+		// ADC $3420,Y	-> A + contents of memory $3420 + Y
+		case AddressingModes::ABSOLUTE_INDEXED_Y:
+			return Read(AbsY());
+		// ADC $F6 -> A + contents of memory $F6
+		case AddressingModes::ZERO_PAGE:
+			return Read(Zp(Imm()));
+		// ADC ($F6,X) -> A + contents of address at [$F6 + X]
+		case AddressingModes::INDEXED_INDIRECT_X:
+			return Zp(Imm() + x);
+		// ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
+		case AddressingModes::INDIRECT_INDEXED:
+			return Zp(Imm()) + y;
+	}
 }
 
 //....	and (with accumulator)  

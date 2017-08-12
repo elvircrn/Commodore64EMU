@@ -29,7 +29,6 @@ enum AddressingModes
 
 class CPU
 {
-
 	// Registers
 	uint8_t  a = 0; // Accumulator
 	uint8_t  x = 0; // General purpose
@@ -38,10 +37,10 @@ class CPU
 	uint8_t  p = 0; // Flags | N | V |   | B | D | I | Z | C |
 	uint16_t pc = 0;
 
-
 	// Memory
 	constexpr static int INSTR_MEM_SIZE = 0x10000;
 	std::vector<u8> instrs;
+	u8 buff;
 
 	constexpr static int RAM_SIZE = 0x800;
 	std::vector<u8> ram;
@@ -51,12 +50,18 @@ class CPU
 	uint16_t rst;
 	std::vector<uint8_t> instr;
 
+	// Instruction helpers
+	inline u8 _ASL(u8 &x) { C(x & 0x80); x << 1; return x; }
+	inline u8 _ROL(u8& x) { return x = (((x & 0x80) ? 1 : 0) | (x << 1)); }
+	inline u8 _ROR(u8& x) { return x = (((x & 0x01) ? 0x80 : 0) | (x >> 1)); }
+
+
 	// Addressing helpers
 	inline u8 Imm() { return instrs[pc++]; }
 	inline u16 Abs() { u16 res = (instrs[pc] << 8) | instrs[pc + 1]; pc += 2; return res; }
 	inline u16 AbsX() { u16 res = (instrs[pc] << 8) | instrs[pc + 1]; pc += 2; return res + x; }
 	inline u16 AbsY() { u16 res = (instrs[pc] << 8) | instrs[pc + 1]; pc += 2; return res + y; }
-	inline u8 Zp(u8 addr) { return ram[addr]; }
+	inline u8& Zp(u8 addr) { return ram[addr]; }
 	inline bool CrossesZp(u16 addr) { return addr > 0xff; }
 
 	// Flag helpers
@@ -68,9 +73,17 @@ class CPU
 	inline bool Z() { return GetFlag(Flags::Z); }
 	inline bool C() { return GetFlag(Flags::C); }
 
+	inline void N(bool x) { SetFlag(Flags::N, x); }
+	inline void V(bool x) { SetFlag(Flags::V, x); }
+	inline void B(bool x) { SetFlag(Flags::B, x); }
+	inline void D(bool x) { SetFlag(Flags::D, x); }
+	inline void I(bool x) { SetFlag(Flags::I, x); }
+	inline void Z(bool x) { SetFlag(Flags::Z, x); }
+	inline void C(bool x) { SetFlag(Flags::C, x); }
+
 public:
 #pragma region Memory
-	inline u8 Read(u16 addr) { return ram[addr]; }
+	inline u8& Read(u16 addr) { return ram[addr]; }
 #pragma endregion
 
 #pragma region Flags
@@ -114,65 +127,122 @@ public:
 	template<AddressingModes mode>
 	void ADC();	//....	add with carry
 
+	template<AddressingModes mode>
 	void AND();	//....	and (with accumulator)
+
+	template<AddressingModes mode>
 	void ASL();	//....	arithmetic shift left
+
+	template<AddressingModes mode>
 	void BCC();	//....	branch on carry clear
+	template<AddressingModes mode>
 	void BCS();	//....	branch on carry set
+	template<AddressingModes mode>
 	void BEQ();	//....	branch on equal (zero set)
+	template<AddressingModes mode>
 	void BIT();	//....	bit test
+	template<AddressingModes mode>
 	void BMI();	//....	branch on minus (negative set)
+	template<AddressingModes mode>
 	void BNE();	//....	branch on not equal (zero clear)
+	template<AddressingModes mode>
 	void BPL();	//....	branch on plus (negative clear)
+	template<AddressingModes mode>
 	void BRK();	//....	interrupt
+	template<AddressingModes mode>
 	void BVC();	//....	branch on overflow clear
+	template<AddressingModes mode>
 	void BVS();	//....	branch on overflow set
+	template<AddressingModes mode>
 	void CLC();	//....	clear carry
+	template<AddressingModes mode>
 	void CLD();	//....	clear decimal
+	template<AddressingModes mode>
 	void CLI();	//....	clear interrupt disable
+	template<AddressingModes mode>
 	void CLV();	//....	clear overflow
+	template<AddressingModes mode>
 	void CMP();	//....	compare (with accumulator)
+	template<AddressingModes mode>
 	void CPX();	//....	compare with X
+	template<AddressingModes mode>
 	void CPY();	//....	compare with Y
+	template<AddressingModes mode>
 	void DEC();	//....	decrement
+	template<AddressingModes mode>
 	void DEX();	//....	decrement X
+	template<AddressingModes mode>
 	void DEY();	//....	decrement Y
+	template<AddressingModes mode>
 	void EOR();	//....	exclusive or (with accumulator)
+	template<AddressingModes mode>
 	void INC();	//....	increment
+	template<AddressingModes mode>
 	void INX();	//....	increment X
+	template<AddressingModes mode>
 	void INY();	//....	increment Y
+	template<AddressingModes mode>
 	void JMP();	//....	jump
+	template<AddressingModes mode>
 	void JSR();	//....	jump subroutine
+	template<AddressingModes mode>
 	void LDA();	//....	load accumulator
+	template<AddressingModes mode>
 	void LDX();	//....	load X
+	template<AddressingModes mode>
 	void LDY();	//....	load Y
+	template<AddressingModes mode>
 	void LSR();	//....	logical shift right
+	template<AddressingModes mode>
 	void NOP();	//....	no operation
+	template<AddressingModes mode>
 	void ORA();	//....	or with accumulator
+	template<AddressingModes mode>
 	void PHA();	//....	push accumulator
+	template<AddressingModes mode>
 	void PHP();	//....	push processor status (SR)
+	template<AddressingModes mode>
 	void PLA();	//....	pull accumulator
+	template<AddressingModes mode>
 	void PLP();	//....	pull processor status (SR)
+	template<AddressingModes mode>
 	void ROL();	//....	rotate left
+	template<AddressingModes mode>
 	void ROR();	//....	rotate right
+	template<AddressingModes mode>
 	void RTI();	//....	return from interrupt
+	template<AddressingModes mode>
 	void RTS();	//....	return from subroutine
+	template<AddressingModes mode>
 	void SBC();	//....	subtract with carry
+	template<AddressingModes mode>
 	void SEC();	//....	set carry
+	template<AddressingModes mode>
 	void SED();	//....	set decimal
+	template<AddressingModes mode>
 	void SEI();	//....	set interrupt disable
+	template<AddressingModes mode>
 	void STA();	//....	store accumulator
+	template<AddressingModes mode>
 	void STX();	//....	store X
+	template<AddressingModes mode>
 	void STY();	//....	store Y
+	template<AddressingModes mode>
 	void TAX();	//....	transfer accumulator to X
+	template<AddressingModes mode>
 	void TAY();	//....	transfer accumulator to Y
+	template<AddressingModes mode>
 	void TSX();	//....	transfer stack pointer to X
+	template<AddressingModes mode>
 	void TXA();	//....	transfer X to accumulator
+	template<AddressingModes mode>
 	void TXS();	//....	transfer X to stack pointer
+	template<AddressingModes mode>
 	void TYA();	//....	transfer Y to accumulator
 #pragma endregion
 
 	template<AddressingModes m>
-	u16 GetOperand();
+	u8& GetOperand();
 };
 
 // Inlined functions
@@ -219,3 +289,4 @@ inline void CPU::UpdNZ(u8 x)
 	UpdN(x);
 	UpdZ(x);
 }
+

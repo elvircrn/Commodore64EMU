@@ -27,6 +27,27 @@ void CPU::Execute()
 
 		// ADC
 		case 0x69: ADC<AddressingModes::IMMEDIATE>(); break;
+		case 0x65: ADC<AddressingModes::ZERO_PAGE>(); break;
+		case 0x75: ADC<AddressingModes::ZERO_PAGE_X>(); break;
+		case 0x6D: ADC<AddressingModes::ABSOLUTE>(); break;
+		case 0x7D: ADC<AddressingModes::ABSOLUTE_INDEXED_X>(); break;
+		case 0x79: ADC<AddressingModes::ABSOLUTE_INDEXED_Y>(); break;
+		case 0x71: ADC<AddressingModes::INDEXED_INDIRECT_X>(); break;
+		case 0x61: ADC<AddressingModes::INDIRECT_INDEXED>(); break;
+
+		// AND
+		case 0x29: AND<AddressingModes::IMMEDIATE>(); break;
+		case 0x25: AND<AddressingModes::ZERO_PAGE>(); break;
+		case 0x35: AND<AddressingModes::ZERO_PAGE_X>(); break;
+		case 0x2D: AND<AddressingModes::ABSOLUTE>(); break;
+		case 0x3D: AND<AddressingModes::ABSOLUTE_INDEXED_X>(); break;
+		case 0x39: AND<AddressingModes::ABSOLUTE_INDEXED_Y>(); break;
+		case 0x21: AND<AddressingModes::INDEXED_INDIRECT_X>(); break;
+		case 0x31: AND<AddressingModes::INDIRECT_INDEXED>(); break;
+
+		// ASL
+
+		
 	}
 }
 
@@ -94,77 +115,19 @@ uint16_t CPU::GetPC() const
 
 #pragma endregion
 
-//.... add with carry
+#pragma region Instruction helpers
 template<AddressingModes mode>
-void CPU::ADC()
-{
-	u16 lhs = a;
-	u16 rhs = GetOperand<mode>() + C();
-	u16 res = lhs + rhs;
-	a = res;
-
-	rhs = GetOperand<mode>();
-
-	// TODO: Use constexpr-if after VS update
-	switch (mode)
-	{
-		// ADC #2 -> A + #2
-		case AddressingModes::IMMEDIATE:
-			rhs = Imm() + C();
-			res = lhs + rhs;
-			a = res;
-			break;
-		// ADC $3420 -> A + contents of memory $3420
-		case AddressingModes::ABSOLUTE:
-			rhs = Abs() + C();
-			res = lhs + rhs;
-			a = res;
-			break;
-		// ADC $3420,X -> A + contents of memory $3420 + X
-		case AddressingModes::ABSOLUTE_INDEXED_X:
-			rhs = Read(AbsX()) + C();
-			res = lhs + rhs;
-			a = res;
-			break;
-		// ADC $3420,Y	-> A + contents of memory $3420 + Y
-		case AddressingModes::ABSOLUTE_INDEXED_Y:
-			rhs = Read(AbsY()) + C();
-			res = lhs + rhs;
-			a = res;
-			break;
-		// ADC $F6 -> A + contents of memory $F6
-		case AddressingModes::ZERO_PAGE:
-			rhs = Read(Zp(Imm())) + C();
-			res = lhs + rhs;
-			a = res;
-			break;
-		// ADC ($F6,X) -> A + contents of address at [$F6 + X]
-		case AddressingModes::INDEXED_INDIRECT_X:
-			rhs = Zp(Imm() + x) + C();
-			res = lhs + rhs;
-			a = res;
-			break;
-		// ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
-		case AddressingModes::INDIRECT_INDEXED:
-			rhs = Zp(Imm()) + y + C();
-			res = lhs + rhs;
-			break;
-	}
-
-	UpdCV(lhs, rhs, res);
-	UpdNZ(res);
-}
-
-template<AddressingModes mode>
-u16 CPU::GetOperand()
+u8& CPU::GetOperand()
 {
 	switch (mode)
 	{
+		// ADC #2 -> A + 2
 		case AddressingModes::IMMEDIATE:
-			return Imm();
+			buff = Imm();
+			return buff;
 		// ADC $3420 -> A + contents of memory $3420
 		case AddressingModes::ABSOLUTE:
-			return Abs() + C();
+			return Read(Abs());
 		// ADC $3420,X -> A + contents of memory $3420 + X
 		case AddressingModes::ABSOLUTE_INDEXED_X:
 			return Read(AbsX());
@@ -179,285 +142,120 @@ u16 CPU::GetOperand()
 			return Zp(Imm() + x);
 		// ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
 		case AddressingModes::INDIRECT_INDEXED:
-			return Zp(Imm()) + y;
+			buff = Zp(Imm()) + y;
+			return buff;
+		case AddressingModes::ACCUMULATOR:
+			return a;
 	}
+}
+#pragma endregion
+
+//.... add with carry
+template<AddressingModes mode>
+void CPU::ADC()
+{
+	u16 lhs = a;
+	u16 rhs = GetOperand<mode>() + C();
+	u16 res = lhs + rhs;
+	a = res;
+	UpdCV(lhs, rhs, res);
+	UpdNZ(res);
 }
 
 //....	and (with accumulator)  
-void CPU::AND()
-{
+template<AddressingModes mode>
+void CPU::AND() { UpdNZ(a &= GetOperand<mode>()); }
 
-}
 //....	arithmetic shift left  
-void CPU::ASL()
-{
+template<AddressingModes mode>
+void CPU::ASL() { UpdNZ(_ASL(GetOperand<mode>())); }
 
-}
-//....	branch on carry clear  
-void CPU::BCC()
-{
-
-}
-//....	branch on carry set  
-void CPU::BCS()
-{
-
-}
-//....	branch on equal (zero set)  
-void CPU::BEQ()
-{
-
-}
-//....	bit test  
+template<AddressingModes mode>
 void CPU::BIT()
 {
-
-}
-//....	branch on minus (negative set)  
-void CPU::BMI()
-{
-
-}
-//....	branch on not equal (zero clear)  
-void CPU::BNE()
-{
-
-}
-//....	branch on plus (negative clear)  
-void CPU::BPL()
-{
-
-}
-//....	interrupt  
-void CPU::BRK()
-{
-
-}
-//....	branch on overflow clear  
-void CPU::BVC()
-{
-
-}
-//....	branch on overflow set  
-void CPU::BVS()
-{
-
-}
-//....	clear carry  
-void CPU::CLC()
-{
-
-}
-//....	clear decimal  
-void CPU::CLD()
-{
-
-}
-//....	clear interrupt disable  
-void CPU::CLI()
-{
-
-}
-//....	clear overflow  
-void CPU::CLV()
-{
-
-}
-//....	compare (with accumulator)  
-void CPU::CMP()
-{
-
-}
-//....	compare with X  
-void CPU::CPX()
-{
-
-}
-//....	compare with Y  
-void CPU::CPY()
-{
-
-}
-//....	decrement  
-void CPU::DEC()
-{
-
-}
-//....	decrement X  
-void CPU::DEX()
-{
-
-}
-//....	decrement Y  
-void CPU::DEY()
-{
-
-}
-//....	exclusive or (with accumulator)  
-void CPU::EOR()
-{
-
-}
-//....	increment  
-void CPU::INC()
-{
-
-}
-//....	increment X  
-void CPU::INX()
-{
-
-}
-//....	increment Y 
-void CPU::INY()
-{
-
-}
-//....	jump  
-void CPU::JMP()
-{
-
-}
-//....	jump subroutine  
-void CPU::JSR()
-{
-
-}
-//....	load accumulator  
-void CPU::LDA()
-{
-
+	u8 res = a & GetOperand<mode>();
+	UpdNZ(res);
+	V(res & (1 << 6));
 }
 
-//....	load X  
-void CPU::LDX()
-{
+template<AddressingModes mode>
+void CPU::CLC() { C(0); }
 
-}
+template<AddressingModes mode>
+void CPU::CLD() { D(0); }
 
-//....	load Y
-void CPU::LDY()
-{
+template<AddressingModes mode>
+void CPU::CLI() { I(0); }
 
-}
-//....	logical shift right  
+template<AddressingModes mode>
+void CPU::CLV() { V(0); }
+
+template<AddressingModes mode>
+void CPU::DEC() { UpdNZ(--GetOperand<mode>()); }
+
+template<AddressingModes mode>
+void CPU::DEX() { UpdateNZ(--x); }
+
+template<AddressingModes mode>
+void CPU::DEY() { UpdateNZ(--y); }
+
+template<AddressingModes mode>
+void CPU::EOR() { UpdNZ(a ^= GetOperand<mode>()); }
+
+template<AddressingModes mode>
+void CPU::INC() { UpdNZ(++GetOperand<mode>()); }
+
+template<AddressingModes mode>
+void CPU::INX() { UpdNZ(++x); }
+
+template<AddressingModes mode>
+void CPU::INY() { UpdNZ(++y); }
+
+template<AddressingModes mode>
+void CPU::LDA() { UpdNZ(a = GetOperand<mode>()); }
+
+template<AddressingModes mode>
+void CPU::LDX() { UpdNZ(x = GetOperand<mode>()); }
+
+template<AddressingModes mode>
+void CPU::LDY() { UpdNZ(y = GetOperand<mode>()); }
+
+template<AddressingModes mode>
 void CPU::LSR()
 {
-
+	UpdC(GetOperand<mode>() & 1);
+	UpdNZ(GetOperand<mode>() <<= 1);
 }
-//....	no operation  
-void CPU::NOP()
-{
 
-}
-//....	or with accumulator  
-void CPU::ORA()
-{
+template<AddressingModes mode>
+void CPU::NOP() { }
 
-}
-//....	push accumulator  
-void CPU::PHA()
-{
+template<AddressingModes mode>
+void CPU::ORA() { UpdNZ(a |= GetOperand<mode>()); }
 
-}
-//....	push processor status (SR)  
-void CPU::PHP()
-{
-
-}
-//....	pull accumulator  
-void CPU::PLA()
-{
-
-}
-//....	pull processor status (SR)  
-void CPU::PLP()
-{
-
-}
-//....	rotate left  
+template<AddressingModes mode>
 void CPU::ROL()
 {
-
+	UpdC(a & 0x80);
+	u8 res = _ROL(GetOperand<mode>());
+	UpdNZ(res);
 }
-//....	rotate right  
+
+template<AddressingModes mode>
 void CPU::ROR()
 {
-
+	UpdC(a & 0x80);
+	u8 res = _ROR(GetOperand<mode>());
+	UpdNZ(res);
 }
-//....	return from interrupt  
-void CPU::RTI()
-{
 
-}
-//....	return from subroutine  
-void CPU::RTS()
-{
-
-}
-//....	subtract with carry  
+// TODO: Figure out how to update C properly
+template<AddressingModes mode>
 void CPU::SBC()
 {
-
 }
-//....	set carry  
-void CPU::SEC()
-{
 
-}
-//....	set decimal  
-void CPU::SED()
-{
 
-}
-//....	set interrupt disable  
-void CPU::SEI()
-{
 
-}
-//....	store accumulator  
-void CPU::STA()
-{
 
-}
-//....	store X  
-void CPU::STX()
-{
-
-}
-//....	store Y  
-void CPU::STY()
-{
-
-}
-//....	transfer accumulator to X  
-void CPU::TAX()
-{
-
-}
-//....	transfer accumulator to Y  
-void CPU::TAY()
-{
-
-}
-//....	transfer stack pointer to X  
-void CPU::TSX()
-{
-
-}
-//....	transfer X to accumulator  
-void CPU::TXA()
-{
-
-}
-//....	transfer X to stack pointer  
-void CPU::TXS()
-{
-
-}
-//....	transfer Y to accumulator  
-void CPU::TYA()
-{
-
-}
 

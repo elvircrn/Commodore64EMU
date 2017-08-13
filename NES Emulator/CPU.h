@@ -9,7 +9,7 @@
 enum Flags { C = 0, Z, I, D, B, _, V, N };
 
 // Adressing modes
-enum AddressingModes
+enum class AddressingModes
 {
 	ACCUMULATOR,
 	IMMEDIATE,
@@ -55,7 +55,6 @@ class CPU
 	inline u8 _ROL(u8& x) { return x = (((x & 0x80) ? 1 : 0) | (x << 1)); }
 	inline u8 _ROR(u8& x) { return x = (((x & 0x01) ? 0x80 : 0) | (x >> 1)); }
 
-
 	// Addressing helpers
 	inline u8 Imm() { return instrs[pc++]; }
 	inline u16 Abs() { u16 res = (instrs[pc] << 8) | instrs[pc + 1]; pc += 2; return res; }
@@ -84,6 +83,7 @@ class CPU
 public:
 #pragma region Memory
 	inline u8& Read(u16 addr) { return ram[addr]; }
+	inline u8& Stk(u8 addr) { return ram[0x0100 + addr]; }
 #pragma endregion
 
 #pragma region Flags
@@ -98,7 +98,6 @@ public:
 	inline void UpdZ(u8);
 	inline void UpdNZ(u8);
 #pragma endregion
-
 
 	CPU();
 	CPU(uint16_t);
@@ -126,13 +125,10 @@ public:
 #pragma region Instructions
 	template<AddressingModes mode>
 	void ADC();	//....	add with carry
-
 	template<AddressingModes mode>
 	void AND();	//....	and (with accumulator)
-
 	template<AddressingModes mode>
 	void ASL();	//....	arithmetic shift left
-
 	template<AddressingModes mode>
 	void BCC();	//....	branch on carry clear
 	template<AddressingModes mode>

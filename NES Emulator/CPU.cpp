@@ -98,6 +98,7 @@ void CPU::Execute()
 		case 0xEE: INC<AddressingModes::ABSOLUTE>(); break;
 		case 0xFE: INC<AddressingModes::ABSOLUTE_INDEXED_X>(); break;
 		case 0x4C: JMP<AddressingModes::ABSOLUTE>(); break;
+		case 0x6C: JMP<AddressingModes::INDIRECT>(); break;
 		case 0x20: JSR<AddressingModes::ABSOLUTE>(); break;
 		case 0xA9: LDA<AddressingModes::IMMEDIATE>(); break;
 		case 0xA5: LDA<AddressingModes::ZERO_PAGE>(); break;
@@ -177,9 +178,6 @@ void CPU::Execute()
 		case 0x68: PLA<AddressingModes::IMPLIED>(); break;
 		case 0x08: PHP<AddressingModes::IMPLIED>(); break;
 		case 0x28: PLP<AddressingModes::IMPLIED>(); break;
-
-
-		
 	}
 }
 
@@ -278,6 +276,15 @@ u8& CPU::GetOperand()
 			return buff;
 		case AddressingModes::ACCUMULATOR:
 			return a;
+		// TODO: Check if -1 is needed
+		case AddressingModes::RELATIVE:
+			buff = pc + Imm();
+			return buff;
+		// TODO: Check if -2 is needed
+		case AddressingModes::INDIRECT:
+			return Read(Abs());
+		default:
+			throw "Wrong addressing mode implemented!";
 	}
 }
 #pragma endregion
@@ -302,19 +309,27 @@ void CPU::AND() { UpdNZ(a &= GetOperand<mode>()); }
 template<AddressingModes mode>
 void CPU::ASL() { UpdNZ(_ASL(GetOperand<mode>())); }
 
+// TODO: Consider refactoring into a non-templated function
 template<AddressingModes mode>
 void CPU::BCC()
 {
+	u8 loc = GetOperand<mode>();
+	if (!C())
+		pc = loc;
 }
 
 template<AddressingModes mode>
 void CPU::BCS()
 {
+	u8 loc = GetOperand<mode>();
+	pc = C() ? loc : pc;
 }
 
 template<AddressingModes mode>
 void CPU::BEQ()
 {
+	u8 loc = GetOperand<mode>();
+	pc = Z() ? loc : pc;
 }
 
 template<AddressingModes mode>
@@ -328,31 +343,42 @@ void CPU::BIT()
 template<AddressingModes mode>
 void CPU::BMI()
 {
+	u8 loc = GetOperand<mode>();
+	pc = N() ? loc : pc;
 }
 
 template<AddressingModes mode>
 void CPU::BNE()
 {
+	u8 loc = GetOperand<mode>();
+	pc = !Z() ? loc : pc;
 }
 
 template<AddressingModes mode>
 void CPU::BPL()
 {
+	u8 loc = GetOperand<mode>();
+	pc = !N() ? loc : pc;
 }
 
 template<AddressingModes mode>
 void CPU::BRK()
 {
+	
 }
 
 template<AddressingModes mode>
 void CPU::BVC()
 {
+	u8 loc = GetOperand<mode>();
+	pc = !V() ? loc : pc;
 }
 
 template<AddressingModes mode>
 void CPU::BVS()
 {
+	u8 loc = GetOperand<mode>();
+	pc = V() ? loc : pc;
 }
 
 template<AddressingModes mode>
@@ -370,16 +396,25 @@ void CPU::CLV() { V(0); }
 template<AddressingModes mode>
 void CPU::CMP()
 {
+	u8 mem = GetOperand<mode>();
+	UpdNZ(a - mem);
+	C(a >= mem);
 }
 
 template<AddressingModes mode>
 void CPU::CPX()
 {
+	u8 mem = GetOperand<mode>();
+	UpdNZ(x - mem);
+	C(x >= mem);
 }
 
 template<AddressingModes mode>
 void CPU::CPY()
 {
+	u8 mem = GetOperand<mode>();
+	UpdNZ(y - mem);
+	C(y >= mem);
 }
 
 template<AddressingModes mode>
@@ -404,9 +439,7 @@ template<AddressingModes mode>
 void CPU::INY() { UpdNZ(++y); }
 
 template<AddressingModes mode>
-void CPU::JMP()
-{
-}
+void CPU::JMP() { pc = GetOperand<mode>(); }
 
 template<AddressingModes mode>
 void CPU::JSR()

@@ -59,6 +59,7 @@ void CPU::Execute()
 		case 0xB0: BCS<AddressingModes::RELATIVE>(); break;
 		case 0xD0: BNE<AddressingModes::RELATIVE>(); break;
 		case 0xF0: BEQ<AddressingModes::RELATIVE>(); break;
+		// TODO :Implement the BRK instruction
 		case 0x00: BRK<AddressingModes::IMPLIED>(); break;
 		case 0xC9: CMP<AddressingModes::IMMEDIATE>(); break;
 		case 0xC5: CMP<AddressingModes::ZERO_PAGE>(); break;
@@ -200,7 +201,7 @@ void CPU::SetY(uint8_t _y)
 
 void CPU::SetS(uint8_t _s)
 {
-	s = _s;
+	sp = _s;
 }
 
 void CPU::SetP(uint8_t _p)
@@ -230,7 +231,7 @@ uint8_t CPU::GetY() const
 
 uint8_t CPU::GetS() const
 {
-	return s;
+	return sp;
 }
 
 uint8_t CPU::GetP() const
@@ -361,6 +362,8 @@ void CPU::BPL()
 	pc = !N() ? loc : pc;
 }
 
+// TODO: Consider implementing
+// NOTE: Mostly used for debugging.
 template<AddressingModes mode>
 void CPU::BRK()
 {
@@ -441,9 +444,12 @@ void CPU::INY() { UpdNZ(++y); }
 template<AddressingModes mode>
 void CPU::JMP() { pc = GetOperand<mode>(); }
 
+// TODO: Check if pc - 1 or pc + 1
 template<AddressingModes mode>
 void CPU::JSR()
 {
+	Push16(pc + 1);
+	pc = Abs();
 }
 
 template<AddressingModes mode>
@@ -471,21 +477,30 @@ void CPU::ORA() { UpdNZ(a |= GetOperand<mode>()); }
 template<AddressingModes mode>
 void CPU::PHA()
 {
+	Push8(a);
+	pc++;
 }
 
 template<AddressingModes mode>
 void CPU::PHP()
 {
+	Push8(p);
+	pc++;
 }
 
 template<AddressingModes mode>
 void CPU::PLA()
 {
+	a = Pop8();
+	pc++;
+	UpdNZ(a);
 }
 
 template<AddressingModes mode>
 void CPU::PLP()
 {
+	p = Pop8();
+	pc++;
 }
 
 template<AddressingModes mode>
@@ -507,11 +522,14 @@ void CPU::ROR()
 template<AddressingModes mode>
 void CPU::RTI()
 {
+	p = Pop8();
+	pc = Pop16();
 }
 
 template<AddressingModes mode>
 void CPU::RTS()
 {
+	pc = Pop16() + 1;
 }
 
 template<AddressingModes mode>
@@ -550,13 +568,13 @@ template<AddressingModes mode>
 void CPU::TAY() { y = a; UpdNZ(y); }
 
 template<AddressingModes mode>
-void CPU::TSX() { s = x; UpdNZ(s); }
+void CPU::TSX() { sp = x; UpdNZ(sp); }
 
 template<AddressingModes mode>
 void CPU::TXA() { x = a; UpdNZ(x); }
 
 template<AddressingModes mode>
-void CPU::TXS() { x = s; UpdNZ(x); }
+void CPU::TXS() { x = sp; UpdNZ(x); }
 
 template<AddressingModes mode>
 void CPU::TYA() { y = a; UpdNZ(y); }

@@ -9,7 +9,7 @@
 enum Flags { C = 0, Z, I, D, B, _, V, N };
 
 // Adressing modes
-enum class AddressingModes
+enum AddressingModes
 {
 	ACCUMULATOR,
 	IMMEDIATE,
@@ -27,21 +27,21 @@ enum class AddressingModes
 	INDIRECT_INDEXED
 };
 
+// TODO: Check if every instructions increases the PC by at least 1.
 class CPU
 {
+	// Timers
+	u64 cycle = 0;
+
 	// Registers
-	uint8_t  a = 0; // Accumulator
-	uint8_t  x = 0; // General purpose
-	uint8_t  y = 0;
-	uint8_t  s = 0; // Stack pointer
-	uint8_t  p = 0; // Flags | N | V |   | B | D | I | Z | C |
+	uint8_t  a  = 0; // Accumulator
+	uint8_t  x  = 0; // General purpose
+	uint8_t  y  = 0;
+	uint8_t  sp = 0; // Stack pointer
+	uint8_t  p  = 0; // Flags | N | V |   | B | D | I | Z | C |
 	uint16_t pc = 0;
 
 	// Memory
-	constexpr static int INSTR_MEM_SIZE = 0x10000;
-	std::vector<u8> instrs;
-	u8 buff;
-
 	constexpr static int RAM_SIZE = 0x800;
 	std::vector<u8> ram;
 
@@ -50,8 +50,13 @@ class CPU
 	uint16_t rst;
 	std::vector<uint8_t> instr;
 
+	// Instruction memory
+	constexpr static int INSTR_MEM_SIZE = 0x10000;
+	std::vector<u8> instrs;
+	u8 buff;
+
 	// Instruction helpers
-	inline u8 _ASL(u8 &x) { C(x & 0x80); x << 1; return x; }
+	inline u8 _ASL(u8 &x) { C(x & 0x80); return (x <<= 1); }
 	inline u8 _ROL(u8& x) { return x = (((x & 0x80) ? 1 : 0) | (x << 1)); }
 	inline u8 _ROR(u8& x) { return x = (((x & 0x01) ? 0x80 : 0) | (x >> 1)); }
 
@@ -62,6 +67,11 @@ class CPU
 	inline u16 AbsY() { u16 res = (instrs[pc] << 8) | instrs[pc + 1]; pc += 2; return res + y; }
 	inline u8& Zp(u8 addr) { return ram[addr]; }
 	inline bool CrossesZp(u16 addr) { return addr > 0xff; }
+	inline void Push8(u8 val) { Stk(sp--) = val; }
+	// NOTE: First the high byte is pushed, then the low.
+	inline void Push16(u16 val) { Push8(val & 0xFF); Push8(val >> 8); }
+	inline u8 Pop8() { return Stk(sp++); }
+	inline u16 Pop16() { u8 lo = Pop8(); u16 hi = Pop8() << 8; return hi + lo; }
 
 	// Flag helpers
 	inline bool N() { return GetFlag(Flags::N); }

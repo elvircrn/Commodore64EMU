@@ -30,14 +30,14 @@ error:
 void printVector(const ROM &rom)
 {
 	unsigned offset = 0x8000;
-	unsigned reset = rom[0xfffd - offset] << 8 + rom[0xfffc - offset];
+	unsigned reset = (rom[0xfffd - offset] << 8) + rom[0xfffc - offset];
 	printf("Reset vector: $%04x\n", reset);
 }
 
 
 int main()
 {
-	ROM rom = FileHandler().LoadCartridge("test.nes");
+	ROM rom = FileHandler().LoadCartridge("nestest.nes");
 	for (int i = 0; i < 20; i++)
 		std::cout << std::hex << (int)rom.GetData()[i] << ' ';
 	std::cout << '\n';

@@ -16,10 +16,9 @@ ROM::~ROM()
 {
 }
 
-std::vector<uint8_t>& ROM::GetData()
-{
-	return data;
-}
+std::vector<uint8_t> ROM::GetData() const { return data; }
+
+std::vector<uint8_t>& ROM::GetData() { return data; }
 
 uint8_t & ROM::operator[](const int addr)
 {

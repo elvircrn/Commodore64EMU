@@ -2,8 +2,10 @@
 
 #include <stdint.h>
 #include <vector>
+#include <variant>
 
 #include "core.h"
+#include "ROM.h"
 
 // Flags
 enum Flags { C = 0, Z, I, D, B, _, V, N };
@@ -11,20 +13,20 @@ enum Flags { C = 0, Z, I, D, B, _, V, N };
 // Adressing modes
 enum AddressingModes
 {
-	ACCUMULATOR,
+	RELATIVE = 0,
+	INDIRECT, // Only used by the JMP instruction
+	INDIRECT_INDEXED,
 	IMMEDIATE,
+	ACCUMULATOR,
 	IMPLIED,
-	RELATIVE,
 	ABSOLUTE,
 	ZERO_PAGE,
-	INDIRECT, // Only used by the JMP instruction
 	ABSOLUTE_INDEXED_X,
 	ABSOLUTE_INDEXED_Y,
 	ZERO_PAGE_INDEXED,
 	ZERO_PAGE_X,
 	ZERO_PAGE_Y,
-	INDEXED_INDIRECT_X,
-	INDIRECT_INDEXED
+	INDEXED_INDIRECT_X
 };
 
 // TODO: Check if every instructions increases the PC by at least 1.
@@ -42,35 +44,39 @@ class CPU
 	uint16_t pc = 0;
 
 	// Memory
-	constexpr static int RAM_SIZE = 0x800;
+	constexpr static int RAM_SIZE = 65536;
 	std::vector<u8> ram;
 
 	// Instructions
 	constexpr static int RESET_VECTOR = 0x0000;
 	uint16_t rst;
-	std::vector<uint8_t> instr;
 
 	// Instruction memory
 	constexpr static int INSTR_MEM_SIZE = 0x10000;
-	std::vector<u8> instrs;
-	u8 buff;
+	u16 buff16;
+	u8 buff8;
 
 	// Instruction helpers
 	inline u8 _ASL(u8 &x) { C(x & 0x80); return (x <<= 1); }
 	inline u8 _ROL(u8& x) { return x = (((x & 0x80) ? 1 : 0) | (x << 1)); }
 	inline u8 _ROR(u8& x) { return x = (((x & 0x01) ? 0x80 : 0) | (x >> 1)); }
 
+	inline u16 _ASL(u16 &x) { C(x & 0x8000); return (x <<= 1); }
+	inline u16 _ROL(u16& x) { return x = (((x & 0x8000) ? 1 : 0) | (x << 1)); }
+	inline u16 _ROR(u16& x) { return x = (((x & 0x01) ? 0x8000 : 0) | (x >> 1)); }
+
 	// Addressing helpers
-	inline u8 Imm() { return instrs[pc++]; }
-	inline u16 Abs() { u16 res = (instrs[pc] << 8) | instrs[pc + 1]; pc += 2; return res; }
-	inline u16 AbsX() { u16 res = (instrs[pc] << 8) | instrs[pc + 1]; pc += 2; return res + x; }
-	inline u16 AbsY() { u16 res = (instrs[pc] << 8) | instrs[pc + 1]; pc += 2; return res + y; }
+	inline u8 Imm() { return Read(pc++); }
+	inline u16 Abs() { return Read16((pc += 2) - 2); }
+	inline u16 AbsX() { u16 res = (Read(pc + 1) << 8) | Read(pc); pc += 2; return res + x; }
+	inline u16 AbsY() { u16 res = (Read(pc + 1) << 8) | Read(pc); pc += 2; return res + y; }
 	inline u8& Zp(u8 addr) { return ram[addr]; }
+	inline u16 Zp16(u8 addr) { return ram[addr + 1] << 8 + ram[addr]; }
 	inline bool CrossesZp(u16 addr) { return addr > 0xff; }
 	inline void Push8(u8 val) { Stk(sp--) = val; }
 	// NOTE: First the high byte is pushed, then the low.
-	inline void Push16(u16 val) { Push8(val & 0xFF); Push8(val >> 8); }
-	inline u8 Pop8() { return Stk(sp++); }
+	inline void Push16(u16 val) { Push8(val >> 8); Push8(val & 0xFF); }
+	inline u8 Pop8() { return Stk(++sp); }
 	inline u16 Pop16() { u8 lo = Pop8(); u16 hi = Pop8() << 8; return hi + lo; }
 
 	// Flag helpers
@@ -91,12 +97,26 @@ class CPU
 	inline void C(bool x) { SetFlag(Flags::C, x); }
 
 public:
-#pragma region Memory
-	inline u8& Read(u16 addr) { return ram[addr]; }
-	inline u8& Stk(u8 addr) { return ram[0x0100 + addr]; }
-#pragma endregion
 
-#pragma region Flags
+	#pragma region Debug
+	static constexpr bool DEBUG = true;
+	std::vector<u16> pcHist;
+	std::vector<u8>  opHist;
+	std::vector<u8>  bitStack;
+	#pragma endregion
+
+	#pragma region Setup
+	// TODO: Consider refactoring into an external class?
+	void PowerUp();
+	#pragma endregion
+
+	#pragma region Memory
+	inline u8& Read(u16 addr) { return ram[addr]; }
+	inline u16 Read16(u16 addr) { return ram[addr] + (ram[addr + 1] << 8); }
+	inline u8& Stk(u8 addr) { return ram[0x0100 + addr]; }
+	#pragma endregion
+
+	#pragma region Flags
 	inline void SetFlag(Flags, bool);
 	inline bool GetFlag(Flags) const;
 
@@ -107,7 +127,9 @@ public:
 	inline void UpdN(u8);
 	inline void UpdZ(u8);
 	inline void UpdNZ(u8);
-#pragma endregion
+	#pragma endregion
+
+	void LoadCartridge(const ROM &rom);
 
 	CPU();
 	CPU(uint16_t);
@@ -116,7 +138,7 @@ public:
 	void Tick();
 	void Execute();
 
-#pragma region Register getters and setters
+	#pragma region Register getters and setters
 	void SetA(uint8_t);
 	void SetX(uint8_t);
 	void SetY(uint8_t);
@@ -127,12 +149,12 @@ public:
 	uint8_t GetA() const;
 	uint8_t GetX() const;
 	uint8_t GetY() const;
-	uint8_t GetS() const;
+	uint8_t GetSP() const;
 	uint8_t GetP() const;
 	uint16_t GetPC() const;
-#pragma endregion
+	#pragma endregion
 
-#pragma region Instructions
+	#pragma region Instructions
 	template<AddressingModes mode>
 	void ADC();	//....	add with carry
 	template<AddressingModes mode>
@@ -248,7 +270,14 @@ public:
 #pragma endregion
 
 	template<AddressingModes m>
-	u8& GetOperand();
+	u16 GetOperand16();
+	template<AddressingModes m>
+	u8& GetOperand8();
+	template<AddressingModes m>
+	u16 GetPureOperand();
+
+    template<AddressingModes m>
+    constexpr inline bool Is8Bit() { return !(0 <= m && m <= 2); }
 };
 
 // Inlined functions

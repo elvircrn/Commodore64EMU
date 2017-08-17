@@ -1,11 +1,20 @@
 #include "CppUnitTest.h"
 #include "../NES Emulator/CPU.h"
+#include "../NES Emulator/FileHandler.h"
+#include <experimental\filesystem>
+#include "../NES Emulator/Debugger.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace NESEmulatorTest
 {		
 #define ASRT(X, Y) Assert::AreEqual((X), (Y), L"V test failed", LINE_INFO());
+
+	void LoggerDump(const Debugger &debugger)
+	{
+		Logger::WriteMessage(debugger.GetOpHistForLogging().c_str());
+		//Logger::WriteMessage(debugger.GetPCHistForLogging().c_str());
+	}
 
 	TEST_CLASS(CPUFlagTest)
 	{
@@ -58,6 +67,58 @@ namespace NESEmulatorTest
 
 			cpu.UpdZ(1);
 			ASRT(cpu.GetFlag(Flags::Z), false);
+		}
+
+		TEST_METHOD(NESTest)
+		{
+			auto filepath = std::experimental::filesystem::path(__FILE__)
+				.parent_path()
+				.append("nestest.nes")
+				.string();
+
+			ROM rom = (FileHandler())
+				.LoadCartridge(filepath);
+
+			CPU cpu;
+			Debugger debugger(&cpu);
+			cpu.PowerUp();
+			cpu.LoadCartridge(rom);
+			cpu.SetP(0x24);
+
+			auto res = std::experimental::filesystem::path(__FILE__)
+				.parent_path()
+				.append("res.txt")
+				.string();
+
+			std::ifstream myfile(res);
+			std::string line;
+			std::vector<std::string> lines;
+			while (std::getline(myfile, line))
+				lines.push_back(line);
+
+			for (int i = 0; i < 200; i++)
+			{
+				std::string line = debugger.GetNESTestLine();
+				std::string correctLine = lines[i];
+
+				debugger.AppendStatHist(line);
+				
+				//Assert::AreEqual(lines[i], line, std::to_wstring(cpu.GetPC()).c_str(), LINE_INFO());
+				if (correctLine != line)
+				{
+					LoggerDump(debugger);
+					Logger::WriteMessage(("Correct line: " + correctLine + " found: " + line).c_str());
+					Assert::Fail();
+				}
+				try
+				{
+					cpu.Execute();
+				}
+				catch (std::string e)
+				{
+					Assert::Fail();
+				}
+			}
 		}
 	};
 }

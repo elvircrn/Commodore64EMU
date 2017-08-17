@@ -82,6 +82,7 @@ class CPU
 	// Flag helpers
 	inline bool N() { return GetFlag(Flags::N); }
 	inline bool V() { return GetFlag(Flags::V); }
+	inline bool U() { return GetFlag(Flags::_); }
 	inline bool B() { return GetFlag(Flags::B); }
 	inline bool D() { return GetFlag(Flags::D); }
 	inline bool I() { return GetFlag(Flags::I); }
@@ -90,6 +91,7 @@ class CPU
 
 	inline void N(bool x) { SetFlag(Flags::N, x); }
 	inline void V(bool x) { SetFlag(Flags::V, x); }
+	inline void U(bool x) { SetFlag(Flags::_, x); }
 	inline void B(bool x) { SetFlag(Flags::B, x); }
 	inline void D(bool x) { SetFlag(Flags::D, x); }
 	inline void I(bool x) { SetFlag(Flags::I, x); }
@@ -120,9 +122,9 @@ public:
 	inline void SetFlag(Flags, bool);
 	inline bool GetFlag(Flags) const;
 
-	inline void UpdC(u8, u8, u16);
-	inline void UpdV(u8, u8, u16);
-	inline void UpdCV(u8, u8, u16);
+	inline void UpdC(u8, u8, s16);
+	inline void UpdV(u8, u8, s16);
+	inline void UpdCV(u8, u8, s16);
 
 	inline void UpdN(u8);
 	inline void UpdZ(u8);
@@ -277,7 +279,7 @@ public:
 	u16 GetPureOperand();
 
     template<AddressingModes m>
-    constexpr inline bool Is8Bit() { return !(0 <= m && m <= 2); }
+    constexpr inline bool Is8Bit() { return !(0 <= m && m < 2); }
 };
 
 // Inlined functions
@@ -293,17 +295,17 @@ inline bool CPU::GetFlag(Flags f) const
 	return (p & (1 << f)) > 0;
 }
 
-inline void CPU::UpdV(u8 x, u8 y, u16 r)
+inline void CPU::UpdV(u8 x, u8 y, s16 r)
 {
-	SetFlag(Flags::V, ~(x ^ y)  & (r ^ x) & 0x80);
+	V(~(x ^ y) & (r ^ x) & 0x80);
 }
 
-inline void CPU::UpdC(u8 x, u8 y, u16 r)
+inline void CPU::UpdC(u8 x, u8 y, s16 r)
 {
-	SetFlag(Flags::C, 0xff < r);
+	C(0xff < r);
 }
 
-inline void CPU::UpdCV(u8 x, u8 y, u16 r)
+inline void CPU::UpdCV(u8 x, u8 y, s16 r)
 {
 	UpdV(x, y, r);
 	UpdC(x, y, r);

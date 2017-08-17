@@ -14,8 +14,9 @@ CPU::CPU() : ram(RAM_SIZE)
 
 }
 
-CPU::CPU(uint16_t _rst) : ram(RAM_SIZE), rst(_rst)
+CPU::CPU(uint16_t _rst) : CPU()
 {
+	rst = _rst;
 }
 
 CPU::~CPU()
@@ -309,9 +310,6 @@ u16 CPU::GetOperand16()
         // TODO: Check if -2 is needed
 		case AddressingModes::INDIRECT:
 			return Read16(Abs());
-        // ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
-		case AddressingModes::INDIRECT_INDEXED:
-			return Zp(Imm()) + y;
         default:
             throw "Invalid instruction";
 	}
@@ -350,6 +348,9 @@ u8& CPU::GetOperand8()
 			return Read(Zp16(Imm()) + y);
 		case AddressingModes::ACCUMULATOR:
 			return a;
+        // ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
+		//case AddressingModes::INDIRECT_INDEXED:
+			//return Zp(Imm()) + y;
 		default:
 			throw "Wrong addressing mode implemented!";
 	}
@@ -360,10 +361,10 @@ u8& CPU::GetOperand8()
 template<AddressingModes mode>
 void CPU::ADC()
 {
-	u16 lhs = a;
-	u16 rhs = GetPureOperand<mode>() + C();
-	u16 res = lhs + rhs;
-	a = res;
+	u8 lhs = a;
+	u8 rhs = GetOperand8<mode>();
+	s16 res = lhs + rhs + C();
+	a = static_cast<u8>(res & 0xff);
 	UpdCV(lhs, rhs, res);
 	UpdNZ(res);
 }
@@ -407,9 +408,11 @@ void CPU::BEQ()
 template<AddressingModes mode>
 void CPU::BIT()
 {
-	u8 res = a & GetPureOperand<mode>();
-	UpdNZ(res);
-	V(res & (1 << 6));
+	u8 op = GetPureOperand<mode>();
+	u8 res = a & op;
+	Z(!res);
+	N(op & (1 << 7));
+	V(op & (1 << 6));
 }
 
 template<AddressingModes mode>
@@ -557,7 +560,7 @@ void CPU::LSR()
 {
 	u8& op = GetOperand8<mode>();
 	C(op & 1);
-	UpdNZ(op <<= 1);
+	UpdNZ(op >>= 1);
 }
 
 template<AddressingModes mode>
@@ -589,6 +592,9 @@ template<AddressingModes mode>
 void CPU::PLP()
 {
 	p = Pop8();
+	B(false);
+	// TODO: What?
+	U(true);
 }
 
 template<AddressingModes mode>
@@ -610,7 +616,7 @@ void CPU::ROR()
 template<AddressingModes mode>
 void CPU::RTI()
 {
-	p = Pop8();
+	PLP<mode>();
 	pc = Pop16();
 }
 
@@ -624,12 +630,12 @@ void CPU::RTS()
 template<AddressingModes mode>
 void CPU::SBC()
 {
-	u16 lhs = a ^ 0xff;
-	u16 rhs = GetPureOperand<mode>() + C();
-	u16 res = lhs + rhs;
+	u8 lhs = a;
+	u8 rhs = GetOperand8<mode>() ^ 0xff;
+	s16 res = lhs + rhs + C();
+	UpdCV(a, rhs, res);
 	a = res;
-	UpdCV(lhs, rhs, res);
-	UpdNZ(res);
+	UpdNZ(a);
 }
 
 template<AddressingModes mode>
@@ -657,16 +663,16 @@ template<AddressingModes mode>
 void CPU::TAY() { y = a; UpdNZ(y); }
 
 template<AddressingModes mode>
-void CPU::TSX() { sp = x; UpdNZ(sp); }
+void CPU::TSX() { x = sp; UpdNZ(x); }
 
 template<AddressingModes mode>
-void CPU::TXA() { x = a; UpdNZ(x); }
+void CPU::TXA() { a = x; UpdNZ(a); }
 
 template<AddressingModes mode>
-void CPU::TXS() { x = sp; UpdNZ(x); }
+void CPU::TXS() { sp = x ; }
 
 template<AddressingModes mode>
-void CPU::TYA() { y = a; UpdNZ(y); }
+void CPU::TYA() { a = y; UpdNZ(a); }
 
 
 

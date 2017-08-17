@@ -96,7 +96,7 @@ namespace NESEmulatorTest
 			while (std::getline(myfile, line))
 				lines.push_back(line);
 
-			for (int i = 0; i < 200; i++)
+			for (int i = 0; i < 8000; i++)
 			{
 				std::string line = debugger.GetNESTestLine();
 				std::string correctLine = lines[i];
@@ -107,7 +107,9 @@ namespace NESEmulatorTest
 				if (correctLine != line)
 				{
 					LoggerDump(debugger);
-					Logger::WriteMessage(("Correct line: " + correctLine + " found: " + line).c_str());
+					Logger::WriteMessage(("Exp: " + correctLine + "\nFND: " + line).c_str());
+					Logger::WriteMessage(("Failed at: " + std::to_string(i)).c_str());
+					Logger::WriteMessage(("PC: " + std::to_string(cpu.GetPC())).c_str());
 					Assert::Fail();
 				}
 				try

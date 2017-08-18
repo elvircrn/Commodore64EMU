@@ -51,8 +51,7 @@ class CPU
 	constexpr static int RESET_VECTOR = 0x0000;
 	uint16_t rst;
 
-	// Instruction memory
-	constexpr static int INSTR_MEM_SIZE = 0x10000;
+	// Buffers
 	u16 buff16;
 	u8 buff8;
 
@@ -63,10 +62,17 @@ class CPU
 	// Addressing helpers
 	inline u8 Imm() { return Read(pc++); }
 	inline u16 Abs() { return Read16((pc += 2) - 2); }
-	inline u16 AbsX() { u16 res = (Read(pc + 1) << 8) | Read(pc); pc += 2; return res + x; }
-	inline u16 AbsY() { u16 res = (Read(pc + 1) << 8) | Read(pc); pc += 2; return res + y; }
+	inline u16 AbsX() { return Abs() + x; }
+	inline u16 AbsY() { return Abs() + y; }
 	inline u8& Zp(u8 addr) { return ram[addr]; }
-	inline u16 Zp16(u8 addr) { return (ram[addr + 1] << 8) + ram[addr]; }
+	inline u16 Zp16(u8 addr)
+	{
+		// Check for zero-page crossing
+		if (addr == 0xff)
+			return Read16(addr);
+		else
+			return (ram[addr + 1] << 8) + ram[addr];
+	}
 	inline bool CrossesZp(u16 addr) { return addr > 0xff; }
 	inline void Push8(u8 val) { Stk(sp--) = val; }
 	// NOTE: First the high byte is pushed, then the low.
@@ -110,7 +116,7 @@ public:
 	#pragma region Memory
 	inline u8& Read(u16 addr) { return ram[addr]; }
 	inline u16 Read16(u16 addr) { return ram[addr] + (ram[addr + 1] << 8); }
-	inline u8& Stk(u8 addr) { return ram[0x0100 + addr]; }
+	inline u8& Stk(u8 addr) { return ram[0x0100 + static_cast<u32>(addr)]; }
 	#pragma endregion
 
 	#pragma region Flags
@@ -132,7 +138,10 @@ public:
 	CPU(uint16_t);
 	~CPU();
 
+	#pragma region Timing
 	void Tick();
+	#pragma endregion
+
 	void Execute();
 
 	#pragma region Register getters and setters
@@ -266,6 +275,7 @@ public:
 	void TYA();	//....	transfer Y to accumulator
 #pragma endregion
 
+	#pragma region Operand calculator
 	template<AddressingModes m>
 	u16 GetOperand16();
 	template<AddressingModes m>
@@ -275,6 +285,7 @@ public:
 
     template<AddressingModes m>
     constexpr inline bool Is8Bit() { return !(0 <= m && m < 2); }
+	#pragma endregion
 };
 
 // Inlined functions

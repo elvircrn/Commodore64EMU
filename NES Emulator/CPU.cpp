@@ -46,12 +46,14 @@ void CPU::Execute()
 			bitStack.push_back(Read(pc + i));
 	}
 
+	if (ram[0xff] == 0x400)
+	{
+		int x = 2;
+	}
+
 	u8 op = Read(pc++);
 	switch (op)
 	{
-		// Arithmetic expressions
-
-		// ADC
 		case 0x69: ADC<AddressingModes::IMMEDIATE>(); break;
 		case 0x65: ADC<AddressingModes::ZERO_PAGE>(); break;
 		case 0x75: ADC<AddressingModes::ZERO_PAGE_X>(); break;
@@ -60,8 +62,6 @@ void CPU::Execute()
 		case 0x79: ADC<AddressingModes::ABSOLUTE_INDEXED_Y>(); break;
 		case 0x71: ADC<AddressingModes::INDEXED_INDIRECT_X>(); break;
 		case 0x61: ADC<AddressingModes::INDIRECT_INDEXED>(); break;
-
-		// AND
 		case 0x29: AND<AddressingModes::IMMEDIATE>(); break;
 		case 0x25: AND<AddressingModes::ZERO_PAGE>(); break;
 		case 0x35: AND<AddressingModes::ZERO_PAGE_X>(); break;
@@ -70,8 +70,6 @@ void CPU::Execute()
 		case 0x39: AND<AddressingModes::ABSOLUTE_INDEXED_Y>(); break;
 		case 0x21: AND<AddressingModes::INDEXED_INDIRECT_X>(); break;
 		case 0x31: AND<AddressingModes::INDIRECT_INDEXED>(); break;
-
-
 		// TODO: Check Zero Page, Y!!!
 		case 0x0A: ASL<AddressingModes::ACCUMULATOR>(); break;
 		case 0x06: ASL<AddressingModes::ZERO_PAGE>(); break;
@@ -323,7 +321,10 @@ u8& CPU::GetOperand8()
 	{
 		// ADC $3420 -> A + contents of memory $3420
 		case AddressingModes::ABSOLUTE:
-			return Read(Abs());
+		{
+			u16 abs = Abs();
+			return Read(abs);
+		}
         // ADC #2 -> A + 2
 		case AddressingModes::IMMEDIATE:
 			buff8 = Imm();
@@ -343,7 +344,11 @@ u8& CPU::GetOperand8()
 			return Zp(Imm() + y);
 		// https://www.csh.rit.edu/~moffitt/6502.html#ADDR-IIND
 		case AddressingModes::INDEXED_INDIRECT_X:
-			return Read(Zp16(Imm() + x));
+		{
+			u8 addr8 = Imm() + x;
+			u16 zp16 = Zp16(addr8);
+			return Read(zp16);
+		}
 		case AddressingModes::INDIRECT_INDEXED:
 			return Read(Zp16(Imm()) + y);
 		case AddressingModes::ACCUMULATOR:
@@ -630,11 +635,7 @@ void CPU::RTI()
 }
 
 template<AddressingModes mode>
-void CPU::RTS()
-{
-	int x = sp;
-	pc = Pop16() + 1;
-}
+void CPU::RTS() { pc = Pop16() + 1; }
 
 template<AddressingModes mode>
 void CPU::SBC()
@@ -657,7 +658,10 @@ template<AddressingModes mode>
 void CPU::SEI() { I(1); }
 
 template<AddressingModes mode>
-void CPU::STA() { GetOperand8<mode>() = a; }
+void CPU::STA()
+{
+	GetOperand8<mode>() = a;
+}
 
 template<AddressingModes mode>
 void CPU::STX() { GetOperand8<mode>() = x; }

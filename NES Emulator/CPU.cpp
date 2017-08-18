@@ -547,7 +547,10 @@ void CPU::JSR()
 }
 
 template<AddressingModes mode>
-void CPU::LDA() { UpdNZ(a = GetOperand8<mode>()); }
+void CPU::LDA()
+{
+	UpdNZ(a = GetOperand8<mode>());
+}
 
 template<AddressingModes mode>
 void CPU::LDX() { UpdNZ(x = GetOperand8<mode>()); }
@@ -600,17 +603,23 @@ void CPU::PLP()
 template<AddressingModes mode>
 void CPU::ROL()
 {
-	C(a & 0x80);
-	u8 res = _ROL(GetOperand8<mode>());
-	UpdNZ(res);
+	u8 &mem = GetOperand8<mode>();
+	u8 t = mem;
+	mem <<= 1;
+	mem |= C();
+	C(t & 0x80);
+	UpdNZ(mem);
 }
 
 template<AddressingModes mode>
 void CPU::ROR()
 {
-	C(a & 0x80);
-	u8 res = _ROR(GetOperand8<mode>());
-	UpdNZ(res);
+	u8 &mem = GetOperand8<mode>();
+	u8 t = mem;
+	mem >>= 1;
+	mem |= (C() << 7);
+	C(t & 1);
+	UpdNZ(mem);
 }
 
 template<AddressingModes mode>

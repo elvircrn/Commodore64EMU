@@ -4,6 +4,8 @@
 #include <experimental\filesystem>
 #include "../NES Emulator/Debugger.h"
 
+#include <iomanip>
+
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace NESEmulatorTest
@@ -107,9 +109,11 @@ namespace NESEmulatorTest
 				if (correctLine != line)
 				{
 					LoggerDump(debugger);
-					Logger::WriteMessage(("Exp: " + correctLine + "\nFND: " + line).c_str());
+					Logger::WriteMessage(("Exp: " + correctLine + "\nFnd: " + line).c_str());
 					Logger::WriteMessage(("Failed at: " + std::to_string(i)).c_str());
-					Logger::WriteMessage(("PC: " + std::to_string(cpu.GetPC())).c_str());
+					std::stringstream ss;
+					ss << std::hex << std::setfill('0') << std::setw(2) << (int)cpu.GetPC();
+					Logger::WriteMessage(("PC: " + ss.str()).c_str());
 					Assert::Fail();
 				}
 				try

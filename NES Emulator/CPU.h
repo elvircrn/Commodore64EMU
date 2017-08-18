@@ -57,13 +57,8 @@ class CPU
 	u8 buff8;
 
 	// Instruction helpers
-	inline u8 _ASL(u8 &x) { C(x & 0x80); return (x <<= 1); }
-	inline u8 _ROL(u8& x) { return x = (((x & 0x80) ? 1 : 0) | (x << 1)); }
-	inline u8 _ROR(u8& x) { return x = (((x & 0x01) ? 0x80 : 0) | (x >> 1)); }
-
+	inline u8  _ASL(u8 &x)  { C(x & 0x80);   return (x <<= 1); }
 	inline u16 _ASL(u16 &x) { C(x & 0x8000); return (x <<= 1); }
-	inline u16 _ROL(u16& x) { return x = (((x & 0x8000) ? 1 : 0) | (x << 1)); }
-	inline u16 _ROR(u16& x) { return x = (((x & 0x01) ? 0x8000 : 0) | (x >> 1)); }
 
 	// Addressing helpers
 	inline u8 Imm() { return Read(pc++); }
@@ -71,7 +66,7 @@ class CPU
 	inline u16 AbsX() { u16 res = (Read(pc + 1) << 8) | Read(pc); pc += 2; return res + x; }
 	inline u16 AbsY() { u16 res = (Read(pc + 1) << 8) | Read(pc); pc += 2; return res + y; }
 	inline u8& Zp(u8 addr) { return ram[addr]; }
-	inline u16 Zp16(u8 addr) { return ram[addr + 1] << 8 + ram[addr]; }
+	inline u16 Zp16(u8 addr) { return (ram[addr + 1] << 8) + ram[addr]; }
 	inline bool CrossesZp(u16 addr) { return addr > 0xff; }
 	inline void Push8(u8 val) { Stk(sp--) = val; }
 	// NOTE: First the high byte is pushed, then the low.

@@ -51,6 +51,7 @@ class CPU
 	constexpr static int RESET_VECTOR = 0x0000;
 	uint16_t rst;
 	std::vector<bool> isOfficial;
+	bool zeroPageCrossed;
 
 	// Buffers
 	u16 buff16;
@@ -113,6 +114,8 @@ public:
 	#pragma region Setup
 	// TODO: Consider refactoring into an external class?
 	void PowerUp();
+	// Called before instruction execution
+	inline void Clear() { zeroPageCrossed = false; }
 	#pragma endregion
 
 	#pragma region Memory
@@ -159,7 +162,50 @@ public:
 
 	#pragma region Timing
 	int cycleCount;
-	void Tick(int cylces = 1);
+	inline void Tick(int cycles = 1) { cycleCount += cycles; }
+
+	// Do not use with jumps or returns!
+	template<AddressingModes mode>
+	inline int CalcBaseTick()
+	{
+		switch (mode)
+		{
+			case AddressingModes::IMMEDIATE:
+				return 0;
+			case AddressingModes::ZERO_PAGE:
+				return 1;
+			case AddressingModes::ZERO_PAGE_X:
+				return 2;
+			case AddressingModes::ZERO_PAGE_Y:
+				return 2;
+			case AddressingModes::ABSOLUTE:
+				return 2;
+			case AddressingModes::ABSOLUTE_INDEXED_X:
+				return 2;
+			case AddressingModes::ABSOLUTE_INDEXED_Y:
+				return 2;
+			case AddressingModes::INDEXED_INDIRECT_X:
+				return 4;
+			case AddressingModes::INDIRECT_INDEXED:
+				return 3;
+		}
+		return 0;
+	}
+
+	template<AddressingModes mode>
+	inline int CalcStoreTick()
+	{
+		switch (mode)
+		{
+			case AddressingModes::ABSOLUTE_INDEXED_X:
+				return 1;
+			case AddressingModes::ABSOLUTE_INDEXED_Y:
+				return 1;
+			case AddressingModes::INDIRECT_INDEXED:
+				return 1;
+		}
+		return 0;
+	}
 	#pragma endregion
 
 	void Execute();

@@ -215,7 +215,7 @@ std::string Debugger::GetOpHistForLogging() const
 {
 	std::stringstream ss;
 	ss << "op:\n";
-	for (int i = 0; i < cpu->opHist.size(); i++)
+	for (size_t i = 0; i < cpu->opHist.size(); i++)
 		ss << std::hex << (int)cpu->opHist[i] << ' ' << statHist[i] << '\n';
 	return ss.str();
 }

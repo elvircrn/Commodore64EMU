@@ -1,11 +1,15 @@
 #include <iostream>
+#include <cstdio>
+#include <cstdlib>
+
 #include "CPU.h"
 #include "FileHandler.h"
 
 void print_vector()
 {
 	static unsigned char rom[32 * 1024L];
-	FILE* file = fopen("test.nes", "rb");
+	FILE *file;
+	errno_t err = fopen_s(&file, "test.nes", "rb");
 	if (!file)
 		return;
 
@@ -47,6 +51,5 @@ int main()
 
 	CPU cpu;
 
-	std::getchar();
 	return 0;
 }

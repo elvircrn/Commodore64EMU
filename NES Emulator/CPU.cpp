@@ -186,10 +186,9 @@ void CPU::PowerUp()
 	pc = 0xC000;
 }
 
-void CPU::Tick(int cycles) { cycleCount += cycles; }
-
 void CPU::Execute()
 {
+	Clear();
 	if (DEBUG)
 	{
 		opHist.push_back(Read(pc));
@@ -398,6 +397,8 @@ void CPU::Execute()
 			throw "Instruction not found at pc: " + std::to_string(pc) + "\nDump: " + ss.str();
 			break;
 	}
+
+	Tick(zeroPageCrossed);
 }
 
 #pragma region Register getters and setters
@@ -546,6 +547,8 @@ u8& CPU::GetOperand8()
 template<AddressingModes mode>
 void CPU::ADC()
 {
+	Tick(CalcBaseTick<mode>());
+
 	u8 lhs = a;
 	u8 rhs = GetOperand8<mode>();
 	s16 res = lhs + rhs + C();
@@ -769,7 +772,10 @@ void CPU::LDX()
 }
 
 template<AddressingModes mode>
-void CPU::LDY() { UpdNZ(y = (u8)GetPureOperand<mode>()); }
+void CPU::LDY()
+{
+	UpdNZ(y = (u8)GetPureOperand<mode>());
+}
 
 template<AddressingModes mode>
 void CPU::LSR()

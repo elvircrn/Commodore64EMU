@@ -125,7 +125,13 @@ public:
 		else
 			return ram[addr];
 	}
-	inline u16 Read16(u16 addr) { return ram[addr] + (ram[addr + 1] << 8); }
+	inline u16 Read16(u16 addr) { return Read(addr) + (Read(addr + 1) << 8); }
+	inline u16 Ind(u16 addr)
+	{
+		u8 lo = Read(addr);
+		u8 hi = (addr >> 8) + 1;
+		return Read(lo) + (Read(hi) << 8);
+	}
 	inline u8& Stk(u8 addr) { return ram[0x0100 + static_cast<u32>(addr)]; }
 	#pragma endregion
 

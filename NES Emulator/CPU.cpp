@@ -7,6 +7,9 @@ void CPU::LoadCartridge(const ROM & rom)
 {
 	for (int i = 0; i < 0x4000; i++)
 		ram[0xC000 + i] = rom.data[i];
+	//Push16(pc);
+	//Push8(p | 0x10);
+	//pc = Read16(0xfffe);
 }
 
 CPU::CPU() : ram(RAM_SIZE)
@@ -46,11 +49,6 @@ void CPU::Execute()
 			bitStack.push_back(Read(pc + i));
 	}
 
-	if (ram[0xff] == 0x400)
-	{
-		int x = 2;
-	}
-
 	u8 op = Read(pc++);
 	switch (op)
 	{
@@ -60,8 +58,9 @@ void CPU::Execute()
 		case 0x6D: ADC<AddressingModes::ABSOLUTE>(); break;
 		case 0x7D: ADC<AddressingModes::ABSOLUTE_INDEXED_X>(); break;
 		case 0x79: ADC<AddressingModes::ABSOLUTE_INDEXED_Y>(); break;
-		case 0x71: ADC<AddressingModes::INDEXED_INDIRECT_X>(); break;
-		case 0x61: ADC<AddressingModes::INDIRECT_INDEXED>(); break;
+		case 0x61: ADC<AddressingModes::INDEXED_INDIRECT_X>(); break;
+		case 0x71: ADC<AddressingModes::INDIRECT_INDEXED>(); break;
+
 		case 0x29: AND<AddressingModes::IMMEDIATE>(); break;
 		case 0x25: AND<AddressingModes::ZERO_PAGE>(); break;
 		case 0x35: AND<AddressingModes::ZERO_PAGE_X>(); break;
@@ -301,7 +300,9 @@ u16 CPU::GetOperand16()
 		}
         // TODO: Check if -2 is needed
 		case AddressingModes::INDIRECT:
-			return Read16(Abs());
+			return Ind(Abs());
+        case AddressingModes::ABSOLUTE:
+            return Abs();
         default:
             throw "Invalid instruction";
 	}
@@ -443,7 +444,10 @@ void CPU::BPL()
 template<AddressingModes mode>
 void CPU::BRK()
 {
-	
+	pc++;
+	Push16(pc);
+	Push8(p | 0x10);
+	pc = Read16(0xfffe);
 }
 
 template<AddressingModes mode>
@@ -524,18 +528,7 @@ void CPU::INY() { UpdNZ(++y); }
 
 // TODO: Check if Abs should read memory
 template<AddressingModes mode>
-void CPU::JMP()
-{
-	switch (mode)
-	{
-		case AddressingModes::ABSOLUTE:
-			pc = Abs(); 
-			return;
-		case AddressingModes::INDIRECT:
-			pc = Read(Abs());
-			return;
-	}
-}
+void CPU::JMP() { pc = GetOperand16<mode>(); }
 
 // TODO: Check if pc - 1 or pc + 1
 template<AddressingModes mode>

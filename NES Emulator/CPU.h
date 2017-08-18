@@ -245,6 +245,8 @@ public:
 	void LSR();	//....	logical shift right
 	template<AddressingModes mode>
 	void NOP();	//....	no operation
+	template<AddressingModes mode, int count>
+	void NOP();	//....	no operation
 	template<AddressingModes mode>
 	void ORA();	//....	or with accumulator
 	template<AddressingModes mode>

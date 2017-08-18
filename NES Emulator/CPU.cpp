@@ -206,6 +206,39 @@ void CPU::Execute()
 		case 0x08: PHP<AddressingModes::IMPLIED>(); break;
 		case 0x28: PLP<AddressingModes::IMPLIED>(); break;
 		case 0xEA: NOP<AddressingModes::IMPLIED>(); break;
+
+		//Unofficial opcodes
+		// NOP - skip 0, 2 cycles
+		case 0x1A: NOP<AddressingModes::IMPLIED>(); break;
+		case 0x3A: NOP<AddressingModes::IMPLIED>(); break;
+		case 0x5A: NOP<AddressingModes::IMPLIED>(); break;
+		case 0x7A: NOP<AddressingModes::IMPLIED>(); break;
+		case 0xDA: NOP<AddressingModes::IMPLIED>(); break;
+		case 0xFA: NOP<AddressingModes::IMPLIED>(); break;
+
+		// NOP - skip 1
+		case 0x04: NOP<AddressingModes::IMPLIED, 1>(); break;
+		case 0x44: NOP<AddressingModes::IMPLIED, 1>(); break;
+		case 0x64: NOP<AddressingModes::IMPLIED, 1>(); break;
+		case 0x14: NOP<AddressingModes::IMPLIED, 1>(); break; 
+		case 0x34: NOP<AddressingModes::IMPLIED, 1>(); break; 
+		case 0x54: NOP<AddressingModes::IMPLIED, 1>(); break; 
+		case 0x74: NOP<AddressingModes::IMPLIED, 1>(); break; 
+		case 0xD4: NOP<AddressingModes::IMPLIED, 1>(); break; 
+		case 0xF4: NOP<AddressingModes::IMPLIED, 1>(); break;
+		case 0x80: NOP<AddressingModes::IMPLIED, 1>(); break;
+		
+		// NOP - skip 2
+		case 0x0C: NOP<AddressingModes::IMPLIED, 2>(); break;
+		case 0x1C: NOP<AddressingModes::IMPLIED, 2>(); break; 
+		case 0x3C: NOP<AddressingModes::IMPLIED, 2>(); break; 
+		case 0x5C: NOP<AddressingModes::IMPLIED, 2>(); break; 
+		case 0x7C: NOP<AddressingModes::IMPLIED, 2>(); break; 
+		case 0xDC: NOP<AddressingModes::IMPLIED, 2>(); break; 
+		case 0xFC: NOP<AddressingModes::IMPLIED, 2>(); break;
+
+
+		
 		default:
 			std::stringstream ss;
 			for (int i = pc; i < pc + 10; i++)
@@ -569,6 +602,9 @@ void CPU::LSR()
 
 template<AddressingModes mode>
 void CPU::NOP() { }
+
+template<AddressingModes mode, int waste>
+void CPU::NOP() { pc += waste; }
 
 template<AddressingModes mode>
 void CPU::ORA() { UpdNZ(a |= GetOperand8<mode>()); }

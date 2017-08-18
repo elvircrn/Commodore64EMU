@@ -243,9 +243,7 @@ public:
 	void LDY();	//....	load Y
 	template<AddressingModes mode>
 	void LSR();	//....	logical shift right
-	template<AddressingModes mode>
-	void NOP();	//....	no operation
-	template<AddressingModes mode, int count>
+	template<AddressingModes mode, int count = 0>
 	void NOP();	//....	no operation
 	template<AddressingModes mode>
 	void ORA();	//....	or with accumulator
@@ -291,6 +289,21 @@ public:
 	void TXS();	//....	transfer X to stack pointer
 	template<AddressingModes mode>
 	void TYA();	//....	transfer Y to accumulator
+
+
+	// Unofficial opcodes
+	template<AddressingModes mode>
+	void LAX();
+	template<AddressingModes mode>
+	void SAX();
+	template<AddressingModes mode>
+	void ALR();
+	template<AddressingModes mode>
+	void ANC();
+	template<AddressingModes mode>
+	void ARR();
+	template<AddressingModes mode>
+	void AXS();
 #pragma endregion
 
 	#pragma region Operand calculator

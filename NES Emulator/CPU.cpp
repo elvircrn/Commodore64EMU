@@ -600,9 +600,6 @@ void CPU::LSR()
 	UpdNZ(op >>= 1);
 }
 
-template<AddressingModes mode>
-void CPU::NOP() { }
-
 template<AddressingModes mode, int waste>
 void CPU::NOP() { pc += waste; }
 
@@ -718,6 +715,13 @@ void CPU::TXS() { sp = x ; }
 
 template<AddressingModes mode>
 void CPU::TYA() { a = y; UpdNZ(a); }
+
+template<AddressingModes mode>
+void CPU::LAX()
+{
+	LDA<mode>();
+	TAX<mode>();
+}
 
 
 

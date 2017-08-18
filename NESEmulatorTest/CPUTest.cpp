@@ -15,7 +15,7 @@ namespace NESEmulatorTest
 	void LoggerDump(const Debugger &debugger)
 	{
 		Logger::WriteMessage(debugger.GetOpHistForLogging().c_str());
-		Logger::WriteMessage(debugger.GetPCHistForLogging().c_str());
+		// Logger::WriteMessage(debugger.GetPCHistForLogging().c_str());
 	}
 
 	TEST_CLASS(CPUFlagTest)

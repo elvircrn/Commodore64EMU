@@ -137,7 +137,7 @@ void CPU::Execute()
 		case 0xB1: LDA<AddressingModes::INDIRECT_INDEXED>(); break;
 		case 0xA2: LDX<AddressingModes::IMMEDIATE>(); break;
 		case 0xA6: LDX<AddressingModes::ZERO_PAGE>(); break;
-		case 0xB6: LDX<AddressingModes::ZERO_PAGE>(); break;
+		case 0xB6: LDX<AddressingModes::ZERO_PAGE_Y>(); break;
 		case 0xAE: LDX<AddressingModes::ABSOLUTE>(); break;
 		case 0xBE: LDX<AddressingModes::ABSOLUTE_INDEXED_Y>(); break;
 		case 0xA0: LDY<AddressingModes::IMMEDIATE>(); break;
@@ -551,7 +551,10 @@ void CPU::LDA()
 }
 
 template<AddressingModes mode>
-void CPU::LDX() { UpdNZ(x = GetOperand8<mode>()); }
+void CPU::LDX()
+{
+	UpdNZ(x = GetOperand8<mode>());
+}
 
 template<AddressingModes mode>
 void CPU::LDY() { UpdNZ(y = (u8)GetPureOperand<mode>()); }

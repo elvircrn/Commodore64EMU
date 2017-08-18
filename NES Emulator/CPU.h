@@ -50,6 +50,7 @@ class CPU
 	// Instructions
 	constexpr static int RESET_VECTOR = 0x0000;
 	uint16_t rst;
+	std::vector<bool> isOfficial;
 
 	// Buffers
 	u16 buff16;
@@ -106,6 +107,7 @@ public:
 	std::vector<u16> pcHist;
 	std::vector<u8>  opHist;
 	std::vector<u8>  bitStack;
+	inline bool IsOfficial() { return isOfficial[Read(pc)]; }
 	#pragma endregion
 
 	#pragma region Setup

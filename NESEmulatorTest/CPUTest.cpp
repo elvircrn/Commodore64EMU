@@ -100,12 +100,13 @@ namespace NESEmulatorTest
 
 			for (int i = 0; i < 8000; i++)
 			{
+				if (!cpu.IsOfficial())
+					break;
 				std::string line = debugger.GetNESTestLine();
 				std::string correctLine = lines[i];
 
 				debugger.AppendStatHist(line);
 				
-				//Assert::AreEqual(lines[i], line, std::to_wstring(cpu.GetPC()).c_str(), LINE_INFO());
 				if (correctLine != line)
 				{
 					LoggerDump(debugger);

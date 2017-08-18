@@ -68,10 +68,10 @@ class CPU
 	inline u16 Zp16(u8 addr)
 	{
 		// Check for zero-page crossing
-		if (addr == 0xff)
-			return Read16(addr);
-		else
-			return (ram[addr + 1] << 8) + ram[addr];
+		//if (addr == 0xff)
+			//return Read16(addr);
+		//else
+		return (ram[(addr + 1) & 0xff] << 8) + ram[addr];
 	}
 	inline bool CrossesZp(u16 addr) { return addr > 0xff; }
 	inline void Push8(u8 val) { Stk(sp--) = val; }
@@ -114,7 +114,17 @@ public:
 	#pragma endregion
 
 	#pragma region Memory
-	inline u8& Read(u16 addr) { return ram[addr]; }
+	inline u8& Read(u16 addr)
+	{
+		// Mirrored 2KB of internal RAM
+		if (addr < 0x2000)
+			return ram[addr & 0x7FF];
+		// Mirrors of NES PPU registers
+		else if (0x2000 <= addr && addr <= 0x3fff)
+			return ram[((addr - 0x2000) % 8) + 0x2000];
+		else
+			return ram[addr];
+	}
 	inline u16 Read16(u16 addr) { return ram[addr] + (ram[addr + 1] << 8); }
 	inline u8& Stk(u8 addr) { return ram[0x0100 + static_cast<u32>(addr)]; }
 	#pragma endregion

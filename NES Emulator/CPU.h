@@ -129,8 +129,8 @@ public:
 	inline u16 Ind(u16 addr)
 	{
 		u8 lo = Read(addr);
-		u8 hi = (addr >> 8) + 1;
-		return Read(lo) + (Read(hi) << 8);
+		u8 hi = Read((addr & 0xff00) + LO(addr + 1));
+		return lo + (hi << 8);
 	}
 	inline u8& Stk(u8 addr) { return ram[0x0100 + static_cast<u32>(addr)]; }
 	#pragma endregion

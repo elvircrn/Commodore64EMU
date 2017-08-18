@@ -15,7 +15,7 @@ namespace NESEmulatorTest
 	void LoggerDump(const Debugger &debugger)
 	{
 		Logger::WriteMessage(debugger.GetOpHistForLogging().c_str());
-		//Logger::WriteMessage(debugger.GetPCHistForLogging().c_str());
+		Logger::WriteMessage(debugger.GetPCHistForLogging().c_str());
 	}
 
 	TEST_CLASS(CPUFlagTest)
@@ -122,6 +122,11 @@ namespace NESEmulatorTest
 				}
 				catch (std::string e)
 				{
+
+					LoggerDump(debugger);
+					std::stringstream ss;
+					ss << std::hex << std::setfill('0') << std::setw(2) << (int)cpu.GetPC();
+					Logger::WriteMessage(("PC: " + ss.str()).c_str());
 					Assert::Fail();
 				}
 			}

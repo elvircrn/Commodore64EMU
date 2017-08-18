@@ -10,3 +10,6 @@ typedef unsigned short     u16;
 typedef unsigned int       u32;
 typedef unsigned long long u64;
 
+
+inline u8 LO(const u8 &addr) { return addr & 0xff; }
+inline u8 HI(const u8 &addr) { return (addr >> 8) & 0xff; }

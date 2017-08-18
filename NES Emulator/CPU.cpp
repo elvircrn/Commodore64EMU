@@ -528,7 +528,13 @@ void CPU::INY() { UpdNZ(++y); }
 
 // TODO: Check if Abs should read memory
 template<AddressingModes mode>
-void CPU::JMP() { pc = GetOperand16<mode>(); }
+void CPU::JMP()
+{
+	if (mode == AddressingModes::ABSOLUTE)
+		pc = Abs();
+	else if (mode == AddressingModes::INDIRECT)
+		pc = Ind(Abs());
+}
 
 // TODO: Check if pc - 1 or pc + 1
 template<AddressingModes mode>

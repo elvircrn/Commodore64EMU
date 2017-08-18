@@ -173,6 +173,19 @@ void Debugger::PrintFlags() const
 {
 }
 
+std::string Debugger::GetNESTestLineWithCycles() const
+{
+	std::stringstream ss;
+
+	ss << "A:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetA()
+		<< " X:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetX()
+		<< " Y:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetY()
+		<< " P:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetP()
+		<< " SP:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetSP()
+		<< " CYC:" << std::dec << std::setfill(' ') << std::setw(3) << ((int)cpu->cycleCount + (cpu->cycleCount == 0 ? 0 : 4)) % 340;
+	return ss.str();
+}
+
 std::string Debugger::GetNESTestLine() const
 {
 	std::stringstream ss;

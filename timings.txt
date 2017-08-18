@@ -1,0 +1,14 @@
+Relative -> only used by branches, do not call Tick()
+
+Instructions that call Tick() directly:
+    PHP +1 
+    PHA +1
+    PLA +2
+    PLP +2
+
+Instructions starting with T do not require any extra cycles!
+
+Branches take an extra cycle if the branch is taken and another if zero is
+crossed
+
+

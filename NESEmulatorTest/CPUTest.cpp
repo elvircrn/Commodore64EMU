@@ -10,7 +10,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace NESEmulatorTest
 {		
-#define ASRT(X, Y) Assert::AreEqual((X), (Y), L"V test failed", LINE_INFO());
+	#define ASRT(X, Y) Assert::AreEqual((X), (Y), L"V test failed", LINE_INFO());
 
 	void LoggerDump(const Debugger &debugger)
 	{
@@ -71,7 +71,8 @@ namespace NESEmulatorTest
 			ASRT(cpu.GetFlag(Flags::Z), false);
 		}
 
-		TEST_METHOD(NESTest)
+		// CYC (0..340) +4 for every output
+		TEST_METHOD(NESTestWithCycles)
 		{
 			auto filepath = std::experimental::filesystem::path(__FILE__)
 				.parent_path()
@@ -89,7 +90,7 @@ namespace NESEmulatorTest
 
 			auto res = std::experimental::filesystem::path(__FILE__)
 				.parent_path()
-				.append("res.txt")
+				.append("timing.txt")
 				.string();
 
 			std::ifstream myfile(res);
@@ -102,13 +103,14 @@ namespace NESEmulatorTest
 			{
 				if (!cpu.IsOfficial())
 					break;
-				std::string line = debugger.GetNESTestLine();
+				std::string line = debugger.GetNESTestLineWithCycles();
 				std::string correctLine = lines[i];
 
 				debugger.AppendStatHist(line);
 				
 				if (correctLine != line)
 				{
+					cpu.Execute();
 					LoggerDump(debugger);
 					Logger::WriteMessage(("Exp: " + correctLine + "\nFnd: " + line).c_str());
 					Logger::WriteMessage(("Failed at: " + std::to_string(i)).c_str());
@@ -130,6 +132,70 @@ namespace NESEmulatorTest
 					Logger::WriteMessage(("PC: " + ss.str()).c_str());
 					Assert::Fail();
 				}
+			}
+
+		}
+
+		TEST_METHOD(NESTestNoCycle)
+		{
+			auto filepath = std::experimental::filesystem::path(__FILE__)
+				.parent_path()
+				.append("nestest.nes")
+				.string();
+
+			ROM rom = (FileHandler())
+				.LoadCartridge(filepath);
+
+			CPU cpu;
+			Debugger debugger(&cpu);
+			cpu.PowerUp();
+			cpu.LoadCartridge(rom);
+			cpu.SetP(0x24);
+
+			auto res = std::experimental::filesystem::path(__FILE__)
+				.parent_path()
+				.append("res.txt")
+				.string();
+
+			std::ifstream myfile(res);
+			std::vector<std::string> lines;
+			std::string correctLine;
+
+			int lineCount = 0;
+
+			while(std::getline(myfile, correctLine))
+			{
+				if (!cpu.IsOfficial())
+					break;
+
+				std::string emuLine = debugger.GetNESTestLine();
+
+				debugger.AppendStatHist(emuLine);
+				
+				if (correctLine != emuLine)
+				{
+					LoggerDump(debugger);
+					Logger::WriteMessage(("Exp: " + correctLine + "\nFnd: " + emuLine).c_str());
+					Logger::WriteMessage(("Failed at: " + std::to_string(lineCount)).c_str());
+					std::stringstream ss;
+					ss << std::hex << std::setfill('0') << std::setw(2) << (int)cpu.GetPC();
+					Logger::WriteMessage(("PC: " + ss.str()).c_str());
+					Assert::Fail();
+				}
+				try
+				{
+					cpu.Execute();
+				}
+				catch (std::string e)
+				{
+
+					LoggerDump(debugger);
+					std::stringstream ss;
+					ss << std::hex << std::setfill('0') << std::setw(2) << (int)cpu.GetPC();
+					Logger::WriteMessage(("PC: " + ss.str()).c_str());
+					Assert::Fail();
+				}
+				lineCount++;
 			}
 		}
 	};

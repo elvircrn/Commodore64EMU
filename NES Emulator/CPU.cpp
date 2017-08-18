@@ -12,7 +12,7 @@ void CPU::LoadCartridge(const ROM & rom)
 	//pc = Read16(0xfffe);
 }
 
-CPU::CPU() : ram(RAM_SIZE), isOfficial(0xff)
+CPU::CPU() : ram(RAM_SIZE), isOfficial(0xff), cycleCount(0)
 {
 	isOfficial[0x69] = true;
 	isOfficial[0x65] = true;
@@ -186,7 +186,7 @@ void CPU::PowerUp()
 	pc = 0xC000;
 }
 
-void CPU::Tick() { }
+void CPU::Tick(int cycles) { cycleCount += cycles; }
 
 void CPU::Execute()
 {
@@ -198,6 +198,8 @@ void CPU::Execute()
 		for (int i = 0; i < 5; i++)
 			bitStack.push_back(Read(pc + i));
 	}
+
+	Tick(2);
 
 	u8 op = Read(pc++);
 	switch (op)
@@ -569,7 +571,9 @@ void CPU::BCC()
 {
 	u16 loc = GetPureOperand<mode>();
 	if (!C())
+	{
 		pc = loc;
+	}
 }
 
 template<AddressingModes mode>
@@ -577,7 +581,10 @@ void CPU::BCS()
 {
 	u16 loc = GetPureOperand<mode>();
 	if (C())
+	{
+		Tick();
 		pc = loc;
+	}
 }
 
 template<AddressingModes mode>
@@ -585,7 +592,10 @@ void CPU::BEQ()
 {
 	u16 loc = GetPureOperand<mode>();
 	if (Z())
+	{
+		Tick();
 		pc = loc;
+	}
 }
 
 template<AddressingModes mode>
@@ -611,7 +621,10 @@ void CPU::BNE()
 {
 	u16 loc = GetPureOperand<mode>();
 	if (!Z())
+	{
+		Tick();
 		pc = loc;
+	}
 }
 
 template<AddressingModes mode>
@@ -619,7 +632,10 @@ void CPU::BPL()
 {
 	u16 loc = GetPureOperand<mode>();
 	if (!N())
+	{
+		Tick();
 		pc = loc;
+	}
 }
 
 // TODO: Consider implementing
@@ -638,7 +654,10 @@ void CPU::BVC()
 {
 	u16 loc = GetPureOperand<mode>();
 	if (!V())
+	{
+		Tick();
 		pc = loc;
+	}
 }
 
 template<AddressingModes mode>
@@ -646,7 +665,10 @@ void CPU::BVS()
 {
 	u16 loc = GetPureOperand<mode>();
 	if (V())
+	{
+		Tick();
 		pc = loc;
+	}
 }
 
 template<AddressingModes mode>
@@ -691,9 +713,12 @@ void CPU::DEC()
 	UpdNZ(--GetOperand8<mode>());
 }
 
+
+// No additional cycles
 template<AddressingModes mode>
 void CPU::DEX() { UpdNZ(--x); }
 
+// No additional cycles
 template<AddressingModes mode>
 void CPU::DEY() { UpdNZ(--y); }
 
@@ -714,9 +739,12 @@ template<AddressingModes mode>
 void CPU::JMP()
 {
 	if (mode == AddressingModes::ABSOLUTE)
+	{
+		Tick();
 		pc = Abs();
+	}
 	else if (mode == AddressingModes::INDIRECT)
-		pc = Ind(Abs());
+		pc = Ind(Abs()); // Ind calls tick
 }
 
 // TODO: Check if pc - 1 or pc + 1
@@ -725,6 +753,7 @@ void CPU::JSR()
 {
 	Push16(pc + 1);
 	pc = Abs();
+	Tick(4);
 }
 
 template<AddressingModes mode>
@@ -759,18 +788,21 @@ void CPU::ORA() { UpdNZ(a |= GetOperand8<mode>()); }
 template<AddressingModes mode>
 void CPU::PHA()
 {
+	Tick();
 	Push8(a);
 }
 
 template<AddressingModes mode>
 void CPU::PHP()
 {
+	Tick();
 	Push8(p | (1 << 4));
 }
 
 template<AddressingModes mode>
 void CPU::PLA()
 {
+	Tick(2);
 	a = Pop8();
 	UpdNZ(a);
 }
@@ -778,6 +810,7 @@ void CPU::PLA()
 template<AddressingModes mode>
 void CPU::PLP()
 {
+	Tick(2);
 	p = Pop8();
 	B(false);
 	// TODO: What?
@@ -809,12 +842,13 @@ void CPU::ROR()
 template<AddressingModes mode>
 void CPU::RTI()
 {
-	PLP<mode>();
-	pc = Pop16();
+	PLP<mode>(); // pop8 
+	Tick(2);
+	pc = Pop16(); // pop16
 }
 
 template<AddressingModes mode>
-void CPU::RTS() { pc = Pop16() + 1; }
+void CPU::RTS() { Tick(4); pc = Pop16() + 1; }
 
 template<AddressingModes mode>
 void CPU::SBC()
@@ -837,10 +871,7 @@ template<AddressingModes mode>
 void CPU::SEI() { I(1); }
 
 template<AddressingModes mode>
-void CPU::STA()
-{
-	GetOperand8<mode>() = a;
-}
+void CPU::STA() { GetOperand8<mode>() = a; }
 
 template<AddressingModes mode>
 void CPU::STX() { GetOperand8<mode>() = x; }
@@ -861,7 +892,7 @@ template<AddressingModes mode>
 void CPU::TXA() { a = x; UpdNZ(a); }
 
 template<AddressingModes mode>
-void CPU::TXS() { sp = x ; }
+void CPU::TXS() { sp = x; }
 
 template<AddressingModes mode>
 void CPU::TYA() { a = y; UpdNZ(a); }

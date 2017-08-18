@@ -130,6 +130,7 @@ public:
 	inline u16 Read16(u16 addr) { return Read(addr) + (Read(addr + 1) << 8); }
 	inline u16 Ind(u16 addr)
 	{
+		Tick(3);
 		u8 lo = Read(addr);
 		u8 hi = Read((addr & 0xff00) + LO(addr + 1));
 		return lo + (hi << 8);
@@ -157,7 +158,8 @@ public:
 	~CPU();
 
 	#pragma region Timing
-	void Tick();
+	int cycleCount;
+	void Tick(int cylces = 1);
 	#pragma endregion
 
 	void Execute();

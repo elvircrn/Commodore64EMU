@@ -284,13 +284,7 @@ uint16_t CPU::GetPC() const
 template<AddressingModes mode>
 u16 CPU::GetPureOperand()
 {
-    switch(Is8Bit<mode>())
-    {
-		case true:
-			return GetOperand8<mode>();
-		case false:
-			return GetOperand16<mode>();
-    }
+	return Is8Bit<mode>() ? GetOperand8<mode>() : GetOperand16<mode>();
 }
 
 template<AddressingModes mode>
@@ -371,7 +365,7 @@ void CPU::ADC()
 	s16 res = lhs + rhs + C();
 	a = static_cast<u8>(res & 0xff);
 	UpdCV(lhs, rhs, res);
-	UpdNZ(res);
+	UpdNZ((u8)(res & 0xff));
 }
 
 //....	and (with accumulator)  
@@ -413,7 +407,7 @@ void CPU::BEQ()
 template<AddressingModes mode>
 void CPU::BIT()
 {
-	u8 op = GetPureOperand<mode>();
+	u8 op = (u8)GetPureOperand<mode>();
 	u8 res = a & op;
 	Z(!res);
 	N(op & (1 << 7));
@@ -491,7 +485,7 @@ void CPU::CMP()
 template<AddressingModes mode>
 void CPU::CPX()
 {
-	u8 mem = GetPureOperand<mode>();
+	u8 mem = (u8)GetPureOperand<mode>();
 	UpdNZ(x - mem);
 	C(x >= mem);
 }
@@ -499,7 +493,7 @@ void CPU::CPX()
 template<AddressingModes mode>
 void CPU::CPY()
 {
-	u8 mem = GetPureOperand<mode>();
+	u8 mem = (u8)GetPureOperand<mode>();
 	UpdNZ(y - mem);
 	C(y >= mem);
 }
@@ -561,7 +555,7 @@ template<AddressingModes mode>
 void CPU::LDX() { UpdNZ(x = GetOperand8<mode>()); }
 
 template<AddressingModes mode>
-void CPU::LDY() { UpdNZ(y = GetPureOperand<mode>()); }
+void CPU::LDY() { UpdNZ(y = (u8)GetPureOperand<mode>()); }
 
 template<AddressingModes mode>
 void CPU::LSR()
@@ -611,7 +605,7 @@ void CPU::ROL()
 	u8 &mem = GetOperand8<mode>();
 	u8 t = mem;
 	mem <<= 1;
-	mem |= C();
+	mem |= static_cast<u8>(C());
 	C(t & 0x80);
 	UpdNZ(mem);
 }
@@ -644,7 +638,7 @@ void CPU::SBC()
 	u8 rhs = GetOperand8<mode>() ^ 0xff;
 	s16 res = lhs + rhs + C();
 	UpdCV(a, rhs, res);
-	a = res;
+	a = static_cast<u8>(res);
 	UpdNZ(a);
 }
 

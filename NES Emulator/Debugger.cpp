@@ -182,7 +182,7 @@ std::string Debugger::GetNESTestLineWithCycles() const
 		<< " Y:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetY()
 		<< " P:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetP()
 		<< " SP:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetSP()
-		<< " CYC:" << std::dec << std::setfill(' ') << std::setw(3) << ((int)cpu->cycleCount + (cpu->cycleCount == 0 ? 0 : 4)) % 340;
+		<< " CYC:" << std::dec << std::setfill(' ') << std::setw(3) << ((int)cpu->cycleCount + (cpu->cycleCount == 0 ? 0 : 2)) % 340;
 	return ss.str();
 }
 

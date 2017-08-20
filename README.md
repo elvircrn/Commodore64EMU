@@ -2,6 +2,9 @@
 
 ![Grunt status](https://ci.appveyor.com/api/projects/status/github/elvircrn/NESEmu?branch=master&svg=true) 
 
+# TODOs
+Refactor branches into a single method
+
 # Notes on cycle counting:
 
 Every instruction takes at least two cycles.
@@ -124,3 +127,4 @@ absolute,x    [+2]\
 absolute,y    [+2]\
 (indirect,x)  +4\
 (indirect),y  [+3]
+

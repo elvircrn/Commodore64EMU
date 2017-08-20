@@ -30,6 +30,9 @@
     <ClInclude Include="..\NES Emulator\ROM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\NES Emulator\PPU.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\NES Emulator\core.cpp">
@@ -48,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\NES Emulator\Debugger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\NES Emulator\PPU.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

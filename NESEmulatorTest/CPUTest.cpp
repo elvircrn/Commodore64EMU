@@ -117,6 +117,7 @@ namespace NESEmulatorTest
 					std::stringstream ss;
 					ss << std::hex << std::setfill('0') << std::setw(2) << (int)cpu.GetPC();
 					Logger::WriteMessage(("PC: " + ss.str()).c_str());
+					Logger::WriteMessage(("Cycle delta: " + std::to_string(cpu.Delta())).c_str());
 					Assert::Fail();
 				}
 				try

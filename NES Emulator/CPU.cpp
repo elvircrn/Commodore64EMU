@@ -14,157 +14,23 @@ void CPU::LoadCartridge(const ROM & rom)
 
 CPU::CPU() : ram(RAM_SIZE), isOfficial(0xff), cycleCount(0)
 {
-	isOfficial[0x69] = true;
-	isOfficial[0x65] = true;
-	isOfficial[0x75] = true;
-	isOfficial[0x6D] = true;
-	isOfficial[0x7D] = true;
-	isOfficial[0x79] = true;
-	isOfficial[0x61] = true;
-	isOfficial[0x71] = true;
-	isOfficial[0x29] = true;
-	isOfficial[0x25] = true;
-	isOfficial[0x35] = true;
-	isOfficial[0x2D] = true;
-	isOfficial[0x3D] = true;
-	isOfficial[0x39] = true;
-	isOfficial[0x21] = true;
-	isOfficial[0x31] = true;
-	isOfficial[0x0A] = true;
-	isOfficial[0x06] = true;
-	isOfficial[0x16] = true;
-	isOfficial[0x0E] = true;
-	isOfficial[0x1E] = true;
-	isOfficial[0x24] = true;
-	isOfficial[0x2C] = true;
-	isOfficial[0x10] = true;
-	isOfficial[0x30] = true;
-	isOfficial[0x50] = true;
-	isOfficial[0x70] = true;
-	isOfficial[0x90] = true;
-	isOfficial[0xB0] = true;
-	isOfficial[0xD0] = true;
-	isOfficial[0xF0] = true;
-	isOfficial[0x00] = true;
-	isOfficial[0xC9] = true;
-	isOfficial[0xC5] = true;
-	isOfficial[0xD5] = true;
-	isOfficial[0xCD] = true;
-	isOfficial[0xDD] = true;
-	isOfficial[0xD9] = true;
-	isOfficial[0xC1] = true;
-	isOfficial[0xD1] = true;
-	isOfficial[0xE0] = true;
-	isOfficial[0xE4] = true;
-	isOfficial[0xEC] = true;
-	isOfficial[0xC0] = true;
-	isOfficial[0xC4] = true;
-	isOfficial[0xCC] = true;
-	isOfficial[0xC6] = true;
-	isOfficial[0xD6] = true;
-	isOfficial[0xCE] = true;
-	isOfficial[0xDE] = true;
-	isOfficial[0x49] = true;
-	isOfficial[0x45] = true;
-	isOfficial[0x55] = true;
-	isOfficial[0x4D] = true;
-	isOfficial[0x5D] = true;
-	isOfficial[0x59] = true;
-	isOfficial[0x41] = true;
-	isOfficial[0x51] = true;
-	isOfficial[0x18] = true;
-	isOfficial[0x38] = true;
-	isOfficial[0x58] = true;
-	isOfficial[0x78] = true;
-	isOfficial[0xB8] = true;
-	isOfficial[0xD8] = true;
-	isOfficial[0xF8] = true;
-	isOfficial[0xE6] = true;
-	isOfficial[0xF6] = true;
-	isOfficial[0xEE] = true;
-	isOfficial[0xFE] = true;
-	isOfficial[0x4C] = true;
-	isOfficial[0x6C] = true;
-	isOfficial[0x20] = true;
-	isOfficial[0xA9] = true;
-	isOfficial[0xA5] = true;
-	isOfficial[0xB5] = true;
-	isOfficial[0xAD] = true;
-	isOfficial[0xBD] = true;
-	isOfficial[0xB9] = true;
-	isOfficial[0xA1] = true;
-	isOfficial[0xB1] = true;
-	isOfficial[0xA2] = true;
-	isOfficial[0xA6] = true;
-	isOfficial[0xB6] = true;
-	isOfficial[0xAE] = true;
-	isOfficial[0xBE] = true;
-	isOfficial[0xA0] = true;
-	isOfficial[0xA4] = true;
-	isOfficial[0xB4] = true;
-	isOfficial[0xAC] = true;
-	isOfficial[0xBC] = true;
-	isOfficial[0x4A] = true;
-	isOfficial[0x46] = true;
-	isOfficial[0x56] = true;
-	isOfficial[0x4E] = true;
-	isOfficial[0x5E] = true;
-	isOfficial[0x09] = true;
-	isOfficial[0x05] = true;
-	isOfficial[0x15] = true;
-	isOfficial[0x0D] = true;
-	isOfficial[0x1D] = true;
-	isOfficial[0x19] = true;
-	isOfficial[0x01] = true;
-	isOfficial[0x11] = true;
-	isOfficial[0xAA] = true;
-	isOfficial[0x8A] = true;
-	isOfficial[0xCA] = true;
-	isOfficial[0xE8] = true;
-	isOfficial[0xA8] = true;
-	isOfficial[0x98] = true;
-	isOfficial[0x88] = true;
-	isOfficial[0xC8] = true;
-	isOfficial[0x2A] = true;
-	isOfficial[0x26] = true;
-	isOfficial[0x36] = true;
-	isOfficial[0x2E] = true;
-	isOfficial[0x3E] = true;
-	isOfficial[0x6A] = true;
-	isOfficial[0x66] = true;
-	isOfficial[0x76] = true;
-	isOfficial[0x6E] = true;
-	isOfficial[0x7E] = true;
-	isOfficial[0x40] = true;
-	isOfficial[0x60] = true;
-	isOfficial[0xE9] = true;
-	isOfficial[0xE5] = true;
-	isOfficial[0xF5] = true;
-	isOfficial[0xED] = true;
-	isOfficial[0xFD] = true;
-	isOfficial[0xF9] = true;
-	isOfficial[0xE1] = true;
-	isOfficial[0xF1] = true;
-	isOfficial[0x85] = true;
-	isOfficial[0x95] = true;
-	isOfficial[0x8D] = true;
-	isOfficial[0x9D] = true;
-	isOfficial[0x99] = true;
-	isOfficial[0x81] = true;
-	isOfficial[0x91] = true;
-	isOfficial[0x86] = true;
-	isOfficial[0x96] = true;
-	isOfficial[0x8E] = true;
-	isOfficial[0x84] = true;
-	isOfficial[0x94] = true;
-	isOfficial[0x8C] = true;
-	isOfficial[0x9A] = true;
-	isOfficial[0xBA] = true;
-	isOfficial[0x48] = true;
-	isOfficial[0x68] = true;
-	isOfficial[0x08] = true;
-	isOfficial[0x28] = true;
-	isOfficial[0xEA] = true;
+	u8 official[] = { 0x69, 0x65, 0x75, 0x6D, 0x7D, 0x79, 0x61, 0x71, 0x28, 0xEA,
+		  			  0x29, 0x25, 0x35, 0x2D, 0x3D, 0x39, 0x21, 0x31, 0x0A, 0x06,
+		  			  0x16, 0x0E, 0x1E, 0x24, 0x2C, 0x10, 0x30, 0x50, 0x70, 0x90,
+		  			  0xB0, 0xD0, 0xF0, 0x00, 0xC9, 0xC5, 0xD5, 0xCD, 0xDD, 0xD9,
+		  			  0xC1, 0xD1, 0xE0, 0xE4, 0xEC, 0xC0, 0xC4, 0xCC, 0xC6, 0xD6,
+		  			  0xCE, 0xDE, 0x49, 0x45, 0x55, 0x4D, 0x5D, 0x59, 0x41, 0x51,
+		  			  0x18, 0x38, 0x58, 0x78, 0xB8, 0xD8, 0xF8, 0xE6, 0xF6, 0xEE,
+		  			  0xFE, 0x4C, 0x6C, 0x20, 0xA9, 0xA5, 0xB5, 0xAD, 0xBD, 0xB9,
+		  			  0xA1, 0xB1, 0xA2, 0xA6, 0xB6, 0xAE, 0xBE, 0xA0, 0xA4, 0xB4,
+		  			  0xAC, 0xBC, 0x4A, 0x46, 0x56, 0x4E, 0x5E, 0x09, 0x05, 0x15,
+		  			  0x0D, 0x1D, 0x19, 0x01, 0x11, 0xAA, 0x8A, 0xCA, 0xE8, 0xA8,
+		  			  0x98, 0x88, 0xC8, 0x2A, 0x26, 0x36, 0x2E, 0x3E, 0x6A, 0x66,
+		  			  0x76, 0x6E, 0x7E, 0x40, 0x60, 0xE9, 0xE5, 0xF5, 0xED, 0xFD,
+		  			  0xF9, 0xE1, 0xF1, 0x85, 0x95, 0x8D, 0x9D, 0x99, 0x81, 0x91,
+					  0x86, 0x96, 0x8E, 0x84, 0x94, 0x8C, 0x9A, 0xBA, 0x48, 0x68, 0x08 };
+	for (u8 o : official)
+		isOfficial[o] = true;
 }
 
 CPU::CPU(uint16_t _rst) : CPU()
@@ -387,8 +253,6 @@ void CPU::Execute()
 		case 0x7C: NOP<AddressingModes::IMPLIED, 2>(); break; 
 		case 0xDC: NOP<AddressingModes::IMPLIED, 2>(); break; 
 		case 0xFC: NOP<AddressingModes::IMPLIED, 2>(); break;
-
-
 		
 		default:
 			std::stringstream ss;
@@ -396,9 +260,11 @@ void CPU::Execute()
 				ss << std::hex << (int)Read(i) << ' ';
 			throw "Instruction not found at pc: " + std::to_string(pc) + "\nDump: " + ss.str();
 			break;
+
 	}
 
-	Tick(zeroPageCrossed);
+	Tick(zeroPageCrossed & calcCrossed);
+	cycleCount += 4;
 }
 
 #pragma region Register getters and setters
@@ -531,7 +397,11 @@ u8& CPU::GetOperand8()
 			return Read(zp16);
 		}
 		case AddressingModes::INDIRECT_INDEXED:
-			return Read(Zp16(Imm()) + y);
+		{
+			u16 zp16 = Zp16(Imm());
+			CrossesPage(zp16, y);
+			return Read(zp16 + y);
+		}
 		case AddressingModes::ACCUMULATOR:
 			return a;
         // ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
@@ -547,7 +417,8 @@ u8& CPU::GetOperand8()
 template<AddressingModes mode>
 void CPU::ADC()
 {
-	Tick(CalcBaseTick<mode>());
+	Tick(CalcBaseTicks<mode>());
+	calcCrossed = true;
 
 	u8 lhs = a;
 	u8 rhs = GetOperand8<mode>();
@@ -561,18 +432,25 @@ void CPU::ADC()
 template<AddressingModes mode>
 void CPU::AND()
 {
+	calcCrossed = true;
 	UpdNZ(a &= GetPureOperand<mode>());
 }
 
 //....	arithmetic shift left  
 template<AddressingModes mode>
-void CPU::ASL() { UpdNZ(_ASL(GetOperand8<mode>())); }
+void CPU::ASL()
+{
+	Tick(CalcBaseTicks<mode>());
+	Tick(CalcShiftTicks<mode>());
+	UpdNZ(_ASL(GetOperand8<mode>()));
+}
 
 // TODO: Consider refactoring into a non-templated function
 template<AddressingModes mode>
 void CPU::BCC()
 {
 	u16 loc = GetPureOperand<mode>();
+	calcCrossed = true;
 	if (!C())
 	{
 		pc = loc;
@@ -583,6 +461,7 @@ template<AddressingModes mode>
 void CPU::BCS()
 {
 	u16 loc = GetPureOperand<mode>();
+	calcCrossed = true;
 	if (C())
 	{
 		Tick();
@@ -594,6 +473,7 @@ template<AddressingModes mode>
 void CPU::BEQ()
 {
 	u16 loc = GetPureOperand<mode>();
+	calcCrossed = true;
 	if (Z())
 	{
 		Tick();
@@ -615,14 +495,19 @@ template<AddressingModes mode>
 void CPU::BMI()
 {
 	u16 loc = GetPureOperand<mode>();
+	calcCrossed = true;
 	if (N())
+	{
+		Tick();
 		pc = loc;
+	}
 }
 
 template<AddressingModes mode>
 void CPU::BNE()
 {
 	u16 loc = GetPureOperand<mode>();
+	calcCrossed = true;
 	if (!Z())
 	{
 		Tick();
@@ -634,6 +519,7 @@ template<AddressingModes mode>
 void CPU::BPL()
 {
 	u16 loc = GetPureOperand<mode>();
+	calcCrossed = true;
 	if (!N())
 	{
 		Tick();
@@ -656,6 +542,7 @@ template<AddressingModes mode>
 void CPU::BVC()
 {
 	u16 loc = GetPureOperand<mode>();
+	calcCrossed = true;
 	if (!V())
 	{
 		Tick();
@@ -667,6 +554,7 @@ template<AddressingModes mode>
 void CPU::BVS()
 {
 	u16 loc = GetPureOperand<mode>();
+	calcCrossed = true;
 	if (V())
 	{
 		Tick();
@@ -689,6 +577,7 @@ void CPU::CLV() { V(0); }
 template<AddressingModes mode>
 void CPU::CMP()
 {
+	calcCrossed = true;
 	u8 mem = (u8)GetPureOperand<mode>();
 	UpdNZ(a - mem);
 	C(a >= mem);
@@ -697,6 +586,7 @@ void CPU::CMP()
 template<AddressingModes mode>
 void CPU::CPX()
 {
+	calcCrossed = true;
 	u8 mem = (u8)GetPureOperand<mode>();
 	UpdNZ(x - mem);
 	C(x >= mem);
@@ -705,6 +595,7 @@ void CPU::CPX()
 template<AddressingModes mode>
 void CPU::CPY()
 {
+	calcCrossed = true;
 	u8 mem = (u8)GetPureOperand<mode>();
 	UpdNZ(y - mem);
 	C(y >= mem);
@@ -713,9 +604,9 @@ void CPU::CPY()
 template<AddressingModes mode>
 void CPU::DEC()
 {
+	Tick(CalcBaseTicks<mode>() + CalcIncDecTicks<mode>());
 	UpdNZ(--GetOperand8<mode>());
 }
-
 
 // No additional cycles
 template<AddressingModes mode>
@@ -726,10 +617,19 @@ template<AddressingModes mode>
 void CPU::DEY() { UpdNZ(--y); }
 
 template<AddressingModes mode>
-void CPU::EOR() { UpdNZ(a ^= GetPureOperand<mode>()); }
+void CPU::EOR()
+{
+	Tick(CalcBaseTicks<mode>());
+	calcCrossed = true;
+	UpdNZ(a ^= GetPureOperand<mode>());
+}
 
 template<AddressingModes mode>
-void CPU::INC() { UpdNZ(++GetOperand8<mode>()); }
+void CPU::INC()
+{
+	Tick(CalcBaseTicks<mode>() + CalcIncDecTicks<mode>());
+	UpdNZ(++GetOperand8<mode>());
+}
 
 template<AddressingModes mode>
 void CPU::INX() { UpdNZ(++x); }
@@ -762,18 +662,24 @@ void CPU::JSR()
 template<AddressingModes mode>
 void CPU::LDA()
 {
+	calcCrossed = true;
+	Tick(CalcBaseTicks<mode>());
 	UpdNZ(a = GetOperand8<mode>());
 }
 
 template<AddressingModes mode>
 void CPU::LDX()
 {
+	Tick(CalcBaseTicks<mode>());
+	calcCrossed = true;
 	UpdNZ(x = GetOperand8<mode>());
 }
 
 template<AddressingModes mode>
 void CPU::LDY()
 {
+	Tick(CalcBaseTicks<mode>());
+	calcCrossed = true;
 	UpdNZ(y = (u8)GetPureOperand<mode>());
 }
 
@@ -789,7 +695,11 @@ template<AddressingModes mode, int waste>
 void CPU::NOP() { pc += waste; }
 
 template<AddressingModes mode>
-void CPU::ORA() { UpdNZ(a |= GetOperand8<mode>()); }
+void CPU::ORA()
+{
+	calcCrossed = true;
+	UpdNZ(a |= GetOperand8<mode>());
+}
 
 template<AddressingModes mode>
 void CPU::PHA()
@@ -826,6 +736,8 @@ void CPU::PLP()
 template<AddressingModes mode>
 void CPU::ROL()
 {
+	Tick(CalcBaseTicks<mode>());
+	Tick(CalcShiftTicks<mode>());
 	u8 &mem = GetOperand8<mode>();
 	u8 t = mem;
 	mem <<= 1;
@@ -837,6 +749,8 @@ void CPU::ROL()
 template<AddressingModes mode>
 void CPU::ROR()
 {
+	Tick(CalcBaseTicks<mode>());
+	Tick(CalcShiftTicks<mode>());
 	u8 &mem = GetOperand8<mode>();
 	u8 t = mem;
 	mem >>= 1;
@@ -859,6 +773,8 @@ void CPU::RTS() { Tick(4); pc = Pop16() + 1; }
 template<AddressingModes mode>
 void CPU::SBC()
 {
+	Tick(CalcBaseTicks<mode>());
+	calcCrossed = true;
 	u8 lhs = a;
 	u8 rhs = GetOperand8<mode>() ^ 0xff;
 	s16 res = lhs + rhs + C();
@@ -877,13 +793,28 @@ template<AddressingModes mode>
 void CPU::SEI() { I(1); }
 
 template<AddressingModes mode>
-void CPU::STA() { GetOperand8<mode>() = a; }
+void CPU::STA()
+{
+	Tick(CalcBaseTicks<mode>());
+	Tick(CalcStoreTicks<mode>());
+	GetOperand8<mode>() = a;
+}
 
 template<AddressingModes mode>
-void CPU::STX() { GetOperand8<mode>() = x; }
+void CPU::STX()
+{
+	Tick(CalcBaseTicks<mode>());
+	Tick(CalcStoreTicks<mode>());
+	GetOperand8<mode>() = x;
+}
 
 template<AddressingModes mode>
-void CPU::STY() { GetOperand8<mode>() = y; }
+void CPU::STY()
+{
+	Tick(CalcBaseTicks<mode>());
+	Tick(CalcStoreTicks<mode>());
+	GetOperand8<mode>() = y;
+}
 
 template<AddressingModes mode>
 void CPU::TAX() { x = a; UpdNZ(x); }

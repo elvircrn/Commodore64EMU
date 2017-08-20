@@ -52,6 +52,7 @@ class CPU
 	uint16_t rst;
 	std::vector<bool> isOfficial;
 	bool zeroPageCrossed;
+	bool calcCrossed;
 
 	// Buffers
 	u16 buff16;
@@ -64,18 +65,27 @@ class CPU
 	// Addressing helpers
 	inline u8 Imm() { return Read(pc++); }
 	inline u16 Abs() { return Read16((pc += 2) - 2); }
-	inline u16 AbsX() { return Abs() + x; }
-	inline u16 AbsY() { return Abs() + y; }
+	inline u16 AbsX()
+	{
+		u16 abs = Abs();
+		CrossesPage(abs, x);
+		return abs + x;
+	}
+	inline u16 AbsY()
+	{
+		u16 abs = Abs();
+		CrossesPage(abs, y);
+		return abs + y;
+	}
 	inline u8& Zp(u8 addr) { return ram[addr]; }
 	inline u16 Zp16(u8 addr)
 	{
-		// Check for zero-page crossing
-		//if (addr == 0xff)
-			//return Read16(addr);
-		//else
 		return (ram[(addr + 1) & 0xff] << 8) + ram[addr];
 	}
-	inline bool CrossesZp(u16 addr) { return addr > 0xff; }
+	inline void CrossesPage(u16 addr, u8 offset)
+	{
+		zeroPageCrossed |= ((addr & 0xff00) != ((addr + offset) & 0xff00));
+	}
 	inline void Push8(u8 val) { Stk(sp--) = val; }
 	// NOTE: First the high byte is pushed, then the low.
 	inline void Push16(u16 val) { Push8(val >> 8); Push8(val & 0xFF); }
@@ -115,7 +125,7 @@ public:
 	// TODO: Consider refactoring into an external class?
 	void PowerUp();
 	// Called before instruction execution
-	inline void Clear() { zeroPageCrossed = false; }
+	inline void Clear() { zeroPageCrossed = false; calcCrossed = false; delta = 0; }
 	#pragma endregion
 
 	#pragma region Memory
@@ -162,11 +172,14 @@ public:
 
 	#pragma region Timing
 	int cycleCount;
-	inline void Tick(int cycles = 1) { cycleCount += cycles; }
+	int delta;
+	inline void Tick(int cycles = 1) { cycleCount += cycles; delta += cycles;  }
+	inline int Delta() { return delta; }
 
-	// Do not use with jumps or returns!
+	// NOTE Do not use with jumps or returns!
+	#pragma region Tick calculation
 	template<AddressingModes mode>
-	inline int CalcBaseTick()
+	inline int CalcBaseTicks()
 	{
 		switch (mode)
 		{
@@ -193,7 +206,7 @@ public:
 	}
 
 	template<AddressingModes mode>
-	inline int CalcStoreTick()
+	inline int CalcStoreTicks()
 	{
 		switch (mode)
 		{
@@ -206,6 +219,44 @@ public:
 		}
 		return 0;
 	}
+
+	template<AddressingModes mode>
+	inline int CalcShiftTicks()
+	{
+		switch (mode)
+		{
+			case AddressingModes::ZERO_PAGE:
+				return 2;
+			case AddressingModes::ZERO_PAGE_X:
+				return 2;
+			case AddressingModes::ZERO_PAGE_Y:
+				return 2;
+			case AddressingModes::ABSOLUTE:
+				return 2;
+			case AddressingModes::ABSOLUTE_INDEXED_X:
+				return 3;
+		}
+		return 0;
+	}
+
+
+	template<AddressingModes mode>
+	inline int CalcIncDecTicks()
+	{
+		switch (mode)
+		{
+			case AddressingModes::ZERO_PAGE:
+				return 2;
+			case AddressingModes::ZERO_PAGE_X:
+				return 2;
+			case AddressingModes::ABSOLUTE:
+				return 2;
+			case AddressingModes::ABSOLUTE_INDEXED_X:
+				return 3;
+		}
+		return 0;
+	}
+	#pragma endregion
 	#pragma endregion
 
 	void Execute();

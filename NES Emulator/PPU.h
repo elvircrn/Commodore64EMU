@@ -14,15 +14,15 @@ class PPU
 	constexpr static int OAM_SIZE = 0x100;
 	std::vector<u8> oam;
 
-	u8 PPUCTRL;
-	u8 PPUMASK;
-	u8 PPUSTATUS;
-	u8 OAMADDR;
-	u8 OAMDATA;
-	u8 PPUSCROLL;
-	u8 PPUADDR;
-	u8 PPUDATA;
-	u8 OAMDMA;
+	u8 PPUCTRL;     // VPHB SINN
+	u8 PPUMASK;     // BGRs bMmG
+	u8 PPUSTATUS;   // VSO- ----
+	u8 OAMADDR;     // aaaa aaaa
+	u8 OAMDATA;     // dddd dddd
+	u8 PPUSCROLL;   // xxxx xxxx
+	u8 PPUADDR;     // aaaa aaaa
+	u8 PPUDATA;     // dddd dddd
+	u8 OAMDMA;      // aaaa aaaa
 
 public:
 
@@ -42,6 +42,7 @@ public:
 			default: return mem[addr];
 		}
 	}
+
 	inline u8 Rd(u16 addr) const
 	{
 		switch (addr)

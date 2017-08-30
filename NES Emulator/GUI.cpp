@@ -34,7 +34,6 @@ GUI::GUI() : window(nullptr), screenSurface(nullptr)
 	}
 }
 
-
 GUI::~GUI()
 {
 	if (window != nullptr)

@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClCompile Include="CPU.cpp" />
     <ClCompile Include="Debugger.cpp" />
+    <ClCompile Include="EmuException.cpp" />
     <ClCompile Include="FileHandler.cpp" />
     <ClCompile Include="GUI.cpp" />
     <ClCompile Include="main.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="core.h" />
     <ClInclude Include="CPU.h" />
     <ClInclude Include="Debugger.h" />
+    <ClInclude Include="EmuException.h" />
     <ClInclude Include="FileHandler.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="PPU.h" />

@@ -12,7 +12,7 @@ void CPU::LoadCartridge(const ROM & rom)
 	//pc = Read16(0xfffe);
 }
 
-CPU::CPU() : ram(RAM_SIZE), isOfficial(0xff), cycleCount(0)
+CPU::CPU() : ram(RAM_SIZE), isOfficial(0xff), cycleCount(0), ppu(nullptr)
 {
 	u8 official[] = { 0x69, 0x65, 0x75, 0x6D, 0x7D, 0x79, 0x61, 0x71, 0x28, 0xEA,
 		  			  0x29, 0x25, 0x35, 0x2D, 0x3D, 0x39, 0x21, 0x31, 0x0A, 0x06,
@@ -33,9 +33,15 @@ CPU::CPU() : ram(RAM_SIZE), isOfficial(0xff), cycleCount(0)
 		isOfficial[o] = true;
 }
 
-CPU::CPU(uint16_t _rst) : CPU()
+// TODO: Calculate RST vector
+//CPU::CPU(uint16_t _rst) : CPU()
+//{
+//	rst = _rst;
+//}
+
+CPU::CPU(PPU *_ppu) : CPU()
 {
-	rst = _rst;
+	ppu = _ppu;
 }
 
 CPU::~CPU()
@@ -269,147 +275,84 @@ void CPU::Execute()
 
 #pragma region Register getters and setters
 
-void CPU::SetA(uint8_t _a)
-{
-	a = _a;
-}
-
-void CPU::SetX(uint8_t _x)
-{
-	x = _x;
-}
-
-void CPU::SetY(uint8_t _y)
-{
-	y = _y;
-}
-
-void CPU::SetS(uint8_t _s)
-{
-	sp = _s;
-}
-
-void CPU::SetP(uint8_t _p)
-{
-	p = _p;
-}
-
-void CPU::SetPC(uint16_t _pc)
-{
-	pc = _pc;
-}
-
-uint8_t CPU::GetA() const
-{
-	return a;
-}
-
-uint8_t CPU::GetX() const
-{
-	return x;
-}
-
-uint8_t CPU::GetY() const
-{
-	return y;
-}
-
-uint8_t CPU::GetSP() const
-{
-	return sp;
-}
-
-uint8_t CPU::GetP() const
-{
-	return p;
-}
-
-uint16_t CPU::GetPC() const
-{
-	return pc;
-}
-
 #pragma endregion
 
 // Used for instructions that only use the operand for reading
 template<AddressingModes mode>
 u16 CPU::GetPureOperand()
 {
-	return Is8Bit<mode>() ? GetOperand8<mode>() : GetOperand16<mode>();
+	if constexpr (mode < 2)
+		return GetOperand16<mode>();
+	else
+		return GetOperand8<mode>();
 }
 
 template<AddressingModes mode>
 u16 CPU::GetOperand16()
 {
-	switch (mode)
+	// Used by branch instructions
+	// TODO: Check if -1 is needed
+	if constexpr (mode == AddressingModes::RELATIVE)
 	{
-		// Used by branch instructions
-		// TODO: Check if -1 is needed
-		case AddressingModes::RELATIVE:
-		{
-			u8 imm = Imm();
-			return pc + imm;
-		}
-        // TODO: Check if -2 is needed
-		case AddressingModes::INDIRECT:
-			return Ind(Abs());
-        case AddressingModes::ABSOLUTE:
-            return Abs();
-        default:
-            throw "Invalid instruction";
+		u8 imm = Imm();
+		return pc + imm;
 	}
+	// TODO: Check if -2 is needed
+	else if (mode == AddressingModes::INDIRECT)
+		return Ind(Abs());
+	else
+		throw "Invalid instruction";
 }
 
 #pragma region Instruction helpers
 template<AddressingModes mode>
 u8& CPU::GetOperand8()
 {
-	switch (mode)
+	// ADC $3420 -> A + contents of memory $3420
+	if constexpr (mode == AddressingModes::ABSOLUTE)
 	{
-		// ADC $3420 -> A + contents of memory $3420
-		case AddressingModes::ABSOLUTE:
-		{
-			u16 abs = Abs();
-			return Read(abs);
-		}
-        // ADC #2 -> A + 2
-		case AddressingModes::IMMEDIATE:
-			buff8 = Imm();
-            return buff8;
-		// ADC $3420,X -> A + contents of memory $3420 + X
-		case AddressingModes::ABSOLUTE_INDEXED_X:
-			return Read(AbsX());
-		// ADC $3420,Y	-> A + contents of memory $3420 + Y
-		case AddressingModes::ABSOLUTE_INDEXED_Y:
-			return Read(AbsY());
-		// ADC $F6 -> A + contents of memory $F6
-		case AddressingModes::ZERO_PAGE:
-			return Zp(Imm());
-		case AddressingModes::ZERO_PAGE_X:
-			return Zp(Imm() + x);
-		case AddressingModes::ZERO_PAGE_Y:
-			return Zp(Imm() + y);
-		// https://www.csh.rit.edu/~moffitt/6502.html#ADDR-IIND
-		case AddressingModes::INDEXED_INDIRECT_X:
-		{
-			u8 addr8 = Imm() + x;
-			u16 zp16 = Zp16(addr8);
-			return Read(zp16);
-		}
-		case AddressingModes::INDIRECT_INDEXED:
-		{
-			u16 zp16 = Zp16(Imm());
-			CrossesPage(zp16, y);
-			return Read(zp16 + y);
-		}
-		case AddressingModes::ACCUMULATOR:
-			return a;
-        // ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
-		//case AddressingModes::INDIRECT_INDEXED:
-			//return Zp(Imm()) + y;
-		default:
-			throw "Wrong addressing mode implemented!";
+		u16 abs = Abs();
+		return Read(abs);
 	}
+    // ADC #2 -> A + 2
+	else if (mode == AddressingModes::IMMEDIATE)
+	{
+		buff8 = Imm();
+		return buff8;
+	}
+	// ADC $3420,X -> A + contents of memory $3420 + X
+	else if (mode == AddressingModes::ABSOLUTE_INDEXED_X)
+		return Read(AbsX());
+	// ADC $3420,Y	-> A + contents of memory $3420 + Y
+	else if (mode == AddressingModes::ABSOLUTE_INDEXED_Y)
+		return Read(AbsY());
+	// ADC $F6 -> A + contents of memory $F6
+	else if (mode == AddressingModes::ZERO_PAGE)
+		return Zp(Imm());
+	else if (mode == AddressingModes::ZERO_PAGE_X)
+		return Zp(Imm() + x);
+	else if (mode == AddressingModes::ZERO_PAGE_Y)
+		return Zp(Imm() + y);
+	// https://www.csh.rit.edu/~moffitt/6502.html#ADDR-IIND
+	else if (mode == AddressingModes::INDEXED_INDIRECT_X)
+	{
+		u8 addr8 = Imm() + x;
+		u16 zp16 = Zp16(addr8);
+		return Read(zp16);
+	}
+	else if (mode == AddressingModes::INDIRECT_INDEXED)
+	{
+		u16 zp16 = Zp16(Imm());
+		CrossesPage(zp16, y);
+		return Read(zp16 + y);
+	}
+	else if (mode == AddressingModes::ACCUMULATOR)
+		return a;
+    // ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
+	//case AddressingModes::INDIRECT_INDEXED:
+		//return Zp(Imm()) + y;
+	else
+		throw "Wrong addressing mode implemented!";
 }
 #pragma endregion
 

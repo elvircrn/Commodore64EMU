@@ -177,11 +177,11 @@ std::string Debugger::GetNESTestLineWithCycles() const
 {
 	std::stringstream ss;
 
-	ss << "A:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetA()
-		<< " X:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetX()
-		<< " Y:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetY()
-		<< " P:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetP()
-		<< " SP:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetSP()
+	ss << "A:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->A()
+		<< " X:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->X()
+		<< " Y:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->Y()
+		<< " P:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->P()
+		<< " SP:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->SP()
 		<< " CYC:" << std::dec << std::setfill(' ') << std::setw(3) << ((int)cpu->cycleCount + (cpu->cycleCount == 0 ? 0 : 2)) % 340;
 	return ss.str();
 }
@@ -190,11 +190,11 @@ std::string Debugger::GetNESTestLine() const
 {
 	std::stringstream ss;
 
-	ss  << "A:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetA()
-		<< " X:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetX()
-		<< " Y:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetY()
-		<< " P:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetP()
-		<< " SP:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetSP();
+	ss  << "A:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->A()
+		<< " X:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->X()
+		<< " Y:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->Y()
+		<< " P:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->P()
+		<< " SP:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->SP();
 
 	return ss.str();
 }
@@ -202,13 +202,13 @@ std::string Debugger::GetNESTestLine() const
 std::string Debugger::GetStatusLine() const
 {
 	std::stringstream ss;
-	ss << "PC:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->GetPC();
+	ss << "PC:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->PC();
 	return ss.str() + " " + GetNESTestLine();
 }
 
 void Debugger::AppendStatHist(const std::string &stat)
 {
-	statHist.push_back(instructionName[cpu->Read(cpu->GetPC())] + " " + stat);
+	statHist.push_back(instructionName[cpu->Read(cpu->PC())] + " " + stat);
 }
 
 std::string Debugger::GetOpHistForLogging() const

@@ -3,9 +3,14 @@
 #include <stdint.h>
 #include <vector>
 #include <variant>
+#include <tuple>
+#include <optional>
+#include <functional>
 
 #include "core.h"
 #include "ROM.h"
+#include "PPU.h"
+#include "EmuException.h"
 
 // Flags
 enum Flags { C = 0, Z, I, D, B, _, V, N };
@@ -15,11 +20,11 @@ enum AddressingModes
 {
 	RELATIVE = 0,
 	INDIRECT, // Only used by the JMP instruction
+	ABSOLUTE,
 	INDIRECT_INDEXED,
 	IMMEDIATE,
 	ACCUMULATOR,
 	IMPLIED,
-	ABSOLUTE,
 	ZERO_PAGE,
 	ABSOLUTE_INDEXED_X,
 	ABSOLUTE_INDEXED_Y,
@@ -46,6 +51,9 @@ class CPU
 	// Memory
 	constexpr static int RAM_SIZE = 65536;
 	std::vector<u8> ram;
+
+	// Mapper
+	std::function<u8&(u16)> mapper;
 
 	// Instructions
 	constexpr static int RESET_VECTOR = 0x0000;
@@ -111,7 +119,22 @@ class CPU
 	inline void Z(bool x) { SetFlag(Flags::Z, x); }
 	inline void C(bool x) { SetFlag(Flags::C, x); }
 
+	PPU *ppu;
 public:
+	inline u8 A() { return a; }
+	inline u8 X() { return x; }
+	inline u8 Y() { return y; }
+	inline u8 PC() { return pc; }
+	inline u8 SP() { return sp; }
+	inline u8 P() { return p; }
+
+	inline u8 A(u8 _a) { return a = _a; }
+	inline u8 X(u8 _x) { return x = _x; }
+	inline u8 Y(u8 _y) { return y = _y; }
+	inline u8 PC(u8 _pc) { return pc = _pc; }
+	inline u8 SP(u8 _sp) { return sp = _sp; }
+	inline u8 P(u8 _p) { return p = _p; }
+
 
 	#pragma region Debug
 	static constexpr bool DEBUG = true;
@@ -127,8 +150,9 @@ public:
 	// Called before instruction execution
 	inline void Clear() { zeroPageCrossed = false; calcCrossed = false; delta = 0; }
 	#pragma endregion
-
+	
 	#pragma region Memory
+	// Default memory layout, no reference to PPU
 	inline u8& Read(u16 addr)
 	{
 		// Mirrored 2KB of internal RAM
@@ -136,10 +160,15 @@ public:
 			return ram[addr & 0x7FF];
 		// Mirrors of NES PPU registers
 		else if (0x2000 <= addr && addr <= 0x3fff)
-			return ram[((addr - 0x2000) % 8) + 0x2000];
+		{
+			if (ppu == nullptr)
+				throw "PPU not found";
+			return ppu->Rd(((addr - 0x2000) % 8) + 0x2000);
+		}
 		else
 			return ram[addr];
 	}
+
 	inline u16 Read16(u16 addr) { return Read(addr) + (Read(addr + 1) << 8); }
 	inline u16 Ind(u16 addr)
 	{
@@ -166,9 +195,11 @@ public:
 
 	void LoadCartridge(const ROM &rom);
 
+	#pragma region Constructors
 	CPU();
-	CPU(uint16_t);
+	CPU(PPU *_ppu);
 	~CPU();
+	#pragma endregion 
 
 	#pragma region Timing
 	int cycleCount;
@@ -260,22 +291,6 @@ public:
 	#pragma endregion
 
 	void Execute();
-
-	#pragma region Register getters and setters
-	void SetA(uint8_t);
-	void SetX(uint8_t);
-	void SetY(uint8_t);
-	void SetS(uint8_t);
-	void SetP(uint8_t);
-	void SetPC(uint16_t);
-
-	uint8_t GetA() const;
-	uint8_t GetX() const;
-	uint8_t GetY() const;
-	uint8_t GetSP() const;
-	uint8_t GetP() const;
-	uint16_t GetPC() const;
-	#pragma endregion
 
 	#pragma region Instructions
 	template<AddressingModes mode>

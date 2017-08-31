@@ -79,14 +79,13 @@ namespace NESEmulatorTest
 				.append("nestest.nes")
 				.string();
 
-			ROM rom = (FileHandler())
-				.LoadCartridge(filepath);
+			ROM rom(filepath);
 
 			CPU cpu;
 			Debugger debugger(&cpu);
 			cpu.PowerUp();
 			cpu.LoadCartridge(rom);
-			cpu.SetP(0x24);
+			cpu.P(0x24);
 
 			auto res = std::experimental::filesystem::path(__FILE__)
 				.parent_path()
@@ -115,7 +114,7 @@ namespace NESEmulatorTest
 					Logger::WriteMessage(("Exp: " + correctLine + "\nFnd: " + line).c_str());
 					Logger::WriteMessage(("Failed at: " + std::to_string(i)).c_str());
 					std::stringstream ss;
-					ss << std::hex << std::setfill('0') << std::setw(2) << (int)cpu.GetPC();
+					ss << std::hex << std::setfill('0') << std::setw(2) << (int)cpu.PC();
 					Logger::WriteMessage(("PC: " + ss.str()).c_str());
 					Logger::WriteMessage(("Cycle delta: " + std::to_string(cpu.Delta())).c_str());
 					Assert::Fail();
@@ -129,12 +128,11 @@ namespace NESEmulatorTest
 
 					LoggerDump(debugger);
 					std::stringstream ss;
-					ss << std::hex << std::setfill('0') << std::setw(2) << (int)cpu.GetPC();
+					ss << std::hex << std::setfill('0') << std::setw(2) << (int)cpu.PC();
 					Logger::WriteMessage(("PC: " + ss.str()).c_str());
 					Assert::Fail();
 				}
 			}
-
 		}
 
 		TEST_METHOD(NESTestNoCycle)
@@ -144,14 +142,13 @@ namespace NESEmulatorTest
 				.append("nestest.nes")
 				.string();
 
-			ROM rom = (FileHandler())
-				.LoadCartridge(filepath);
+			ROM rom(filepath);
 
 			CPU cpu;
 			Debugger debugger(&cpu);
 			cpu.PowerUp();
 			cpu.LoadCartridge(rom);
-			cpu.SetP(0x24);
+			cpu.P(0x24);
 
 			auto res = std::experimental::filesystem::path(__FILE__)
 				.parent_path()
@@ -179,7 +176,7 @@ namespace NESEmulatorTest
 					Logger::WriteMessage(("Exp: " + correctLine + "\nFnd: " + emuLine).c_str());
 					Logger::WriteMessage(("Failed at: " + std::to_string(lineCount)).c_str());
 					std::stringstream ss;
-					ss << std::hex << std::setfill('0') << std::setw(2) << (int)cpu.GetPC();
+					ss << std::hex << std::setfill('0') << std::setw(2) << (int)cpu.PC();
 					Logger::WriteMessage(("PC: " + ss.str()).c_str());
 					Assert::Fail();
 				}
@@ -192,7 +189,7 @@ namespace NESEmulatorTest
 
 					LoggerDump(debugger);
 					std::stringstream ss;
-					ss << std::hex << std::setfill('0') << std::setw(2) << (int)cpu.GetPC();
+					ss << std::hex << std::setfill('0') << std::setw(2) << (int)cpu.PC();
 					Logger::WriteMessage(("PC: " + ss.str()).c_str());
 					Assert::Fail();
 				}

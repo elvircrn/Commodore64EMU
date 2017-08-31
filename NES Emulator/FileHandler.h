@@ -1,17 +1,20 @@
 #pragma once
 
-#include "ROM.h"
 #include <string>
 #include <fstream>
 #include <iterator>
+#include <tuple>
+
+#include "ROM.h"
+#include "core.h"
+
+using std::vector;
+using std::tuple;
+using std::string;
 
 class FileHandler
 {
-	void LoadData(const std::ifstream & stream, std::vector<uint8_t>& data);
 public:
-	FileHandler();
-	~FileHandler();
-
-	ROM LoadCartridge(const std::string &fileName);
+	static tuple<vector<u8>, vector<u8>> LoadROMData(const string &fileName);
 };
 

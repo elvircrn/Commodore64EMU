@@ -6,10 +6,7 @@
 void CPU::LoadCartridge(const ROM & rom)
 {
 	for (int i = 0; i < 0x4000; i++)
-		ram[0xC000 + i] = rom.data[i];
-	//Push16(pc);
-	//Push8(p | 0x10);
-	//pc = Read16(0xfffe);
+		ram[0xC000 + i] = rom[i];
 }
 
 CPU::CPU() : ram(RAM_SIZE), isOfficial(0xff), cycleCount(0), ppu(nullptr)
@@ -33,12 +30,6 @@ CPU::CPU() : ram(RAM_SIZE), isOfficial(0xff), cycleCount(0), ppu(nullptr)
 		isOfficial[o] = true;
 }
 
-// TODO: Calculate RST vector
-//CPU::CPU(uint16_t _rst) : CPU()
-//{
-//	rst = _rst;
-//}
-
 CPU::CPU(PPU *_ppu) : CPU()
 {
 	ppu = _ppu;
@@ -50,7 +41,8 @@ CPU::~CPU()
 
 void CPU::PowerUp()
 {
-	p = 0x34; // IRQ disabled
+	// TODO: Check if IRQ should be disabled
+	p = 0x24; // IRQ disabled
 	a = 0;
 	x = 0;
 	y = 0;
@@ -265,8 +257,6 @@ void CPU::Execute()
 			for (int i = pc; i < pc + 10; i++)
 				ss << std::hex << (int)Read(i) << ' ';
 			throw "Instruction not found at pc: " + std::to_string(pc) + "\nDump: " + ss.str();
-			break;
-
 	}
 
 	Tick(zeroPageCrossed & calcCrossed);

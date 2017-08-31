@@ -41,19 +41,16 @@ class CPU
 	u64 cycle = 0;
 
 	// Registers
-	uint8_t  a  = 0; // Accumulator
-	uint8_t  x  = 0; // General purpose
-	uint8_t  y  = 0;
-	uint8_t  sp = 0; // Stack pointer
-	uint8_t  p  = 0; // Flags | N | V |   | B | D | I | Z | C |
-	uint16_t pc = 0;
+	u8 a  = 0; // Accumulator
+	u8 x  = 0; // General purpose
+	u8 y  = 0;
+	u8 sp = 0; // Stack pointer
+	u8 p  = 0; // Flags | N | V |   | B | D | I | Z | C |
+	u16 pc = 0;
 
 	// Memory
 	constexpr static int RAM_SIZE = 65536;
 	std::vector<u8> ram;
-
-	// Mapper
-	std::function<u8&(u16)> mapper;
 
 	// Instructions
 	constexpr static int RESET_VECTOR = 0x0000;
@@ -95,7 +92,6 @@ class CPU
 		zeroPageCrossed |= ((addr & 0xff00) != ((addr + offset) & 0xff00));
 	}
 	inline void Push8(u8 val) { Stk(sp--) = val; }
-	// NOTE: First the high byte is pushed, then the low.
 	inline void Push16(u16 val) { Push8(val >> 8); Push8(val & 0xFF); }
 	inline u8 Pop8() { return Stk(++sp); }
 	inline u16 Pop16() { u8 lo = Pop8(); u16 hi = Pop8() << 8; return hi + lo; }
@@ -124,14 +120,14 @@ public:
 	inline u8 A() { return a; }
 	inline u8 X() { return x; }
 	inline u8 Y() { return y; }
-	inline u8 PC() { return pc; }
+	inline u16 PC() { return pc; }
 	inline u8 SP() { return sp; }
 	inline u8 P() { return p; }
 
 	inline u8 A(u8 _a) { return a = _a; }
 	inline u8 X(u8 _x) { return x = _x; }
 	inline u8 Y(u8 _y) { return y = _y; }
-	inline u8 PC(u8 _pc) { return pc = _pc; }
+	inline u16 PC(u16 _pc) { return pc = _pc; }
 	inline u8 SP(u8 _sp) { return sp = _sp; }
 	inline u8 P(u8 _p) { return p = _p; }
 
@@ -163,7 +159,7 @@ public:
 		{
 			if (ppu == nullptr)
 				throw "PPU not found";
-			return ppu->Rd(((addr - 0x2000) % 8) + 0x2000);
+			return ppu->RdReg(((addr - 0x2000) % 8) + 0x2000);
 		}
 		else
 			return ram[addr];

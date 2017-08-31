@@ -1,4 +1,5 @@
 #include "ROM.h"
+#include "FileHandler.h"
 
 
 ROM::ROM()
@@ -6,27 +7,31 @@ ROM::ROM()
 	data.reserve(MAX_ROM_SIZE);
 }
 
-ROM::ROM(const std::vector<uint8_t>& _data) : data(_data)
+ROM::ROM(const std::vector<u8>& _data) : data(_data)
 {
 	// Calculate the reset vector
 	unsigned offset = 0x8000;
-	rst = static_cast<uint16_t>((data[0xfffd - offset] << 8) + data[0xfffc - offset]);
+	rst = u16((data[0xfffd - offset] << 8) + data[0xfffc - offset]);
 }
 
-ROM::~ROM()
+std::vector<u8> ROM::GetData() const { return data; }
+
+std::vector<u8>& ROM::GetData() { return data; }
+
+ROM::ROM(const std::string &filename)
 {
+	std::tie(header, data) = FileHandler::LoadROMData(filename);
+	
+	prg = header[4];
+	chr = header[5];
 }
 
-std::vector<uint8_t> ROM::GetData() const { return data; }
-
-std::vector<uint8_t>& ROM::GetData() { return data; }
-
-uint8_t & ROM::operator[](const int addr)
+u8 & ROM::operator[](const int addr)
 {
 	return data[addr];
 }
 
-uint8_t ROM::operator[](const int addr) const
+u8 ROM::operator[](const int addr) const
 {
 	return data[addr];
 }

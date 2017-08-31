@@ -1,9 +1,110 @@
-# Yet another NES Emualtor written in C++
+# Yet another NES Emulator written in C++
 
-![Grunt status](https://ci.appveyor.com/api/projects/status/github/elvircrn/NESEmu?branch=master&svg=true) 
+![Grunt status](https://ci.appveyor.com/api/projects/status/github/elvircrn/NESEmu?branch=master&svg=true)
+
+![6502 Schematic](6502.jpg)
 
 # TODOs
 Refactor branches into a single method
+
+# ROM data
+0 = 4E (N)\
+1 = 45 (E)\
+2 = 53 (S)\
+3 = 1A (Character Break, necessary!)
+
+(Bytes 4->8-15 Can BE MODIFIED!)\
+4 = PRG (Hex number depends on size of PRG file)\
+5 = CHR (Hex number depends on size of CHR file)\
+6 = Mapper 0-15/ V or H Mirroring, Battery, 4 Screen VRAM, Trainer Switches
+    Also is used as the "Ones" place holder digit for the extended iNES Header
+    format. (See Sect. 2)\
+7 = Mappers 16-?, the extended iNES Header format "Tens" place holder digit.
+    Again (See Sect. 2 for details on how this is set up.)\
+8->15 = Not used at this tume but MUST BE ALL ZEROS or games will not work.
+
+
+# PPU
+## Registers
+    0 = Always zero              1 = Always 1
+    - = Not used                 ? = Unknown
+
+    +---------+----------------------------------------------------------+
+    | Address | Description                                              |
+    +---------+----------------------------------------------------------+
+    |  $2000  | PPU Control Register #1 (W)                   [PPUCNT0]  |
+    |         |   %vMsbpiNN                                              |
+    |         |               v = Execute NMI on VBlank                  |
+    |         |                      1 = Enabled                         |
+    |         |               M = PPU Selection (unused)                 |
+    |         |                      0 = Master                          |
+    |         |                      1 = Slave                           |
+    |         |               s = Sprite Size                            |
+    |         |                      0 = 8x8                             |
+    |         |                      1 = 8x16                            |
+    |         |               b = Background Pattern Table Address       |
+    |         |                      0 = $0000 (VRAM)                    |
+    |         |                      1 = $1000 (VRAM)                    |
+    |         |               p = Sprite Pattern Table Address           |
+    |         |                      0 = $0000 (VRAM)                    |
+    |         |                      1 = $1000 (VRAM)                    |
+    |         |               i = PPU Address Increment                  |
+    |         |                      0 = Increment by 1                  |
+    |         |                      1 = Increment by 32                 |
+    |         |              NN = Name Table Address                     |
+    |         |                     00 = $2000 (VRAM)                    |
+    |         |                     01 = $2400 (VRAM)                    |
+    |         |                     10 = $2800 (VRAM)                    |
+    |         |                     11 = $2C00 (VRAM)                    |
+    |         |                                                          |
+    |         | NOTE: Bit #6 (M) has no use, as there is only one (1)    |
+    |         |       PPU installed in all forms of the NES and Famicom. |
+    +---------+----------------------------------------------------------+
+    |  $2001  | PPU Control Register #2 (W)                   [PPUCNT1]  |
+    |         |   %fffpcsit                                              |
+    |         |             fff = Full Background Colour                 |
+    |         |                    000 = Black                           |
+    |         |                    001 = Red                             |
+    |         |                    010 = Blue                            |
+    |         |                    100 = Green                           |
+    |         |               p = Sprite Visibility                      |
+    |         |                      1 = Display                         |
+    |         |               c = Background Visibility                  |
+    |         |                      1 = Display                         |
+    |         |               s = Sprite Clipping                        |
+    |         |                      0 = Sprites not displayed in left   |
+    |         |                          8-pixel column                  |
+    |         |                      1 = No clipping                     |
+    |         |               i = Background Clipping                    |
+    |         |                      0 = Background not displayed in     |
+    |         |                          left 8-pixel column             |
+    |         |                      1 = No clipping                     |
+    |         |               t = Display Type                           |
+    |         |                      0 = Colour display                  |
+    |         |                      1 = Mono-type (B&W) display         |
+    +---------+----------------------------------------------------------+
+
+### PPUCTRL0 (PPUCTRL)
+* Selects the Name table to display
+* Sets the ppu address increment (for reading/writing)
+* Sets the address within the pattern table for sprite tiles
+* Sets the address within the pattern table for background tiles
+* Selects the sprite size (8x8 or 8x16)
+* Sets whether to execute an interupt when drawing sprite 0
+* Sets whether to execute an interupt during the Vblank period
+
+### PPUCTRL1 (PPUMASK)
+* Sets the disply to color or mono-tone
+* Sets whether to clip the left 8 pixels of the background
+* Sets whether to clip sprites within the left 8 pixels of the background
+* Sets whether to display the screen or not
+* Selects the screen background color (black, red, blue, green)
+
+### PPUSTATUS
+* Returns whether PPU is in a Vblank period
+* Returns whether there are more than 8 sprites on the current scanline
+* Returns whether sprite 0 has been drawn on the current scanline
+
 
 # Notes on cycle counting:
 

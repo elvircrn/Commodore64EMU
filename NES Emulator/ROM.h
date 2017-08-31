@@ -31,6 +31,9 @@ public:
 
 	u8& operator[](const int addr);
 	u8  operator[](const int addr) const;
+
+	inline u8 CHR() { return chr; }
+	inline u8 PRG() { return prg; }
 };
 
 

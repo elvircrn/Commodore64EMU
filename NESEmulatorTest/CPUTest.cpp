@@ -71,8 +71,7 @@ namespace NESEmulatorTest
 			ASRT(cpu.GetFlag(Flags::Z), false);
 		}
 
-		// CYC (0..340) +4 for every output
-		TEST_METHOD(NESTestWithCycles)
+		TEST_METHOD(ROMHeaderTest)
 		{
 			auto filepath = std::experimental::filesystem::path(__FILE__)
 				.parent_path()
@@ -81,61 +80,11 @@ namespace NESEmulatorTest
 
 			ROM rom(filepath);
 
-			CPU cpu;
-			Debugger debugger(&cpu);
-			cpu.PowerUp();
-			cpu.LoadCartridge(rom);
-			cpu.P(0x24);
-
-			auto res = std::experimental::filesystem::path(__FILE__)
-				.parent_path()
-				.append("timing.txt")
-				.string();
-
-			std::ifstream myfile(res);
-			std::string line;
-			std::vector<std::string> lines;
-			while (std::getline(myfile, line))
-				lines.push_back(line);
-
-			for (int i = 0; i < 8000; i++)
-			{
-				if (!cpu.IsOfficial())
-					break;
-				std::string line = debugger.GetNESTestLineWithCycles();
-				std::string correctLine = lines[i];
-
-				debugger.AppendStatHist(line);
-				
-				if (correctLine != line)
-				{
-					cpu.Execute();
-					LoggerDump(debugger);
-					Logger::WriteMessage(("Exp: " + correctLine + "\nFnd: " + line).c_str());
-					Logger::WriteMessage(("Failed at: " + std::to_string(i)).c_str());
-					std::stringstream ss;
-					ss << std::hex << std::setfill('0') << std::setw(2) << (int)cpu.PC();
-					Logger::WriteMessage(("PC: " + ss.str()).c_str());
-					Logger::WriteMessage(("Cycle delta: " + std::to_string(cpu.Delta())).c_str());
-					Assert::Fail();
-				}
-				try
-				{
-					cpu.Execute();
-				}
-				catch (std::string e)
-				{
-
-					LoggerDump(debugger);
-					std::stringstream ss;
-					ss << std::hex << std::setfill('0') << std::setw(2) << (int)cpu.PC();
-					Logger::WriteMessage(("PC: " + ss.str()).c_str());
-					Assert::Fail();
-				}
-			}
+			ASRT(rom.CHR(), (u8)1);
+			ASRT(rom.PRG(), (u8)1);
 		}
 
-		TEST_METHOD(NESTestNoCycle)
+		TEST_METHOD(NESTestNoCycleCount)
 		{
 			auto filepath = std::experimental::filesystem::path(__FILE__)
 				.parent_path()
@@ -143,12 +92,10 @@ namespace NESEmulatorTest
 				.string();
 
 			ROM rom(filepath);
-
 			CPU cpu;
 			Debugger debugger(&cpu);
 			cpu.PowerUp();
 			cpu.LoadCartridge(rom);
-			cpu.P(0x24);
 
 			auto res = std::experimental::filesystem::path(__FILE__)
 				.parent_path()

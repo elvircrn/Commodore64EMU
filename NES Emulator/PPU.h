@@ -5,6 +5,7 @@
 using std::vector;
 
 #include "core.h"
+#include "ROM.h"
 
 class PPU
 {
@@ -57,6 +58,7 @@ public:
 			return PPUDATA;
 		else if (addr == 0x4014)
 			return OAMDMA;
+		throw "Register not found";
 	}
 
 	inline u8& Rd(u16 addr)
@@ -109,6 +111,8 @@ public:
 	}
 
 	inline u8& operator[](u16 addr) { return Rd(addr); }
-	inline u8 operator[](u8 addr) const { return Rd(addr); }
+	inline u8  operator[](u8 addr) const { return Rd(addr); }
+
+	void LoadROM(const ROM &rom);
 };
 

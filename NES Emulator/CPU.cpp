@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-void CPU::LoadCartridge(const ROM & rom)
+void CPU::LoadROM(const ROM & rom)
 {
 	for (int i = 0; i < 0x4000; i++)
 		ram[0xC000 + i] = rom[i];

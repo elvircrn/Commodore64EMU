@@ -80,8 +80,8 @@ namespace NESEmulatorTest
 
 			ROM rom(filepath);
 
-			ASRT(rom.CHR(), (u8)1);
-			ASRT(rom.PRG(), (u8)1);
+			ASRT(rom.CHRCnt(), 1);
+			ASRT(rom.PRGCnt(), 1);
 		}
 
 		TEST_METHOD(NESTestNoCycleCount)
@@ -95,7 +95,7 @@ namespace NESEmulatorTest
 			CPU cpu;
 			Debugger debugger(&cpu);
 			cpu.PowerUp();
-			cpu.LoadCartridge(rom);
+			cpu.LoadROM(rom);
 
 			auto res = std::experimental::filesystem::path(__FILE__)
 				.parent_path()

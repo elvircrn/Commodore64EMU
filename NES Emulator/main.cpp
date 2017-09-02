@@ -25,7 +25,7 @@ int main()
 
 #else
 
-	std::cout << ROM("donkeykong.nes").Status() << '\n';
+	std::cout << ROM("donkeykong.nes").Info() << '\n';
 	std::getchar();
 
 #endif

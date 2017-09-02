@@ -158,6 +158,7 @@
     <ClCompile Include="FileHandler.cpp" />
     <ClCompile Include="GUI.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="NES.cpp" />
     <ClCompile Include="PPU.cpp" />
     <ClCompile Include="ROM.cpp" />
   </ItemGroup>
@@ -168,6 +169,8 @@
     <ClInclude Include="EmuException.h" />
     <ClInclude Include="FileHandler.h" />
     <ClInclude Include="GUI.h" />
+    <ClInclude Include="NES.h" />
+    <ClInclude Include="Palette.h" />
     <ClInclude Include="PPU.h" />
     <ClInclude Include="ROM.h" />
   </ItemGroup>

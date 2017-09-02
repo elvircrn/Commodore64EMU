@@ -189,7 +189,7 @@ public:
 	inline void UpdNZ(u8);
 	#pragma endregion
 
-	void LoadCartridge(const ROM &rom);
+	void LoadROM(const ROM &rom);
 
 	#pragma region Constructors
 	CPU();

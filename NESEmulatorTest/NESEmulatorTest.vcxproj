@@ -156,6 +156,8 @@
     <ClInclude Include="..\NES Emulator\CPU.h" />
     <ClInclude Include="..\NES Emulator\Debugger.h" />
     <ClInclude Include="..\NES Emulator\FileHandler.h" />
+    <ClInclude Include="..\NES Emulator\NES.h" />
+    <ClInclude Include="..\NES Emulator\Palette.h" />
     <ClInclude Include="..\NES Emulator\PPU.h" />
     <ClInclude Include="..\NES Emulator\ROM.h" />
   </ItemGroup>
@@ -164,6 +166,7 @@
     <ClCompile Include="..\NES Emulator\CPU.cpp" />
     <ClCompile Include="..\NES Emulator\Debugger.cpp" />
     <ClCompile Include="..\NES Emulator\FileHandler.cpp" />
+    <ClCompile Include="..\NES Emulator\NES.cpp" />
     <ClCompile Include="..\NES Emulator\PPU.cpp" />
     <ClCompile Include="..\NES Emulator\ROM.cpp" />
     <ClCompile Include="CPUTest.cpp" />

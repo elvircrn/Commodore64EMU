@@ -12,3 +12,4 @@ typedef unsigned long long u64;
 
 inline u8 LO(const u16 &addr) { return addr & 0xff; }
 inline u8 HI(const u16 &addr) { return (addr >> 8) & 0xff; }
+inline bool BIT(const u8 &bits, const u8 &n) { return (bits & (1 << n)) > 0; }

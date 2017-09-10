@@ -12,6 +12,8 @@
 #include "PPU.h"
 #include "EmuException.h"
 
+enum Interrupts { BRK, IRQ, NMI, RST };
+
 // Flags
 enum Flags { C = 0, Z, I, D, B, _, V, N };
 
@@ -137,6 +139,7 @@ public:
 	std::vector<u16> pcHist;
 	std::vector<u8>  opHist;
 	std::vector<u8>  bitStack;
+	std::vector<std::tuple<u16, std::string, std::array<u8, 3>>> instrHist;
 	inline bool IsOfficial() { return isOfficial[Read(pc)]; }
 	#pragma endregion
 
@@ -401,6 +404,8 @@ public:
 	void TXS();	//....	transfer X to stack pointer
 	template<AddressingModes mode>
 	void TYA();	//....	transfer Y to accumulator
+	template<Interrupts inter>
+	void INT();
 
 
 	// Unofficial opcodes

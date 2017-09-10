@@ -156,6 +156,8 @@
     <ClCompile Include="Debugger.cpp" />
     <ClCompile Include="EmuException.cpp" />
     <ClCompile Include="FileHandler.cpp" />
+    <ClCompile Include="Instructions.cpp" />
+    <ClCompile Include="SDLCore.cpp" />
     <ClCompile Include="GUI.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NES.cpp" />
@@ -168,6 +170,8 @@
     <ClInclude Include="Debugger.h" />
     <ClInclude Include="EmuException.h" />
     <ClInclude Include="FileHandler.h" />
+    <ClInclude Include="Instructions.h" />
+    <ClInclude Include="SDLCore.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="NES.h" />
     <ClInclude Include="Palette.h" />

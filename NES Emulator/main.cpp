@@ -2,8 +2,9 @@
 #include <cstdio>
 #include <cstdlib>
 
-// #define USES_SDL
+//#define USES_SDL
 
+#include "NES.h"
 #include "CPU.h"
 #include "FileHandler.h"
 
@@ -19,15 +20,44 @@ int main(int argc, char* args[])
 int main()
 #endif
 {
+
 #ifdef USES_SDL
 
-	GUI gui = GUI();
+	SDL_Init(SDL_INIT_VIDEO);
+	GUI gui;
+
+	std::getchar();
 
 #else
 
-	std::cout << ROM("donkeykong.nes").Info() << '\n';
-	std::getchar();
+	ROM rom("donkeykong.nes");
+	PPU ppu(rom);
 
+	auto data = ppu.Pattern();
+
+	for (auto& x : data)
+	{
+		for (auto& y : x)
+		{
+			if (y == 0)
+				std::cout << ' ';
+			else
+				std::cout << (int)y;
+		}
+		std::cout << '\n';
+	}
+
+	CPU cpu;
+	cpu.PowerUp();
+
+	cpu.LoadROM(rom);
+
+	for (int i = 0; i < 10; i++)
+	{
+		cpu.Execute();
+	}
+
+	std::getchar();
 #endif
 
 	return 0;

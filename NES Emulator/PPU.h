@@ -7,6 +7,15 @@ using std::vector;
 #include "core.h"
 #include "ROM.h"
 
+enum class MirroringTypes
+{
+	Any,
+	Vertical,
+	Horizontal,
+	MapperSwitch,
+	Various
+};
+
 class PPU
 {
 	// Memory
@@ -36,6 +45,7 @@ class PPU
 public:
 #pragma region Constructors
 	PPU();
+	PPU(const ROM &rom);
 #pragma endregion
 
 	inline u8& RdReg(u16 addr)
@@ -114,5 +124,7 @@ public:
 	inline u8  operator[](u8 addr) const { return Rd(addr); }
 
 	void LoadROM(const ROM &rom);
+
+	vector<vector<u8>> Pattern();
 };
 

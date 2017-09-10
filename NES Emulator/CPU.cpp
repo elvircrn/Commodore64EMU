@@ -1,5 +1,8 @@
 #include "CPU.h"
+#include "Instructions.h"
 
+#include <array>
+#include <tuple>
 #include <sstream>
 #include <string>
 
@@ -52,12 +55,16 @@ void CPU::PowerUp()
 
 void CPU::Execute()
 {
+	u16 prevPc = pc;
 	Clear();
 	if (DEBUG)
 	{
 		opHist.push_back(Read(pc));
 		pcHist.push_back(pc);
 		bitStack.clear();
+		instrHist.emplace_back(pc,
+			Instructions::Name(Read(pc)),
+			std::array<u8, 3>({ Read(pc + 1), Read(pc + 2), Read(pc + 3) }));
 		for (int i = 0; i < 5; i++)
 			bitStack.push_back(Read(pc + i));
 	}
@@ -774,5 +781,30 @@ void CPU::LAX()
 	TAX<mode>();
 }
 
+template<Interrupts inter>
+void CPU::INT()
+{
+	Tick();
+	if constexpr (inter != Interrupts::BRK)
+		Tick();
 
+	if (inter != Interrupts::RST)
+	{
+		Push16(pc);
+		Push(p | ((Interrupts::BRK == inter) << 4));
+	}
+	else
+	{
+		s -= 3;
+		Tick(3);
+	}
 
+	I(true);
+
+	constexpr u16 vect[] = { 0xFFFA, 0xFFFC, 0xFFFE, 0xFFFE };
+	PC = rd16(vect[t]);
+	
+	if (t == NMI) 
+		nmi = false;
+
+}

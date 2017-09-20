@@ -47,7 +47,7 @@ int main()
 		std::cout << '\n';
 	}
 
-	CPU cpu;
+	CPU cpu(&ppu);
 	cpu.PowerUp();
 
 	cpu.LoadROM(rom);

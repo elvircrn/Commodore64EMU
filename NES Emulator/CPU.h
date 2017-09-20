@@ -50,6 +50,9 @@ class CPU
 	u8 p  = 0; // Flags | N | V |   | B | D | I | Z | C |
 	u16 pc = 0;
 
+	// Interrupts
+	bool nmi = false;
+
 	// Memory
 	constexpr static int RAM_SIZE = 65536;
 	std::vector<u8> ram;
@@ -139,8 +142,10 @@ public:
 	std::vector<u16> pcHist;
 	std::vector<u8>  opHist;
 	std::vector<u8>  bitStack;
+	std::vector<std::pair<std::string, u16>> vectors;
 	std::vector<std::tuple<u16, std::string, std::array<u8, 3>>> instrHist;
 	inline bool IsOfficial() { return isOfficial[Read(pc)]; }
+	void DebugDump();
 	#pragma endregion
 
 	#pragma region Setup

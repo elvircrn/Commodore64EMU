@@ -57,7 +57,7 @@ void CPU::Execute()
 {
 	u16 prevPc = pc;
 	Clear();
-	if (DEBUG)
+	if constexpr (DEBUG)
 	{
 		opHist.push_back(Read(pc));
 		pcHist.push_back(pc);
@@ -263,12 +263,21 @@ void CPU::Execute()
 			std::stringstream ss;
 			for (int i = pc; i < pc + 10; i++)
 				ss << std::hex << (int)Read(i) << ' ';
+			DebugDump();
 			throw "Instruction not found at pc: " + std::to_string(pc) + "\nDump: " + ss.str();
 	}
 
 	Tick(zeroPageCrossed & calcCrossed);
 	cycleCount += 4;
 }
+
+#pragma region Debug and Logging
+void CPU::DebugDump()
+{
+	for (int i = 0xfff0; i < 0x10000; i++)
+		vectors.emplace_back(HexString(i), Read(static_cast<u16>(i)));
+}
+#pragma endregion 
 
 #pragma region Register getters and setters
 
@@ -349,7 +358,7 @@ u8& CPU::GetOperand8()
 	//case AddressingModes::INDIRECT_INDEXED:
 		//return Zp(Imm()) + y;
 	else
-		throw "Wrong addressing mode implemented!";
+		throw "Wrong addressing mode implemented! " + std::to_string(mode);
 }
 #pragma endregion
 
@@ -472,10 +481,7 @@ void CPU::BPL()
 template<AddressingModes mode>
 void CPU::BRK()
 {
-	pc++;
-	Push16(pc);
-	Push8(p | 0x10);
-	pc = Read16(0xfffe);
+	INT<Interrupts::BRK>();
 }
 
 template<AddressingModes mode>
@@ -699,9 +705,19 @@ void CPU::ROR()
 	UpdNZ(mem);
 }
 
+
+/**
+This instruction transfers from the stack into the microprocessor
+the processor status and the program counter location for the instruction
+which was interrupted.By virtue of the interrupt having stored this data
+before executing the instruction and the fact that the RTI reinitializes
+the microprocessor to the same state as when it was interrupted, the
+combination of interrupt plus RTI allows truly reentrant coding.
+*/
 template<AddressingModes mode>
 void CPU::RTI()
 {
+	// NOTE: Changes the p register
 	PLP<mode>(); // pop8 
 	Tick(2);
 	pc = Pop16(); // pop16
@@ -784,14 +800,30 @@ void CPU::LAX()
 template<Interrupts inter>
 void CPU::INT()
 {
-	Tick();
-	if constexpr (inter != Interrupts::BRK)
-		Tick();
+	// Note that BRK, although it is a one - byte instruction, needs an extra
+	// byte of padding after it.This is because the return address it puts on
+	// the stack will cause the RTI to put the program counter back not to the
+	// very next byte after the BRK, but to the second byte after it. This
+	// padding byte can be used for a signature byte to tell the BReaK interrupt
+	// routine which BRK caused the particular software interrupt.
+	pc++;
 
-	if (inter != Interrupts::RST)
+	Tick();
+
+	if constexpr (inter != Interrupts::BRK)
+	{
+		Tick();
+	}
+
+	// The microprocessor uses the stack to save the reentrant 
+	// or recovery code and then uses the interrupt vectors
+	// FFFE and FFFF, (or FFFA and FFFB), depending on whether 
+	// or not an interrupt request or a non maskable interrupt 
+	// request had occurred
+	if constexpr (inter != Interrupts::RST)
 	{
 		Push16(pc);
-		Push(p | ((Interrupts::BRK == inter) << 4));
+		Push8(p | ((Interrupts::BRK == inter) << 4));
 	}
 	else
 	{
@@ -799,12 +831,18 @@ void CPU::INT()
 		Tick(3);
 	}
 
+	// It should he noted that the interrupt disable is turned on at this 
+	// point by the micro - processor automatically.
+
+	// BRK does set the interrupt-disable I flag like an IRQ does, and if
+	// you have the CMOS 6502 (65C02), it will also clear the decimal D flag.
+
 	I(true);
 
 	constexpr u16 vect[] = { 0xFFFA, 0xFFFC, 0xFFFE, 0xFFFE };
-	PC = rd16(vect[t]);
+	pc = Read16(vect[inter]);
 	
-	if (t == NMI) 
+	if (inter == NMI) 
 		nmi = false;
 
 }

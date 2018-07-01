@@ -129,7 +129,7 @@ void CPU::Execute() {
 		break;
 	case 0xF0: BEQ<AddressingModes::RELATIVE>();
 		break;
-		// TODO :Implement the BRK instruction
+	// TODO :Implement the BRK instruction
 	case 0x00: BRK<AddressingModes::IMPLIED>();
 		break;
 	case 0xC9: CMP<AddressingModes::IMMEDIATE>();

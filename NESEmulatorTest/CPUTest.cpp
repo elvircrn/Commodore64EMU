@@ -18,13 +18,15 @@ void LoggerDump(const Debugger &debugger) {
 }
 
 TEST_CASE("FlagSet") {
-	CPU cpu;
+	u8 xx;
+	CPU cpu([&xx](u16 x) -> u8& { return xx; });
 	cpu.SetFlag(Flags::V, 1);
 	ASRT(cpu.GetFlag(Flags::V), true);
 }
 
 TEST_CASE("UpdateV") {
-	CPU cpu;
+	u8 xx;
+	CPU cpu([&xx](u16 x) -> u8& { return xx; });
 
 	cpu.UpdV(0x80, 0x80, 0);
 	ASRT(cpu.GetFlag(Flags::V), true);
@@ -37,7 +39,8 @@ TEST_CASE("UpdateV") {
 }
 
 TEST_CASE("UpdateC") {
-	CPU cpu;
+	u8 xx;
+	CPU cpu([&xx](u16 x) -> u8& { return xx; });
 
 	cpu.UpdC(0xff, 0xff, 0xff + 0xff);
 	ASRT(cpu.GetFlag(Flags::C), true);
@@ -47,7 +50,8 @@ TEST_CASE("UpdateC") {
 }
 
 TEST_CASE("UpdateNZ") {
-	CPU cpu;
+	u8 xx;
+	CPU cpu([&xx](u16 x) -> u8& { return xx; });
 
 	cpu.UpdN(0);
 	ASRT(cpu.GetFlag(Flags::N), false);

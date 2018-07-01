@@ -37,6 +37,7 @@ enum AddressingModes {
 
 // TODO: Check if every instructions increases the PC by at least 1.
 class CPU {
+	CPU();
 	// Timers
 	u64 cycle = 0;
 
@@ -195,7 +196,6 @@ public:
 	void LoadROM(const ROM &rom);
 
 #pragma region Constructors
-	CPU();
 	explicit CPU(const std::function<u8 &(u16)> &mmu);
 	~CPU();
 #pragma endregion

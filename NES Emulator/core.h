@@ -1,7 +1,8 @@
 #pragma once
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 #include <sstream>
+#include "optional.h"
 
 typedef signed char        s8;
 typedef short              s16;
@@ -12,8 +13,11 @@ typedef unsigned short     u16;
 typedef unsigned int       u32;
 typedef unsigned long long u64;
 
-inline u8 LO(const u16 &addr) { return addr & 0xff; }
-inline u8 HI(const u16 &addr) { return (addr >> 8) & 0xff; }
+template<class T>
+using optional = std::experimental::optional<T>;
+
+inline u8 LO(const u16 &addr) { return static_cast<u8>(addr & 0xff); }
+inline u8 HI(const u16 &addr) { return static_cast<u8>((addr >> 8) & 0xff); }
 inline bool BIT(const u8 &bits, const u8 &n) { return (bits & (1 << n)) > 0; }
 
 template<class T>

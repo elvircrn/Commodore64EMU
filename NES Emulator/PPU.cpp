@@ -27,8 +27,8 @@ vector<vector<u8>> PPU::Pattern()
 	for (int y = 0; y < 8; y++)
 	for (int i = 0; i < 8; i++)
 	for (int j = 0; j < 8; j++)
-		data[x * 8 + i][y * 8 + j] = (BIT(pattern[0][(x * 8 + y) + i + 8], j) << 1) + 
-		BIT(pattern[0][(x * 8 + y) + i], j);
+		data[x * 8 + i][y * 8 + j] = static_cast<unsigned char>((BIT(pattern[0][(x * 8 + y) + i + 8], j) << 1) +
+				BIT(pattern[0][(x * 8 + y) + i], j));
 	return data;
 }
 

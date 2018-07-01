@@ -7,8 +7,7 @@ using std::vector;
 #include "core.h"
 #include "ROM.h"
 
-enum class MirroringTypes
-{
+enum class MirroringTypes {
 	Any,
 	Vertical,
 	Horizontal,
@@ -16,8 +15,7 @@ enum class MirroringTypes
 	Various
 };
 
-class PPU
-{
+class PPU {
 	// Memory
 	constexpr static int PPU_MEM_SIZE = 0x4000;
 	vector<u8> mem;
@@ -48,8 +46,7 @@ public:
 	PPU(const ROM &rom);
 #pragma endregion
 
-	inline u8& RdReg(u16 addr)
-	{
+	inline u8 &RdReg(u16 addr) {
 		if (addr == 0x2000)
 			return PPUCTRL;
 		else if (addr == 0x2001)
@@ -71,8 +68,7 @@ public:
 		throw "Register not found";
 	}
 
-	inline u8& Rd(u16 addr)
-	{
+	inline u8 &Rd(u16 addr) {
 		// Registers
 		if (addr < 0x2000)
 			return pattern[addr / 0x1000][addr & 0xfff];
@@ -87,8 +83,7 @@ public:
 		return mem[addr];
 	}
 
-	inline u8 Rd(u16 addr) const
-	{
+	inline u8 Rd(u16 addr) const {
 		// Registers
 		if (addr < 0x2000)
 			return pattern[addr / 0x1000][addr & 0xfff];
@@ -103,25 +98,23 @@ public:
 		return mem[addr];
 	}
 
-	inline u8 RdReg(u16 addr) const
-	{
-		switch (addr)
-		{
-			case 0x2000: return PPUCTRL;
-			case 0x2001: return PPUMASK;
-			case 0x2002: return PPUSTATUS;
-			case 0x2003: return OAMADDR;
-			case 0x2004: return OAMDATA;
-			case 0x2005: return PPUSCROLL;
-			case 0x2006: return PPUADDR;
-			case 0x2007: return PPUDATA;
-			case 0x4014: return OAMDMA;
-			default: return mem[addr];
+	inline u8 RdReg(u16 addr) const {
+		switch (addr) {
+		case 0x2000: return PPUCTRL;
+		case 0x2001: return PPUMASK;
+		case 0x2002: return PPUSTATUS;
+		case 0x2003: return OAMADDR;
+		case 0x2004: return OAMDATA;
+		case 0x2005: return PPUSCROLL;
+		case 0x2006: return PPUADDR;
+		case 0x2007: return PPUDATA;
+		case 0x4014: return OAMDMA;
+		default: return mem[addr];
 		}
 	}
 
-	inline u8& operator[](u16 addr) { return Rd(addr); }
-	inline u8  operator[](u8 addr) const { return Rd(addr); }
+	inline u8 &operator[](u16 addr) { return Rd(addr); }
+	inline u8 operator[](u8 addr) const { return Rd(addr); }
 
 	void LoadROM(const ROM &rom);
 

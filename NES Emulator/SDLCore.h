@@ -14,4 +14,11 @@ window_ptr_t make_window(const char *title, int x, int y, int w, int h, Uint32 f
 
 using renderer_ptr_t = std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRenderer)>;
 renderer_ptr_t make_renderer(const window_ptr_t &, int index, Uint32 flags);
+
+using texture_ptr_t = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>;
+texture_ptr_t make_texture(const sdl2::renderer_ptr_t &renderer,
+													 Uint32 format,
+													 int access,
+													 int w,
+													 int h);
 }

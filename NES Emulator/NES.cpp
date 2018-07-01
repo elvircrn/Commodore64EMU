@@ -1,8 +1,9 @@
 #include "NES.h"
 
-void NES::LoadROM(const std::string & filename)
-{
-	ROM rom(filename);
+#include <fstream>
+
+void NES::LoadROM(std::ifstream &fstream) {
+	ROM rom(fstream);
 	cpu.LoadROM(rom);
 	ppu.LoadROM(rom);
 }

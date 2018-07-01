@@ -1,37 +1,36 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
-
-#define USES_SDL
-
-// #define TEST_MODE
-
-#ifndef TEST_MODE
+#include "boost/filesystem.hpp"
 
 #include "NES.h"
 #include "CPU.h"
 #include "FileHandler.h"
 
-#ifdef USES_SDL
 #include "SDL.h"
 #include "GUI.h"
-#endif
+#include "MMU.h"
 
-#ifdef USES_SDL
-int main(int argc, char *args[])
-#else
-int main()
-#endif
-{
-
-#ifdef USES_SDL
-
+int _main(int argc, char *args[]) {
 	SDL_Init(SDL_INIT_VIDEO);
-	GUI gui;
-	SDL_Quit();
-#else
 
-	ROM rom("donkeykong.nes");
+	std::string fileName = "donkeykong.nes";
+	std::string filePath = boost::filesystem::path(__FILE__)
+			.parent_path()
+			.append(fileName)
+			.string();
+
+	std::cout << "Trying to load: " << filePath << '\n';
+	std::ifstream file(filePath, std::ios::binary);
+
+	if (!file) {
+		std::cout << "Failed to read rom given: " << filePath << '\n';
+		return 0;
+	}
+
+	file.unsetf(std::ios::skipws);
+
+	ROM rom(file);
 	PPU ppu(rom);
 
 	auto data = ppu.Pattern();
@@ -46,18 +45,25 @@ int main()
 		std::cout << '\n';
 	}
 
-	CPU cpu(&ppu);
-	cpu.PowerUp();
 
-	cpu.LoadROM(rom);
+	MMU mmu(ppu);
+	std::function<u8&(u8)> mmuFn = [&mmu](u8 addr) -> u8& { return static_cast<u8&>(mmu(addr)); };
 
-	for (int i = 0; i < 10; i++) {
-		cpu.Execute();
+	try {
+		CPU cpu(mmu);
+		cpu.PowerUp();
+
+		cpu.LoadROM(rom);
+
+		for (int i = 0; i < 100; i++) {
+			cpu.Execute();
+		}
+	} catch (const std::string &error) {
+		std::cout << error << '\n';
 	}
 
-	std::getchar();
-#endif
+	GUI gui;
+	SDL_Quit();
 
 	return 0;
 }
-#endif

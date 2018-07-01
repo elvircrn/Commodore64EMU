@@ -28,7 +28,7 @@ class ROM
 	
 public:
 	ROM();
-	ROM(const std::string &filename);
+	ROM(std::ifstream &filename);
 
 	u8& operator[](const int addr);
 	u8  operator[](const int addr) const;

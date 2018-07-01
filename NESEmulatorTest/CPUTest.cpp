@@ -1,6 +1,3 @@
-// #define RUN_TESTS
-
-#ifdef RUN_TESTS
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include "../NES Emulator/CPU.h"
@@ -8,7 +5,9 @@
 #include <boost/filesystem.hpp>
 #include "../NES Emulator/Debugger.h"
 
+#include <fstream>
 #include <iomanip>
+#include <NES Emulator/MMU.h>
 
 namespace NESEmulatorTest {
 #define ASRT(X, Y) REQUIRE((X) == (Y))
@@ -64,25 +63,46 @@ TEST_CASE("UpdateNZ") {
 }
 
 TEST_CASE("ROMHeaderTest") {
-	auto filepath = boost::filesystem::path(__FILE__)
+	auto filePath = boost::filesystem::path(__FILE__)
 			.parent_path()
 			.append("nestest.nes")
 			.string();
 
-	ROM rom(filepath);
+	std::ifstream file(filePath, std::ios::binary);
+
+	if (!file) {
+		std::cout << "Failed to read rom given: " << filePath << '\n';
+		ASRT(true, false);
+	}
+
+	file.unsetf(std::ios::skipws);
+
+	ROM rom(file);
 
 	ASRT(rom.CHRCnt(), 1);
 	ASRT(rom.PRGCnt(), 1);
 }
 
 TEST_CASE("NESTestNoCycleCount") {
-	auto filepath = boost::filesystem::path(__FILE__)
+	auto filePath = boost::filesystem::path(__FILE__)
 			.parent_path()
 			.append("nestest.nes")
 			.string();
 
-	ROM rom(filepath);
-	CPU cpu;
+	std::ifstream file(filePath, std::ios::binary);
+
+	if (!file) {
+		std::cout << "Failed to read rom given: " << filePath << '\n';
+		ASRT(true, false);
+	}
+
+	file.unsetf(std::ios::skipws);
+
+	ROM rom(file);
+	PPU ppu(rom);
+	MMU mmu(ppu);
+	auto mmuFn = [&mmu](u16 addr) -> u8& { return static_cast<u8&>(mmu(addr)); };
+	CPU cpu(mmuFn);
 	Debugger debugger(&cpu);
 	cpu.PowerUp();
 	cpu.LoadROM(rom);
@@ -129,4 +149,3 @@ TEST_CASE("NESTestNoCycleCount") {
 	}
 }
 }
-#endif

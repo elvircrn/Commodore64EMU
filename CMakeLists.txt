@@ -52,7 +52,7 @@ add_executable(NESEmu
         6502.jpg
         NESEmulator.sln
         README.md
-        timings.txt "NES Emulator/optional.h" "NES Emulator/variant.h" "NES Emulator/catch.hpp")
+        timings.txt "NES Emulator/optional.h" "NES Emulator/variant.h" "NES Emulator/catch.hpp" "NES Emulator/MMU.cpp" "NES Emulator/MMU.h")
 include(FindPkgConfig)
 pkg_search_module(SDL2 REQUIRED sdl2)
 include_directories(${SDL2_INCLUDE_DIRS})

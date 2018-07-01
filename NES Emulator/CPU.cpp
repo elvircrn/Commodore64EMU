@@ -8,10 +8,10 @@
 
 void CPU::LoadROM(const ROM &rom) {
 	for (int i = 0; i < 0x4000; i++)
-		ram[0xC000 + i] = rom[i];
+		mmu(0xC000 + i) = rom[i];
 }
 
-CPU::CPU() : ram(RAM_SIZE), isOfficial(0xff), cycleCount(0), ppu(nullptr) {
+CPU::CPU() : isOfficial(0xff), cycleCount(0) {
 	u8 official[] = {0x69, 0x65, 0x75, 0x6D, 0x7D, 0x79, 0x61, 0x71, 0x28, 0xEA,
 									 0x29, 0x25, 0x35, 0x2D, 0x3D, 0x39, 0x21, 0x31, 0x0A, 0x06,
 									 0x16, 0x0E, 0x1E, 0x24, 0x2C, 0x10, 0x30, 0x50, 0x70, 0x90,
@@ -31,8 +31,8 @@ CPU::CPU() : ram(RAM_SIZE), isOfficial(0xff), cycleCount(0), ppu(nullptr) {
 		isOfficial[o] = true;
 }
 
-CPU::CPU(PPU *_ppu) : CPU() {
-	ppu = _ppu;
+CPU::CPU(const std::function<u8 &(u16)> &_mmu) : CPU() {
+	mmu = _mmu;
 }
 
 CPU::~CPU() = default;

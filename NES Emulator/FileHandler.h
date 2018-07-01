@@ -7,17 +7,24 @@
 
 #include "ROM.h"
 #include "core.h"
+#include "optional.h"
 
 using std::vector;
 using std::tuple;
 using std::string;
 
-class FileHandler
-{
+class FileHandler {
 public:
 	/**
 		Returns the header, prg banks, and chr banks respectively.
 	*/
-	static tuple<int, vector<u8>, vector<vector<u8>>, vector<vector<u8>>> LoadROMData(const string &fileName);
+	static std::experimental::optional<tuple<int,
+																					 vector<u8>,
+																					 vector<vector<u8>>,
+																					 vector<vector<u8>>>> LoadROMData(const std::string &);
+	static std::experimental::optional<tuple<int,
+																					 vector<u8>,
+																					 vector<vector<u8>>,
+																					 vector<vector<u8>>>> LoadROMData(std::ifstream &fileStream);
 };
 

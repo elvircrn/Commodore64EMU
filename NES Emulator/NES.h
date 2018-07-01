@@ -12,6 +12,6 @@ public:
 
 	NES();
 
-	void LoadROM(const std::string &filename);
+	void LoadROM(std::ifstream &filename);
 };
 

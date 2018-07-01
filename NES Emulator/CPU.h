@@ -52,8 +52,7 @@ class CPU {
 	bool nmi = false;
 
 	// Memory
-	constexpr static int RAM_SIZE = 65536;
-	std::vector<u8> ram;
+	std::function<u8&(u16)> mmu;
 
 	// Instructions
 	constexpr static int RESET_VECTOR = 0x0000;
@@ -89,9 +88,9 @@ class CPU {
 		CrossesPage(abs, y);
 		return abs + y;
 	}
-	inline u8 &Zp(u8 addr) { return ram[addr]; }
+	inline u8 &Zp(u8 addr) { return static_cast<u8&>(mmu(addr)); }
 	inline u16 Zp16(u8 addr) {
-		return (ram[(addr + 1) & 0xff] << 8) + ram[addr];
+		return (mmu(static_cast<u16>((addr + 1) & 0xff)) << 8) + mmu(addr);
 	}
 	inline void CrossesPage(u16 addr, u8 offset) {
 		zeroPageCrossed |= ((addr & 0xff00) != ((addr + offset) & 0xff00));
@@ -127,7 +126,6 @@ class CPU {
 	inline void Z(bool x) { SetFlag(Flags::Z, x); }
 	inline void C(bool x) { SetFlag(Flags::C, x); }
 
-	PPU *ppu;
 public:
 	inline u8 A() { return a; }
 	inline u8 X() { return x; }
@@ -168,16 +166,7 @@ public:
 #pragma region Memory
 	// Default memory layout, no reference to PPU
 	inline u8 &Read(u16 addr) {
-		// Mirrored 2KB of internal RAM
-		if (addr < 0x2000)
-			return ram[addr & 0x7FF];
-			// Mirrors of NES PPU registers
-		else if (0x2000 <= addr && addr <= 0x3fff) {
-			if (ppu == nullptr)
-				throw "PPU not found";
-			return ppu->RdReg(((addr - 0x2000) % 8) + 0x2000);
-		} else
-			return ram[addr];
+		return static_cast<u8&>(mmu(addr));
 	}
 
 	inline u16 Read16(u16 addr) { return Read(addr) + (Read(addr + 1) << 8); }
@@ -187,7 +176,7 @@ public:
 		u8 hi = Read((addr & 0xff00) + LO(addr + 1));
 		return lo + (hi << 8);
 	}
-	inline u8 &Stk(u8 addr) { return ram[0x0100 + static_cast<u32>(addr)]; }
+	inline u8 &Stk(u8 addr) { return static_cast<u8&>(mmu(static_cast<u16>(0x0100 + static_cast<u32>(addr)))); }
 #pragma endregion
 
 #pragma region Flags
@@ -207,7 +196,7 @@ public:
 
 #pragma region Constructors
 	CPU();
-	CPU(PPU *_ppu);
+	explicit CPU(const std::function<u8 &(u16)> &mmu);
 	~CPU();
 #pragma endregion
 
@@ -218,6 +207,7 @@ public:
 		cycleCount += cycles;
 		delta += cycles;
 	}
+
 	inline int Delta() { return delta; }
 
 	// NOTE Do not use with jumps or returns!

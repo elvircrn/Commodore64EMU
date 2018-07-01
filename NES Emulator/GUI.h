@@ -1,13 +1,11 @@
 #pragma once
-#include "SDL.h"
+#include "SDL2/SDL.h"
 #include "SDLCore.h"
 
 class GUI
 {
 	sdl2::window_ptr_t window;
-	SDL_Surface* screenSurface;
-
-	int sdlState;
+	sdl2::renderer_ptr_t renderer;
 public:
 	GUI();
 

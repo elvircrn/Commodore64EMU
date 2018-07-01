@@ -2,7 +2,11 @@
 #include <cstdio>
 #include <cstdlib>
 
-//#define USES_SDL
+#define USES_SDL
+
+// #define TEST_MODE
+
+#ifndef TEST_MODE
 
 #include "NES.h"
 #include "CPU.h"
@@ -13,9 +17,8 @@
 #include "GUI.h"
 #endif
 
-
 #ifdef USES_SDL
-int main(int argc, char* args[])
+int main(int argc, char *args[])
 #else
 int main()
 #endif
@@ -25,9 +28,7 @@ int main()
 
 	SDL_Init(SDL_INIT_VIDEO);
 	GUI gui;
-
-	std::getchar();
-
+	SDL_Quit();
 #else
 
 	ROM rom("donkeykong.nes");
@@ -35,14 +36,12 @@ int main()
 
 	auto data = ppu.Pattern();
 
-	for (auto& x : data)
-	{
-		for (auto& y : x)
-		{
+	for (auto &x : data) {
+		for (auto &y : x) {
 			if (y == 0)
 				std::cout << ' ';
 			else
-				std::cout << (int)y;
+				std::cout << (int) y;
 		}
 		std::cout << '\n';
 	}
@@ -52,8 +51,7 @@ int main()
 
 	cpu.LoadROM(rom);
 
-	for (int i = 0; i < 10; i++)
-	{
+	for (int i = 0; i < 10; i++) {
 		cpu.Execute();
 	}
 
@@ -62,3 +60,4 @@ int main()
 
 	return 0;
 }
+#endif

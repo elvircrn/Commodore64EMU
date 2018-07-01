@@ -3,39 +3,19 @@ sudo: false
 
 matrix:
   include:
-
-    # Linux C++14 GCC builds
+    Linux C++14 Clang builds
     - os: linux
-      compiler: gcc
-      addons: &gcc6
+      compiler: clang
+      addons: &clang38
         apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-6']
-      env: COMPILER='g++-6' BUILD_TYPE='Release'
+          sources: ['llvm-toolchain-precise-3.8', 'ubuntu-toolchain-r-test']
+          packages: ['clang-3.8', 'libc++-dev', 'libc++1']
+      env: COMPILER='clang++-3.8' BUILD_TYPE='Release' FLAGS='stdlib=libc++'
 
     - os: linux
-      compiler: gcc
-      addons: *gcc6
-      env: COMPILER='g++-6' BUILD_TYPE='Debug'
-
-    - os: linux
-      compiler: gcc
-      addons: *gcc6
-      env: COMPILER='g++-6' BUILD_TYPE='Debug' FLAGS='-m32'
-
-    # Linux C++14 Clang builds
-    # - os: linux
-    #   compiler: clang
-    #   addons: &clang38
-    #     apt:
-    #       sources: ['llvm-toolchain-precise-3.8', 'ubuntu-toolchain-r-test']
-    #       packages: ['clang-3.8', 'libc++-dev', 'libc++1']
-    #   env: COMPILER='clang++-3.8' BUILD_TYPE='Release' FLAGS='stdlib=libc++'
-
-    # - os: linux
-    #   compiler: clang
-    #   addons: *clang38
-    #   env: COMPILER='clang++-3.8' BUILD_TYPE='Debug' FLAGS='stdlib=libc++'
+      compiler: clang
+      addons: *clang38
+      env: COMPILER='clang++-3.8' BUILD_TYPE='Debug' FLAGS='stdlib=libc++'
 
 
 install:

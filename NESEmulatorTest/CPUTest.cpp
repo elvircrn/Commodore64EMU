@@ -1,4 +1,4 @@
-#define CATCH_CONFIG_MAIN
+/*
 #include "catch.hpp"
 #include "../NES Emulator/CPU.h"
 #include "../NES Emulator/FileHandler.h"
@@ -6,6 +6,7 @@
 #include "../NES Emulator/Debugger.h"
 
 #include <fstream>
+#include <iostream>
 #include <iomanip>
 #include <NES Emulator/MMU.h>
 
@@ -153,3 +154,4 @@ TEST_CASE("NESTestNoCycleCount") {
 	}
 }
 }
+ */

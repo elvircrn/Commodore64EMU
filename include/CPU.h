@@ -10,7 +10,6 @@
 #include "core.h"
 #include "ROM.h"
 #include "PPU.h"
-#include "EmuException.h"
 
 enum Interrupts { BRK, IRQ, NMI, RST };
 

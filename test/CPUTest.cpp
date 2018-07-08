@@ -1,14 +1,14 @@
-/*
+#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
-#include "../NES Emulator/CPU.h"
-#include "../NES Emulator/FileHandler.h"
+#include "CPU.h"
+#include "FileHandler.h"
 #include <boost/filesystem.hpp>
-#include "../NES Emulator/Debugger.h"
+#include "Debugger.h"
 
 #include <fstream>
 #include <iostream>
 #include <iomanip>
-#include <NES Emulator/MMU.h>
+#include "MMU.h"
 
 namespace NESEmulatorTest {
 #define ASRT(X, Y) REQUIRE((X) == (Y))
@@ -20,14 +20,14 @@ void LoggerDump(const Debugger &debugger) {
 
 TEST_CASE("FlagSet") {
 	u8 xx;
-	CPU cpu([&xx](u16 x) -> u8& { return xx; });
+	CPU cpu([&xx](u16 x) -> u8 & { return xx; });
 	cpu.SetFlag(Flags::V, 1);
 	ASRT(cpu.GetFlag(Flags::V), true);
 }
 
 TEST_CASE("UpdateV") {
 	u8 xx;
-	CPU cpu([&xx](u16 x) -> u8& { return xx; });
+	CPU cpu([&xx](u16 x) -> u8 & { return xx; });
 
 	cpu.UpdV(0x80, 0x80, 0);
 	ASRT(cpu.GetFlag(Flags::V), true);
@@ -41,7 +41,7 @@ TEST_CASE("UpdateV") {
 
 TEST_CASE("UpdateC") {
 	u8 xx;
-	CPU cpu([&xx](u16 x) -> u8& { return xx; });
+	CPU cpu([&xx](u16 x) -> u8 & { return xx; });
 
 	cpu.UpdC(0xff, 0xff, 0xff + 0xff);
 	ASRT(cpu.GetFlag(Flags::C), true);
@@ -52,7 +52,7 @@ TEST_CASE("UpdateC") {
 
 TEST_CASE("UpdateNZ") {
 	u8 xx;
-	CPU cpu([&xx](u16 x) -> u8& { return xx; });
+	CPU cpu([&xx](u16 x) -> u8 & { return xx; });
 
 	cpu.UpdN(0);
 	ASRT(cpu.GetFlag(Flags::N), false);
@@ -106,7 +106,7 @@ TEST_CASE("NESTestNoCycleCount") {
 	ROM rom(file);
 	PPU ppu(rom);
 	MMU mmu(ppu);
-	auto mmuFn = [&mmu](u16 addr) -> u8& { return static_cast<u8&>(mmu(addr)); };
+	auto mmuFn = [&mmu](u16 addr) -> u8 & { return static_cast<u8 &>(mmu(addr)); };
 	CPU cpu(mmuFn);
 	Debugger debugger(&cpu);
 	cpu.PowerUp();
@@ -143,7 +143,7 @@ TEST_CASE("NESTestNoCycleCount") {
 		try {
 			cpu.Execute();
 		}
-		catch (std::string e) {
+		catch (std::string &e) {
 			LoggerDump(debugger);
 			std::stringstream ss;
 			ss << std::hex << std::setfill('0') << std::setw(2) << (int) cpu.PC();
@@ -154,4 +154,3 @@ TEST_CASE("NESTestNoCycleCount") {
 	}
 }
 }
- */

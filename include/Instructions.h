@@ -1,13 +1,10 @@
 #pragma once
 #include <string>
 #include "core.h"
-class Instructions
-{
+class Instructions {
 public:
-	static inline std::string Name(u8 opcode)
-	{
-		switch (opcode)
-		{
+	static inline std::string Name(u8 opcode) {
+		switch (opcode) {
 		case 0x69: return "ADC";
 		case 0x65: return "ADC";
 		case 0x75: return "ADC";
@@ -159,8 +156,8 @@ public:
 		case 0x08: return "PHP";
 		case 0x28: return "PLP";
 		case 0xEA: return "NOP";
+		default: return "";
 		}
-		return "";
 	}
 };
 

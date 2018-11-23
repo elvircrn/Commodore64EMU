@@ -1,6 +1,7 @@
-#include <iostream>
 #include <cstdio>
 #include <cstdlib>
+#include <thread>
+#include <iostream>
 #include "boost/filesystem.hpp"
 
 #include "NES.h"
@@ -10,6 +11,9 @@
 #include "SDL.h"
 #include "GUI.h"
 #include "MMU.h"
+#include "NanoLog.h"
+#include "NanoLog.h"
+#include "Clock.h"
 
 void textureDemo() {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -64,7 +68,8 @@ void putPixelRGB(SDL_Renderer *renderer, int x, int y, unsigned char r, unsigned
 	SDL_RenderDrawPoint(renderer, x, y);
 }
 
-void textureDemo(std::vector<std::vector<u8>> data) {
+void textureDemo(PPU &ppu) {
+	static int offX{}, offY{};
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
 	}
@@ -90,13 +95,28 @@ void textureDemo(std::vector<std::vector<u8>> data) {
 		// filled with red rectangles
 		SDL_RenderClear(renderer.get());
 
+		if (event.type == SDL_KEYDOWN) {
+			switch (event.key.keysym.sym) {
+			case SDLK_LEFT: offX--;
+				break;
+			case SDLK_RIGHT: offX++;
+				break;
+			case SDLK_UP: offY--;
+				break;
+			case SDLK_DOWN: offY++;
+				break;
+			default: break;
+			}
+		}
+
+		auto data = ppu.Pattern(offX, offY);
 
 		for (size_t i = 0; i < data.size(); i++) {
 			for (size_t j = 0; j < data[0].size(); j++) {
 				if (data[i][j]) {
 					for (size_t k = 0; k < 8; k++) {
 						for (size_t l = 0; l < 8; l++) {
-							putPixelRGB(renderer.get(), 8 * i + k, 8 * j + l, 0xff, 0xff, 0xff);
+							putPixelRGB(renderer.get(), 8 * j + l, 8 * i + k, 0xff, 0xff, 0xff);
 						}
 					}
 				}
@@ -137,23 +157,37 @@ int main(int argc, char *args[]) {
 	ROM rom(file);
 	PPU ppu(rom);
 
-	auto data = ppu.Pattern();
+	textureDemo(ppu);
+	return 0;
+}
 
-	for (auto &x : data) {
-		for (auto &y : x) {
-			if (y == 0)
-				std::cout << ' ';
-			else
-				std::cout << (int) y;
-		}
-		std::cout << '\n';
+int _main(int argc, char *args[]) {
+	std::ios_base::sync_with_stdio(false);
+	nanolog::initialize(nanolog::NonGuaranteedLogger(3), "/tmp/", "nanolog", 1);
+	LOG_INFO << "Sample NanoLog: ";
+	LOG_INFO << 123;
+	SDL_Init(SDL_INIT_VIDEO);
+
+	std::string fileName = "donkeykong.nes";
+	std::string filePath = boost::filesystem::path(__FILE__)
+			.parent_path()
+			.append(fileName)
+			.string();
+
+	LOG_INFO << "Trying to load: " << filePath << '\n';
+	std::ifstream file(filePath, std::ios::binary);
+
+	if (!file) {
+		LOG_INFO << "Failed to read rom given: " << filePath << '\n';
+		return 0;
 	}
 
-	textureDemo(data);
-	return 0;
+	file.unsetf(std::ios::skipws);
 
+	ROM rom(file);
+	PPU ppu(rom);
 	MMU mmu(ppu);
-	std::function<u8 &(u8)> mmuFn = [&mmu](u8 addr) -> u8 & { return static_cast<u8 &>(mmu(addr)); };
+	std::function<u8 &(u8)> mmuFn = [&mmu](u8 addr) -> u8 & { return mmu(addr); };
 
 	try {
 		CPU cpu(mmu);
@@ -161,15 +195,32 @@ int main(int argc, char *args[]) {
 
 		cpu.LoadROM(rom);
 
-		for (int i = 0; i < 100; i++) {
-			cpu.Execute();
-		}
+		std::thread cpuThread([&]() {
+			try {
+				while (true) {
+					cpu.Execute();
+				}
+			} catch (const std::string &error) {
+				std::cout << error << '\n';
+			}
+		});
+
+		std::thread ppuThread([&]() {
+			try {
+
+			} catch (const std::string &error) {
+
+			}
+		});
+
+		cpuThread.join();
 	} catch (const std::string &error) {
 		std::cout << error << '\n';
+		LOG_INFO << error << '\n';
 	}
 
-	GUI gui;
-	SDL_Quit();
+//	GUI gui;
+//	SDL_Quit();
 
 	return 0;
 }

@@ -11,10 +11,6 @@ set (THIRD_PARTY_MODULE_PATH "${PROJECT_SOURCE_DIR}/third_party")
 #configure directories
 set (SDL2_MODULE_PATH "${THIRD_PARTY_MODULE_PATH}/SDL2")
 set (SDL2_INCLUDE_PATH "${SDL_MODULE_PATH}/include")
-
-# -------------------------------------------------------------------------
-
-#set variables
 set (THIRD_PARTY_INCLUDE_PATH  ${SDL2_INCLUDE_PATH})
 
 #export vars

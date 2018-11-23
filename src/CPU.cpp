@@ -5,6 +5,7 @@
 #include <tuple>
 #include <sstream>
 #include <string>
+#include "NanoLog.h"
 
 void CPU::LoadROM(const ROM &rom) {
 	for (int i = 0; i < 0x4000; i++)
@@ -50,6 +51,9 @@ void CPU::PowerUp() {
 void CPU::Execute() {
 	u16 prevPc = pc;
 	Clear();
+	Tick(2);
+
+	u8 op = Read(pc++);
 	if constexpr (DEBUG) {
 		opHist.push_back(Read(pc));
 		pcHist.push_back(pc);
@@ -59,11 +63,9 @@ void CPU::Execute() {
 													 std::array<u8, 3>({Read(pc + 1), Read(pc + 2), Read(pc + 3)}));
 		for (int i = 0; i < 5; i++)
 			bitStack.push_back(Read(pc + i));
+		LOG_INFO << Instructions::Name(op) << '\n';
 	}
 
-	Tick(2);
-
-	u8 op = Read(pc++);
 	switch (op) {
 	case 0x69: ADC<AddressingModes::IMMEDIATE>();
 		break;
@@ -129,7 +131,7 @@ void CPU::Execute() {
 		break;
 	case 0xF0: BEQ<AddressingModes::RELATIVE>();
 		break;
-	// TODO :Implement the BRK instruction
+		// TODO :Implement the BRK instruction
 	case 0x00: BRK<AddressingModes::IMPLIED>();
 		break;
 	case 0xC9: CMP<AddressingModes::IMMEDIATE>();
@@ -425,10 +427,12 @@ void CPU::Execute() {
 		break;
 
 	default: std::stringstream ss;
-		for (int i = pc; i < pc + 10; i++)
-			ss << std::hex << (int) Read(i) << ' ';
-		DebugDump();
-		throw "Instruction not found at pc: " + std::to_string(pc) + "\nDump: " + ss.str();
+		if constexpr (!ignoreUnknownInstr) {
+			for (int i = pc; i < pc + 10; i++)
+				ss << std::hex << (int) Read(i) << ' ';
+			DebugDump();
+			throw "Instruction not found at pc: " + std::to_string(pc) + "\nDump: " + ss.str();
+		}
 	}
 
 	Tick(zeroPageCrossed & calcCrossed);
@@ -529,14 +533,14 @@ void CPU::ADC() {
 	UpdNZ((u8) (res & 0xff));
 }
 
-//....	and (with accumulator)  
+//....	and (with accumulator)
 template<AddressingModes mode>
 void CPU::AND() {
 	calcCrossed = true;
 	UpdNZ(a &= GetPureOperand<mode>());
 }
 
-//....	arithmetic shift left  
+//....	arithmetic shift left
 template<AddressingModes mode>
 void CPU::ASL() {
 	Tick(CalcBaseTicks<mode>());
@@ -827,7 +831,7 @@ combination of interrupt plus RTI allows truly reentrant coding.
 template<AddressingModes mode>
 void CPU::RTI() {
 	// NOTE: Changes the p register
-	PLP<mode>(); // pop8 
+	PLP<mode>(); // pop8
 	Tick(2);
 	pc = Pop16(); // pop16
 }
@@ -854,10 +858,10 @@ template<AddressingModes mode>
 void CPU::SEC() { C(1); }
 
 template<AddressingModes mode>
-void CPU::SED() { D(1); }
+void CPU::SED() { D(true); }
 
 template<AddressingModes mode>
-void CPU::SEI() { I(1); }
+void CPU::SEI() { I(true); }
 
 template<AddressingModes mode>
 void CPU::STA() {

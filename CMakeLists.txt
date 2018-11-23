@@ -29,6 +29,5 @@ if (Boost_FOUND)
 endif ()
 target_link_libraries(NESEmu ${Boost_LIBRARIES})
 
-
 add_subdirectory(test)
 

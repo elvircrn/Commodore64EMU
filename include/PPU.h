@@ -29,6 +29,8 @@ class PPU {
 	vector<u8> palletes;
 
 #pragma region Registers
+	// Controls whether the background and sprites use the left half ($0000-$0FFF) or
+	// the right half ($1000-$1FFF) of the pattern table.
 	u8 PPUCTRL;     // VPHB SINN
 	u8 PPUMASK;     // BGRs bMmG
 	u8 PPUSTATUS;   // VSO- ----
@@ -118,6 +120,6 @@ public:
 
 	void LoadROM(const ROM &rom);
 
-	vector<vector<u8>> Pattern();
+	vector<vector<u8>> Pattern(int, int);
 };
 

@@ -6,7 +6,7 @@
 #include "Debugger.h"
 
 #include <fstream>
-#include <iostream>
+#include "NanoLog.h"
 #include <iomanip>
 #include "MMU.h"
 
@@ -76,7 +76,7 @@ TEST_CASE("ROMHeaderTest") {
 	std::ifstream file(filePath, std::ios::binary);
 
 	if (!file) {
-		std::cout << "Failed to read rom given: " << filePath << '\n';
+		LOG_INFO << "Failed to read rom given: " << filePath << '\n';
 		ASRT(true, false);
 	}
 
@@ -97,7 +97,7 @@ TEST_CASE("NESTestNoCycleCount") {
 	std::ifstream file(filePath, std::ios::binary);
 
 	if (!file) {
-		std::cout << "Failed to read rom given: " << filePath << '\n';
+		LOG_INFO << "Failed to read rom given: " << filePath << '\n';
 		ASRT(true, false);
 	}
 

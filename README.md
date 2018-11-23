@@ -7,6 +7,8 @@
 # TODOs
 Refactor branches into a single method
 
+
+
 # ROM data
 0 = 4E (N)\
 1 = 45 (E)\
@@ -121,6 +123,10 @@ absolute,y    +2\
 (indirect,x)  +4\
 (indirect),y  +3
 
+## OAM
+The OAM (Object Attribute Memory) is internal memory inside the PPU that 
+contains a display list of up to 64 sprites, where each sprite's information 
+occupies 4 bytes.
 
 ## NOP
 
@@ -228,4 +234,3 @@ absolute,x    [+2]\
 absolute,y    [+2]\
 (indirect,x)  +4\
 (indirect),y  [+3]
-

@@ -1,4 +1,4 @@
-#include <iostream>
+#include "NanoLog.h"
 #include <string>
 
 #include "SDL2/SDL.h"
@@ -11,7 +11,7 @@ GUI::GUI() : window(sdl2::make_window("NESEmu",
 																			SDL_WINDOW_SHOWN)),
 						 renderer(sdl2::make_renderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)) {
 	if (!window) {
-		std::cout << "Window could not be created! SDL_Error: " << SDL_GetError() << '\n';
+		LOG_INFO << "Window could not be created! SDL_Error: " << SDL_GetError() << '\n';
 		return;
 	}
 

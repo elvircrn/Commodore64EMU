@@ -36,6 +36,7 @@ enum AddressingModes {
 
 // TODO: Check if every instructions increases the PC by at least 1.
 class CPU {
+	static constexpr bool ignoreUnknownInstr = true;
 	CPU();
 	// Timers
 	u64 cycle = 0;
@@ -52,7 +53,7 @@ class CPU {
 	bool nmi = false;
 
 	// Memory
-	std::function<u8&(u16)> mmu;
+	std::function<u8 &(u16)> mmu;
 
 	// Instructions
 	constexpr static int RESET_VECTOR = 0x0000;
@@ -88,7 +89,7 @@ class CPU {
 		CrossesPage(abs, y);
 		return abs + y;
 	}
-	inline u8 &Zp(u8 addr) { return static_cast<u8&>(mmu(addr)); }
+	inline u8 &Zp(u8 addr) { return static_cast<u8 &>(mmu(addr)); }
 	inline u16 Zp16(u8 addr) {
 		return (mmu(static_cast<u16>((addr + 1) & 0xff)) << 8) + mmu(addr);
 	}
@@ -142,7 +143,7 @@ public:
 	inline u8 P(u8 _p) { return p = _p; }
 
 #pragma region Debug
-	static constexpr bool DEBUG = true;
+	static constexpr bool DEBUG = false;
 	std::vector<u16> pcHist;
 	std::vector<u8> opHist;
 	std::vector<u8> bitStack;
@@ -166,7 +167,7 @@ public:
 #pragma region Memory
 	// Default memory layout, no reference to PPU
 	inline u8 &Read(u16 addr) {
-		return static_cast<u8&>(mmu(addr));
+		return static_cast<u8 &>(mmu(addr));
 	}
 
 	inline u16 Read16(u16 addr) { return Read(addr) + (Read(addr + 1) << 8); }
@@ -176,7 +177,7 @@ public:
 		u8 hi = Read((addr & 0xff00) + LO(addr + 1));
 		return lo + (hi << 8);
 	}
-	inline u8 &Stk(u8 addr) { return static_cast<u8&>(mmu(static_cast<u16>(0x0100 + static_cast<u32>(addr)))); }
+	inline u8 &Stk(u8 addr) { return static_cast<u8 &>(mmu(static_cast<u16>(0x0100 + static_cast<u32>(addr)))); }
 #pragma endregion
 
 #pragma region Flags

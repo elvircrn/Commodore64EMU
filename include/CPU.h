@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include <vector>
 #include "variant.h"
 #include <tuple>
@@ -14,24 +14,24 @@
 enum Interrupts { BRK, IRQ, NMI, RST };
 
 // Flags
-enum Flags { C = 0, Z, I, D, B, _, V, N };
+enum Flags { C, Z, I, D, B, _, V, N };
 
 // Adressing modes
 enum AddressingModes {
-	RELATIVE = 0,
-	INDIRECT, // Only used by the JMP instruction
-	ABSOLUTE,
-	INDIRECT_INDEXED,
-	IMMEDIATE,
-	ACCUMULATOR,
-	IMPLIED,
-	ZERO_PAGE,
-	ABSOLUTE_INDEXED_X,
-	ABSOLUTE_INDEXED_Y,
-	ZERO_PAGE_INDEXED,
-	ZERO_PAGE_X,
-	ZERO_PAGE_Y,
-	INDEXED_INDIRECT_X
+  RELATIVE = 0,
+  INDIRECT, // Only used by the JMP instruction
+  ABSOLUTE,
+  INDIRECT_INDEXED,
+  IMMEDIATE,
+  ACCUMULATOR,
+  IMPLIED,
+  ZERO_PAGE,
+  ABSOLUTE_INDEXED_X,
+  ABSOLUTE_INDEXED_Y,
+  ZERO_PAGE_INDEXED,
+  ZERO_PAGE_X,
+  ZERO_PAGE_Y,
+  INDEXED_INDIRECT_X
 };
 
 // TODO: Check if every instructions increases the PC by at least 1.

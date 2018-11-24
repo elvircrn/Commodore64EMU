@@ -1,6 +1,6 @@
 #pragma once
 #include "SDL2/SDL.h"
-#include "SDLCore.h"
+#include "sdl2.h"
 
 class GUI
 {

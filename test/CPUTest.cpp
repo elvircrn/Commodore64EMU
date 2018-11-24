@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
-#include "catch.hpp"
 #include "CPU.h"
+#include "catch.hpp"
 #include "FileHandler.h"
 #include <boost/filesystem.hpp>
 #include "Debugger.h"

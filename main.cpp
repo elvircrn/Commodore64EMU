@@ -8,7 +8,7 @@
 #include "CPU.h"
 #include "FileHandler.h"
 
-#include "SDL.h"
+#include <SDL2/SDL.h>
 #include "GUI.h"
 #include "MMU.h"
 #include "NanoLog.h"
@@ -21,8 +21,8 @@ void textureDemo() {
 	}
 
 	auto window = sdl2::make_window("Texture Demo", 0, 0, 1024, 768, 0);
-	auto renderer = sdl2::make_renderer(window, -1, 0);
-	auto texture = sdl2::make_texture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 768);
+	auto renderer = sdl2::make_renderer(window.get(), -1, 0);
+	auto texture = sdl2::make_bmp(renderer.get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 768);
 
 	SDL_Event event;
 	SDL_Rect r{0, 0, 100, 50};
@@ -75,8 +75,8 @@ void textureDemo(PPU &ppu) {
 	}
 
 	auto window = sdl2::make_window("Texture Demo", 0, 0, 1024, 768, 0);
-	auto renderer = sdl2::make_renderer(window, -1, 0);
-	auto texture = sdl2::make_texture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 768);
+	auto renderer = sdl2::make_renderer(window.get(), -1, 0);
+	auto texture = sdl2::make_bmp(renderer.get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 768);
 
 	SDL_Event event;
 	for (;;) {
@@ -134,6 +134,7 @@ void textureDemo(PPU &ppu) {
 		SDL_RenderPresent(renderer.get());
 	}
 }
+
 
 int main(int argc, char *args[]) {
 	SDL_Init(SDL_INIT_VIDEO);

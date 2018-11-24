@@ -1,6 +1,7 @@
 # Yet another NES Emulator written in C++
 
 ![Grunt status](https://ci.appveyor.com/api/projects/status/github/elvircrn/NESEmu?branch=master&svg=true)
+[![Build Status](https://travis-ci.org/elvircrn/NESEmu.svg?branch=master)](https://travis-ci.org/elvircrn/NESEmu)
 
 ![6502 Schematic](6502.jpg)
 

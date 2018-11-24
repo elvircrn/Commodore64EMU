@@ -1,19 +1,26 @@
 language: cpp
 sudo: false
 
+addons:
+  homebrew:
+    casks:
+      - gcc
+    update: true
 
 matrix:
   include:
     - os: osx
       osx_image: xcode8
       env:
-        - MATRIX_EVAL="brew install gcc && CC=gcc-7 && CXX=g++-7"
+        - MATRIX_EVAL="rvm use 2.3 --install --binary && brew install openssl && rvm use $TRAVIS_RUBY_VERSION && CC=gcc-8 && CXX=g++-8"
 
 before_install:
     - eval "${MATRIX_EVAL}"
 
 
 install:
+  - pip install conan
+  - conan user
   - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
   - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
   - |
@@ -31,6 +38,7 @@ before_script:
   - cd Build
 
 script:
+  - conan create . user/channel
   - make -j 2
   - ctest -V -j 2
 

@@ -4,7 +4,7 @@ sudo: false
 addons:
   homebrew:
     casks:
-      - gcc
+      gcc
     update: true
 
 matrix:
@@ -12,7 +12,7 @@ matrix:
     - os: osx
       osx_image: xcode8
       env:
-        - MATRIX_EVAL="rvm use 2.3 --install --binary && brew install openssl && rvm use $TRAVIS_RUBY_VERSION && CC=gcc-8 && CXX=g++-8"
+        - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
 
 before_install:
     - eval "${MATRIX_EVAL}"

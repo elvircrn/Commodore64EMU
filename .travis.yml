@@ -1,45 +1,22 @@
 language: cpp
-sudo: false
-
-addons:
-  homebrew:
-    - casks: gcc
-    - update: true
-
-matrix:
-  include:
-    - os: osx
-      osx_image: xcode8
-      env:
-        - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
-
-before_install:
-    - eval "${MATRIX_EVAL}"
-
-
+compiler:
+- gcc
 install:
-  - pip install conan
-  - conan user
-  - DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
-  - mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
-  - |
-    if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-      CMAKE_URL="http://www.cmake.org/files/v3.3/cmake-3.3.2-Linux-x86_64.tar.gz"
-      mkdir cmake && travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C cmake
-      export PATH=${DEPS_DIR}/cmake/bin:${PATH}
-    elif [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
-      which cmake || brew install cmake
-    fi
-before_script:
-  - export CXX=${COMPILER}
-  - cd ${TRAVIS_BUILD_DIR}
-  - cmake -H. -BBuild -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -Wdev
-  - cd Build
+# Upgrade GCC
+- sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+- sudo apt-get update -qq
+- sudo apt-get install -qq g++-4.9
+- sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-4.9
+
+# Install conan
+- pip install conan
+# Automatic detection of your arch, compiler, etc.
+- conan user
 
 script:
-  - conan create . user/channel
-  - make -j 2
-  - ctest -V -j 2
+# Download dependencies, build, test and create package
+- conan create . user/channel
+
 
 notifications:
   email: false

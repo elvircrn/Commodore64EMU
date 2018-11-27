@@ -959,7 +959,7 @@ void CPU::INT() {
 
 	I(true);
 
-	constexpr u16 vect[] = {0xFFFA, 0xFFFC, 0xFFFE, 0xFFFE};
+	constexpr u16 vect[] = {0xFFFE, 0xFFFE, 0xFFFA, 0xFFFC};
 	pc = Read16(vect[inter]);
 
 	if (inter == NMI)

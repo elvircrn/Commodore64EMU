@@ -2,7 +2,7 @@
 
 # Mac OS X
 ```
-sudo conan install . --install-folder=cmake-build-debug  --build=missing -s compiler=apple-clang -s compiler.version=0 -s compiler.libcxx=libc++ -s build_type=Debug
+sudo conan install . --install-folder=cmake-build-debug  --build=missing -s compiler=apple-clang -s compiler.version=9.1 -s compiler.libcxx=libc++ -s build_type=Debug
 ```
 
 # Yet another NES Emulator written in C++

@@ -3,9 +3,8 @@ sudo: false
 
 addons:
   homebrew:
-    casks:
-      gcc
-    update: true
+    - casks: gcc
+    - update: true
 
 matrix:
   include:

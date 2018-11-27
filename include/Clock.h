@@ -2,17 +2,22 @@
 #define NESEMU_CLOCK_H
 
 #include "core.h"
+#include <chrono>
+#include <atomic>
+#include <unordered_map>
+#include <thread>
 
 class Clock {
-	u64 t;
+	std::atomic<int> stamp;
+	std::chrono::nanoseconds t = std::chrono::nanoseconds::zero();
+	std::unordered_map<std::thread::id, std::atomic<int>> stamps;
 public:
-	Clock(u64 _t, const std::function<void()> &_onTick);
+	Clock();
+	Clock(std::chrono::nanoseconds _t);
 
 	void startTicking();
 
-	void onTick();
-
-	void tick();
+	void waitTick();
 };
 
 #endif //NESEMU_CLOCK_H

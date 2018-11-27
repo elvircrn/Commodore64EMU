@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <chrono>
 
 using std::vector;
 
@@ -43,6 +44,7 @@ class PPU {
 #pragma endregion
 
 public:
+	static constexpr std::chrono::milliseconds CYCLE_LENGTH{ 500 };
 #pragma region Constructors
 	PPU();
 	PPU(const ROM &rom);

@@ -5,6 +5,7 @@
 #include "variant.h"
 #include <tuple>
 #include "optional.h"
+#include "Clock.h"
 #include <functional>
 
 #include "core.h"
@@ -37,7 +38,8 @@ enum AddressingModes {
 // TODO: Check if every instructions increases the PC by at least 1.
 class CPU {
 	static constexpr bool ignoreUnknownInstr = true;
-	CPU();
+	Clock& clock;
+
 	// Timers
 	u64 cycle = 0;
 
@@ -191,12 +193,15 @@ public:
 	inline void UpdN(u8);
 	inline void UpdZ(u8);
 	inline void UpdNZ(u8);
+
+	inline void SetNmi(bool _nmi) { nmi = _nmi; }
+	inline bool CPU::GetNMI() { return nmi; }
 #pragma endregion
 
 	void LoadROM(const ROM &rom);
 
 #pragma region Constructors
-	explicit CPU(const std::function<u8 &(u16)> &mmu);
+	explicit CPU(Clock&, const std::function<u8 &(u16)> &mmu);
 	~CPU();
 #pragma endregion
 
@@ -204,6 +209,7 @@ public:
 	int cycleCount;
 	int delta;
 	inline void Tick(int cycles = 1) {
+
 		cycleCount += cycles;
 		delta += cycles;
 	}
@@ -410,6 +416,7 @@ public:
 };
 
 // Inlined functions
+
 
 // Flags
 inline void CPU::SetFlag(Flags f, bool bit) {

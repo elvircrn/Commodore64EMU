@@ -20,14 +20,16 @@ void LoggerDump(const Debugger &debugger) {
 
 TEST_CASE("FlagSet") {
 	u8 xx;
-	CPU cpu([&xx](u16 x) -> u8 & { return xx; });
+	Clock clk;
+	CPU cpu(clk, [&xx](u16 x) -> u8 & { return xx; });
 	cpu.SetFlag(Flags::V, 1);
 	ASRT(cpu.GetFlag(Flags::V), true);
 }
 
 TEST_CASE("UpdateV") {
 	u8 xx;
-	CPU cpu([&xx](u16 x) -> u8 & { return xx; });
+	Clock clk;
+	CPU cpu(clk, [&xx](u16 x) -> u8 & { return xx; });
 
 	cpu.UpdV(0x80, 0x80, 0);
 	ASRT(cpu.GetFlag(Flags::V), true);
@@ -41,7 +43,8 @@ TEST_CASE("UpdateV") {
 
 TEST_CASE("UpdateC") {
 	u8 xx;
-	CPU cpu([&xx](u16 x) -> u8 & { return xx; });
+	Clock clk;
+	CPU cpu(clk, [&xx](u16 x) -> u8 & { return xx; });
 
 	cpu.UpdC(0xff, 0xff, 0xff + 0xff);
 	ASRT(cpu.GetFlag(Flags::C), true);
@@ -52,7 +55,8 @@ TEST_CASE("UpdateC") {
 
 TEST_CASE("UpdateNZ") {
 	u8 xx;
-	CPU cpu([&xx](u16 x) -> u8 & { return xx; });
+	Clock clk;
+	CPU cpu(clk, [&xx](u16 x) -> u8 & { return xx; });
 
 	cpu.UpdN(0);
 	ASRT(cpu.GetFlag(Flags::N), false);
@@ -102,12 +106,12 @@ TEST_CASE("NESTestNoCycleCount") {
 	}
 
 	file.unsetf(std::ios::skipws);
-
+	Clock clk;
 	ROM rom(file);
 	PPU ppu(rom);
 	MMU mmu(ppu);
 	auto mmuFn = [&mmu](u16 addr) -> u8 & { return static_cast<u8 &>(mmu(addr)); };
-	CPU cpu(mmuFn);
+	CPU cpu(clk, mmuFn);
 	Debugger debugger(&cpu);
 	cpu.PowerUp();
 	cpu.LoadROM(rom);

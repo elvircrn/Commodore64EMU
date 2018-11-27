@@ -2,16 +2,16 @@
 #include <cstdlib>
 #include <thread>
 #include <iostream>
+#include <chrono>
+
 #include "boost/filesystem.hpp"
+#include <SDL2/SDL.h>
 
 #include "NES.h"
 #include "CPU.h"
 #include "FileHandler.h"
-
-#include <SDL2/SDL.h>
 #include "GUI.h"
 #include "MMU.h"
-#include "NanoLog.h"
 #include "NanoLog.h"
 #include "Clock.h"
 
@@ -136,7 +136,7 @@ void textureDemo(PPU &ppu) {
 }
 
 
-int main(int argc, char *args[]) {
+int _main(int argc, char *args[]) {
 	SDL_Init(SDL_INIT_VIDEO);
 
 	std::string fileName = "donkeykong.nes";
@@ -156,13 +156,15 @@ int main(int argc, char *args[]) {
 	file.unsetf(std::ios::skipws);
 
 	ROM rom(file);
+	std::cout << rom[0xfffa] << '\n';
 	PPU ppu(rom);
 
 	textureDemo(ppu);
 	return 0;
 }
 
-int _main(int argc, char *args[]) {
+int main(int argc, char *args[]) {
+	std::cout << "Hello world\n";
 	std::ios_base::sync_with_stdio(false);
 	nanolog::initialize(nanolog::NonGuaranteedLogger(3), "/tmp/", "nanolog", 1);
 	LOG_INFO << "Sample NanoLog: ";
@@ -185,13 +187,15 @@ int _main(int argc, char *args[]) {
 
 	file.unsetf(std::ios::skipws);
 
+	Clock clk(std::chrono::milliseconds(10));
 	ROM rom(file);
 	PPU ppu(rom);
 	MMU mmu(ppu);
 	std::function<u8 &(u8)> mmuFn = [&mmu](u8 addr) -> u8 & { return mmu(addr); };
 
 	try {
-		CPU cpu(mmu);
+		CPU cpu(clk, mmu);
+		std::cout << "Hi " << std::hex << (int) mmu(0xfffa) << '\n';
 		cpu.PowerUp();
 
 		cpu.LoadROM(rom);
@@ -208,9 +212,8 @@ int _main(int argc, char *args[]) {
 
 		std::thread ppuThread([&]() {
 			try {
-
 			} catch (const std::string &error) {
-
+				std::cout << error << '\n';
 			}
 		});
 

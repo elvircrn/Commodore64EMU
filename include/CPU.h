@@ -195,7 +195,7 @@ public:
 	inline void UpdNZ(u8);
 
 	inline void SetNmi(bool _nmi) { nmi = _nmi; }
-	inline bool CPU::GetNMI() { return nmi; }
+	inline bool GetNMI() { return nmi; }
 #pragma endregion
 
 	void LoadROM(const ROM &rom);

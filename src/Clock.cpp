@@ -17,8 +17,7 @@ void Clock::startTicking() {
 
 void Clock::waitTick() {
 	if (t != std::chrono::nanoseconds::zero()) {
-		while (stamps[std::this_thread::get_id()] != stamp) {
-			stamps[std::this_thread::get_id()].store(stamp);
-		}
+		while (stamps[std::this_thread::get_id()] == stamp) { }
+		stamps[std::this_thread::get_id()].store(stamp);
 	}
 }

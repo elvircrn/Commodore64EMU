@@ -17,7 +17,7 @@ public:
 
 	void startTicking();
 
-	void waitTick();
+	void waitTick(uint32_t ticks = 1);
 };
 
 #endif //NESEMU_CLOCK_H

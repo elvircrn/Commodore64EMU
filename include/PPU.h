@@ -7,6 +7,7 @@ using std::vector;
 
 #include "core.h"
 #include "ROM.h"
+#include "sdl2.h"
 
 enum class MirroringTypes {
 	Any,
@@ -79,11 +80,11 @@ public:
 		else if (addr < 0x3000)
 			return nametables[(addr - 0x2000) / 0x400][addr];
 		else if (addr < 0x3fff)
-			return Rd(addr - 0x1000);
+			return Rd(addr - (u8)0x1000);
 		else if (addr < 0x3f20)
 			return palletes[addr - 0x3f00];
 		else if (addr < 0x4000)
-			return Rd(addr - 0xe0);
+			return Rd(addr - (u8)0xe0);
 		return mem[addr];
 	}
 
@@ -123,5 +124,30 @@ public:
 	void LoadROM(const ROM &rom);
 
 	vector<vector<u8>> Pattern(int, int);
+	vector<vector<u8>> Nametable(int, int);
+
+	void Cycle();
+
+
+	/**
+		Rendering is fetched 8 BG pixels at a time, as follows:
+			Nametable fetch
+			Attribute table fetch (which palette)
+			Pattern table fetch, plane 0
+			Pattern table fetch, plane 1
+
+			Conceptually, the PPU does this 33 times for each scanline:
+
+		Fetch a nametable entry from $2000-$2FBF.
+		Fetch the corresponding attribute table entry from $23C0-$2FFF and increment the current VRAM address within the same row.
+		Fetch the low-order byte of an 8x1 pixel sliver of pattern table from $0000-$0FF7 or $1000-$1FF7.
+		Fetch the high-order byte of this sliver from an address 8 bytes higher.
+		Turn the attribute data and the pattern table data into palette indices, and combine them with data from sprite data using priority.
+		It also does a fetch of a 34th (nametable, attribute, pattern) tuple that is never used, but some mappers rely on this fetch for timing purposes.
+	 */
+	void drawStuff() {
+
+	}
 };
+
 

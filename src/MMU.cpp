@@ -6,6 +6,7 @@ u8 &MMU::operator()(u16 addr) {
 		// Mirrors of NES PPU registers
 	else if (0x2000 <= addr && addr <= 0x3fff) {
 		return ppu.RdReg(((addr - 0x2000) % 8) + 0x2000);
-	} else
+	} else {
 		return ram[addr];
+	}
 }

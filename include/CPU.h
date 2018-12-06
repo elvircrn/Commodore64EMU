@@ -12,9 +12,11 @@
 #include "ROM.h"
 #include "PPU.h"
 
+// Interrupt types along with their respective vectors
 enum Interrupts { BRK, IRQ, NMI, RST };
+constexpr u16 vect[] = {0xFFFE, 0xFFFE, 0xFFFA, 0xFFFC};
 
-// Flags
+// CPU Flags, _ -> empty
 enum Flags { C, Z, I, D, B, _, V, N };
 
 // Adressing modes
@@ -40,9 +42,6 @@ class CPU {
 	static constexpr bool ignoreUnknownInstr = true;
 	Clock& clock;
 
-	// Timers
-	u64 cycle = 0;
-
 	// Registers
 	u8 a = 0; // Accumulator
 	u8 x = 0; // General purpose
@@ -58,8 +57,6 @@ class CPU {
 	std::function<u8 &(u16)> mmu;
 
 	// Instructions
-	constexpr static int RESET_VECTOR = 0x0000;
-	uint16_t rst;
 	std::vector<bool> isOfficial;
 	bool zeroPageCrossed;
 	bool calcCrossed;
@@ -145,7 +142,7 @@ public:
 	inline u8 P(u8 _p) { return p = _p; }
 
 #pragma region Debug
-	static constexpr bool DEBUG = false;
+	static constexpr bool DEBUG = true;
 	std::vector<u16> pcHist;
 	std::vector<u8> opHist;
 	std::vector<u8> bitStack;
@@ -209,7 +206,6 @@ public:
 	int cycleCount;
 	int delta;
 	inline void Tick(int cycles = 1) {
-
 		cycleCount += cycles;
 		delta += cycles;
 	}

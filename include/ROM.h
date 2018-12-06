@@ -9,13 +9,12 @@
 
 using std::vector;
 
-class ROM
-{
+class ROM {
 	constexpr static size_t MAX_ROM_SIZE = 1024 * 1024;
 
 	// Number of chr and prg memory banks
 	u8 mapper;
-	
+
 	// Reset vector
 	u16 rst;
 
@@ -25,13 +24,13 @@ class ROM
 	vector<vector<u8>> prg;
 
 	u32 size;
-	
+
 public:
 	ROM();
 	ROM(std::ifstream &filename);
 
-	u8& operator[](const int addr);
-	u8  operator[](const int addr) const;
+	u8 &operator[](const int addr) noexcept;
+	u8 operator[](const int addr) const noexcept;
 
 	inline u32 Size() { return size; }
 	inline int CHRCnt() { return chr.size(); }

@@ -4,6 +4,7 @@
 #include "SDL2/SDL.h"
 #include "GUI.h"
 
+#include <iostream>
 GUI::GUI() : window(sdl2::make_window("NESEmu",
 																			SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 																			SCREEN_WIDTH,
@@ -11,7 +12,7 @@ GUI::GUI() : window(sdl2::make_window("NESEmu",
 																			SDL_WINDOW_SHOWN)),
 						 renderer(sdl2::make_renderer(window.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)) {
 	if (!window) {
-		LOG_INFO << "Window could not be created! SDL_Error: " << SDL_GetError() << '\n';
+		std::cout << "Window could not be created! SDL_Error: " << SDL_GetError() << '\n'; // TODO: Remove
 		return;
 	}
 

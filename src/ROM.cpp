@@ -9,22 +9,20 @@ ROM::ROM(std::ifstream &fileStream) {
 	mapper = header[7] + (header[6] >> 4);
 }
 
-u8 &ROM::operator[](const int addr) {
+u8 &ROM::operator[](const int addr) noexcept {
 	if (addr < prg.size() * 0x4000)
 		return prg[addr / 0x4000][addr % 0x4000];
 	else if (addr < chr.size() * 0x2000)
 		return chr[addr / 0x2000][addr % 0x2000];
-
-	throw "Invalid index";
+	exit(1); // Panic!
 }
 
-u8 ROM::operator[](const int addr) const {
+u8 ROM::operator[](const int addr) const noexcept {
 	if (addr < prg.size() * 0x4000)
 		return prg[addr / 0x4000][addr % 0x4000];
 	else if (addr < chr.size() * 0x2000)
 		return chr[addr / 0x2000][addr % 0x2000];
-
-	throw "Invalid index";
+	exit(1); // Panic!
 }
 
 std::string ROM::Info() {

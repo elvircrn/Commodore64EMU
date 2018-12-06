@@ -74,7 +74,7 @@ void textureDemo(PPU &ppu) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
 	}
 
-	auto window = sdl2::make_window("Texture Demo", 0, 0, 1024, 768, 0);
+	auto window = sdl2::make_window("Texture Demo1", 0, 0, 1024, 768, 0);
 	auto renderer = sdl2::make_renderer(window.get(), -1, 0);
 	auto texture = sdl2::make_bmp(renderer.get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, 1024, 768);
 
@@ -156,7 +156,6 @@ int _main(int argc, char *args[]) {
 	file.unsetf(std::ios::skipws);
 
 	ROM rom(file);
-	std::cout << rom[0xfffa] << '\n';
 	PPU ppu(rom);
 
 	textureDemo(ppu);
@@ -187,7 +186,7 @@ int main(int argc, char *args[]) {
 
 	file.unsetf(std::ios::skipws);
 
-	Clock clk(std::chrono::milliseconds(10));
+	Clock clk(std::chrono::milliseconds(100));
 	ROM rom(file);
 	PPU ppu(rom);
 	MMU mmu(ppu);
@@ -199,6 +198,15 @@ int main(int argc, char *args[]) {
 		cpu.PowerUp();
 
 		cpu.LoadROM(rom);
+
+		std::thread clockThread([&]() {
+			clk.startTicking();
+		});
+
+		std::thread ioThread([&]() {
+			std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+			cpu.SetNmi(true);
+		});
 
 		std::thread cpuThread([&]() {
 			try {
@@ -218,6 +226,7 @@ int main(int argc, char *args[]) {
 		});
 
 		cpuThread.join();
+		ioThread.join();
 	} catch (const std::string &error) {
 		std::cout << error << '\n';
 		LOG_INFO << error << '\n';

@@ -16,12 +16,12 @@
 #include "NanoLog.h"
 #include "Clock.h"
 
-int _main(int argc, char *args[]) {
+int main(int argc, char *args[]) {
 	patternTablesDemo();
 	return 0;
 }
 
-int main(int argc, char *args[]) {
+int _main(int argc, char *args[]) {
 	std::ios_base::sync_with_stdio(false);
 	nanolog::initialize(nanolog::NonGuaranteedLogger(3), "/tmp/", "nanolog", 1);
 	LOG_INFO << "Sample NanoLog: ";

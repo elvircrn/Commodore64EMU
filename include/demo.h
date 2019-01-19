@@ -56,7 +56,7 @@ void _patternTablesDemo(const PPU &ppu) {
 		SDL_RenderClear(renderer.get());
 
 		for (int patternId = 0; patternId < PATTERN_CNT; patternId++) {
-			auto data = ppu.drawPatternTable(static_cast<u16>(0x1000 * patternId));
+			auto data = ppu.getPatternTable(static_cast<u16>(0x1000 * patternId));
 			for (size_t i = 0; i < data.size(); i++) {
 				for (size_t j = 0; j < data[0].size(); j++) {
 					if (data[j][i]) {
@@ -107,7 +107,15 @@ void patternTablesDemo() {
 	ROM rom(file);
 	PPU ppu(rom);
 
-	auto data = ppu.drawPatternTable(0x0000);
+	auto data = ppu.getPatternTable(0x0000);
+
+
+	for (const auto &row : data) {
+		for (const auto &d : row) {
+			std::cout << (int) d << ' ';
+		}
+		std::cout << '\n';
+	}
 
 	_patternTablesDemo(ppu);
 }

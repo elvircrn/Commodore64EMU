@@ -18,6 +18,47 @@ void LoggerDump(const Debugger &debugger) {
 	// INFO(debugger.GetPCHistForLogging().c_str());
 }
 
+
+TEST_CASE("PatternLoad") {
+	std::string donkeyPatternName = "donkeypattern.txt";
+	std::string donkeyPatternPath = boost::filesystem::path(__FILE__)
+			.parent_path()
+			.append(donkeyPatternName)
+			.string();
+	std::ifstream in(donkeyPatternPath);
+	std::vector<std::vector<char>> expected(128, std::vector<char>(128));
+	for (size_t i = 0; i < 128; i++) {
+		for (size_t j = 0; j < 128; j++) {
+			in >> expected[i][j];
+			expected[i][j] -= '0';
+		}
+	}
+
+	std::string fileName = "donkeykong.nes";
+	std::string filePath = boost::filesystem::path(__FILE__)
+			.parent_path()
+			.parent_path()
+			.append(fileName)
+			.string();
+
+	std::cout << "Trying to load: " << filePath << '\n';
+	std::ifstream file(filePath, std::ios::binary);
+
+	if (!file) {
+		std::cout << "Failed to read rom given: " << filePath << '\n';
+		ASRT(true, false);
+	}
+
+	file.unsetf(std::ios::skipws);
+
+	ROM rom(file);
+	PPU ppu(rom);
+
+	auto actual = ppu.getPatternTable(0x0000);
+
+	ASRT(actual, expected);
+}
+
 TEST_CASE("FlagSet") {
 	u8 xx;
 	Clock clk;

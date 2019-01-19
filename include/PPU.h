@@ -172,7 +172,8 @@ public:
 		std::cout << '\n';
 	}
 
-	std::vector<std::vector<char>> drawPatternTable(u16 offset) const {
+	// NOTE: Only for debugging pruposes
+	std::vector<std::vector<char>> getPatternTable(u16 offset) const {
 		std::vector<std::vector<char>> ret(128, std::vector<char>(128));
 		// The pattern table is divided into two 256-tile sections: $0000-$0FFF, nicknamed "left", and $1000-$1FFF, nicknamed
 		int x{}, y{}, id{};

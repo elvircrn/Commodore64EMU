@@ -142,7 +142,7 @@ public:
 	inline u8 P(u8 _p) { return p = _p; }
 
 #pragma region Debug
-	static constexpr bool DEBUG = true;
+	static constexpr bool DEBUG = false;
 	std::vector<u16> pcHist;
 	std::vector<u8> opHist;
 	std::vector<u8> bitStack;

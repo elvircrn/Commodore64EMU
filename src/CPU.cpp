@@ -48,13 +48,12 @@ void CPU::PowerUp() {
 #include <iostream>
 void CPU::Execute() {
 	clock.waitTick();
-	std::cout << "Tick tock\n"; // TODO: Remove
-	u16 prevPc = pc;
 	Clear();
 	Tick(2);
 
 	u8 op = Read(pc++);
 	if constexpr (DEBUG) {
+		std::cout << "Tick tock\n"; // TODO: Remove
 		opHist.push_back(Read(pc));
 		pcHist.push_back(pc);
 		bitStack.clear();
@@ -834,7 +833,9 @@ combination of interrupt plus RTI allows truly reentrant coding.
 */
 template<AddressingModes mode>
 void CPU::RTI() {
-	std::cout << "RTI called\n"; // TODO: Remove
+	if (DEBUG) {
+		std::cout << "RTI called\n"; // TODO: Remove
+	}
 	// NOTE: Changes the p register
 	PLP<mode>(); // pop8
 	Tick(2);
@@ -931,7 +932,9 @@ void CPU::LAX() {
 // INT is not a 6502 instruction. It is simply an interrupt handler.
 template<Interrupts inter>
 void CPU::INT() {
-	std::cout << "Interrupted, type: " << inter << '\n'; // TODO: Find a better way to log
+	if (DEBUG) {
+		std::cout << "Interrupted, type: " << inter << '\n'; // TODO: Find a better way to log
+	}
 	// Note that BRK, although it is a one - byte instruction, needs an extra
 	// byte of padding after it.This is because the return address it puts on
 	// the stack will cause the RTI to put the program counter back not to the

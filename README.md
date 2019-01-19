@@ -62,7 +62,7 @@ Refactor branches into a single method
     +---------+----------------------------------------------------------+
     | Address | Description                                              |
     +---------+----------------------------------------------------------+
-    |  $2000  | PPU Control Register #1 (W)                   [PPUCNT0]  |
+    |  $2000  | PPjkU Control Register #1 (W)                   [PPUCNT0]  |
     |         |   %vMsbpiNN                                              |
     |         |               v = Execute NMI on VBlank                  |
     |         |                      1 = Enabled                         |

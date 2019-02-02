@@ -16,9 +16,10 @@ class MMU {
 	PPU &ppu;
 
 public:
-	MMU(PPU &_ppu) : ram(RAM_SIZE), ppu(_ppu) {}
+	explicit MMU(PPU &_ppu) : ram(RAM_SIZE), ppu(_ppu) {}
 
 	u8 &operator()(u16 addr);
+	void write(u16 addr, u8 val);
 };
 
 #endif //NESEMU_MMU_H

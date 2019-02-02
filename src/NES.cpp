@@ -4,6 +4,6 @@
 
 void NES::LoadROM(std::ifstream &fstream) {
 	ROM rom(fstream);
-	cpu.LoadROM(rom);
+	cpu.loadROM(rom);
 	ppu.LoadROM(rom);
 }

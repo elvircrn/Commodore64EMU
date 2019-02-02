@@ -7,7 +7,7 @@
 #include "boost/filesystem.hpp"
 #include <SDL2/SDL.h>
 
-#include "demo.h"
+#include "graphics_demo.h"
 #include "NES.h"
 #include "CPU.h"
 #include "FileHandler.h"
@@ -15,18 +15,28 @@
 #include "MMU.h"
 #include "NanoLog.h"
 #include "Clock.h"
+#include "sdl2.h"
 
-int main(int argc, char *args[]) {
+int _main(int argc, char *args[]) {
 	patternTablesDemo();
 	return 0;
 }
 
-int _main(int argc, char *args[]) {
+int main(int argc, char *args[]) {
 	std::ios_base::sync_with_stdio(false);
 	nanolog::initialize(nanolog::NonGuaranteedLogger(3), "/tmp/", "nanolog", 1);
 	LOG_INFO << "Sample NanoLog: ";
 	LOG_INFO << 123;
 	SDL_Init(SDL_INIT_VIDEO);
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
+	}
+
+	constexpr u16 WINDOW_WIDTH = 256, WINDOW_HEIGHT = 240;
+	auto window = sdl2::make_window("NES Emulator", 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
+	auto renderer = sdl2::make_renderer(window.get(), -1, 0);
+	auto texture =
+			sdl2::make_bmp(renderer.get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	std::string fileName = "donkeykong.nes";
 	std::string filePath = boost::filesystem::path(__FILE__)
@@ -44,53 +54,63 @@ int _main(int argc, char *args[]) {
 
 	file.unsetf(std::ios::skipws);
 
-	Clock clk(std::chrono::milliseconds(100));
+	Clock clk(std::chrono::milliseconds(1));
 	ROM rom(file);
 	PPU ppu(rom);
 	MMU mmu(ppu);
-	std::function<u8 &(u8)> mmuFn = [&mmu](u8 addr) -> u8 & { return mmu(addr); };
 
 	try {
 		CPU cpu(clk, mmu);
-		cpu.PowerUp();
+		cpu.powerUp();
 
-		cpu.LoadROM(rom);
+		cpu.loadROM(rom);
 
 		std::thread clockThread([&]() {
 			clk.startTicking();
 		});
 
-		std::thread ioThread([&]() {
-			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-			for (;;) {
-				cpu.SetNmi(true);
-				std::this_thread::sleep_for(std::chrono::milliseconds(100));
-				for (int i = 0; i < 34; i++) {
-//					ppu.drawStuff();
-					std::this_thread::sleep_for(std::chrono::milliseconds(100));
-				}
-			}
-		});
-
 		std::thread cpuThread([&]() {
 			try {
 				while (true) {
-					cpu.Execute();
+					cpu.execute();
 				}
 			} catch (const std::string &error) {
 				std::cout << error << '\n';
 			}
 		});
 
-		std::thread ppuThread([&]() {
-			try {
-			} catch (const std::string &error) {
-				std::cout << error << '\n';
-			}
-		});
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // Wait until CPU is initialized.
+		SDL_Event event;
+		for (;;) {
+			cpu.SetNmi(true);
+			std::this_thread::sleep_for(std::chrono::milliseconds(300));
+			SDL_PollEvent(&event);
+			if (event.type == SDL_QUIT)
+				break;
 
+			// Make the screen black
+			SDL_SetRenderDrawColor(renderer.get(), 0x00, 0x00, 0x00, 0x00);
+
+			// Set a texture as the current rendering target
+			SDL_SetRenderTarget(renderer.get(), texture.get());
+
+			// Should this be set to false, the screen would slowly get
+			// filled with red rectangles
+			SDL_RenderClear(renderer.get());
+
+			ppu.drawStuff(renderer.get());
+
+			SDL_SetRenderTarget(renderer.get(), nullptr);
+
+			// SDL_RenderCopy is responsible for making the gameloop understand that there's
+			// something that wants to be rendered, inside the parentheses are (the renderer's name,
+			// the name of the texture, the area it wants to crop but you can leave this as NULL
+			// if you don't want the texture to be cropped, and the texture's rect).
+			SDL_RenderCopy(renderer.get(), texture.get(), nullptr, nullptr);
+
+			SDL_RenderPresent(renderer.get());
+		}
 		cpuThread.join();
-		ioThread.join();
 	} catch (const std::string &error) {
 		std::cout << error << '\n';
 		LOG_INFO << error << '\n';

@@ -1,9 +1,11 @@
+
 #pragma once
 
 #include <cstdint>
 #include <vector>
 #include "variant.h"
 #include <tuple>
+#include "MMU.h"
 #include "optional.h"
 #include "Clock.h"
 #include <functional>
@@ -21,26 +23,26 @@ enum Flags { C, Z, I, D, B, _, V, N };
 
 // Adressing modes
 enum AddressingModes {
-  RELATIVE = 0,
-  INDIRECT, // Only used by the JMP instruction
-  ABSOLUTE,
-  INDIRECT_INDEXED,
-  IMMEDIATE,
-  ACCUMULATOR,
-  IMPLIED,
-  ZERO_PAGE,
-  ABSOLUTE_INDEXED_X,
-  ABSOLUTE_INDEXED_Y,
-  ZERO_PAGE_INDEXED,
-  ZERO_PAGE_X,
-  ZERO_PAGE_Y,
-  INDEXED_INDIRECT_X
+	RELATIVE = 0,
+	INDIRECT, // Only used by the JMP instruction
+	ABSOLUTE,
+	INDIRECT_INDEXED,
+	IMMEDIATE,
+	ACCUMULATOR,
+	IMPLIED,
+	ZERO_PAGE,
+	ABSOLUTE_INDEXED_X,
+	ABSOLUTE_INDEXED_Y,
+	ZERO_PAGE_INDEXED,
+	ZERO_PAGE_X,
+	ZERO_PAGE_Y,
+	INDEXED_INDIRECT_X
 };
 
 // TODO: Check if every instructions increases the PC by at least 1.
 class CPU {
 	static constexpr bool ignoreUnknownInstr = true;
-	Clock& clock;
+	Clock &clock;
 
 	// Registers
 	u8 a = 0; // Accumulator
@@ -54,7 +56,7 @@ class CPU {
 	bool nmi = false;
 
 	// Memory
-	std::function<u8 &(u16)> mmu;
+	MMU mmu;
 
 	// Instructions
 	std::vector<bool> isOfficial;
@@ -154,9 +156,9 @@ public:
 
 #pragma region Setup
 	// TODO: Consider refactoring into an external class?
-	void PowerUp();
+	void powerUp();
 	// Called before instruction execution
-	inline void Clear() {
+	inline void clear() {
 		zeroPageCrossed = false;
 		calcCrossed = false;
 		delta = 0;
@@ -164,14 +166,22 @@ public:
 #pragma endregion
 
 #pragma region Memory
+	bool inline isOAMDMA(u16 addr) {
+		return addr == 0x4014;
+	}
+
 	// Default memory layout, no reference to PPU
 	inline u8 &Read(u16 addr) {
-		return static_cast<u8 &>(mmu(addr));
+		u8 &result = mmu(addr);
+		if (!oamDmaIdx && isOAMDMA(addr)) {
+			oamDmaIdx = 256;
+		}
+		return result;
 	}
 
 	inline u16 Read16(u16 addr) { return Read(addr) + (Read(addr + 1) << 8); }
 	inline u16 Ind(u16 addr) {
-		Tick(3);
+		tick(3);
 		u8 lo = Read(addr);
 		u8 hi = Read((addr & 0xff00) + LO(addr + 1));
 		return lo + (hi << 8);
@@ -195,17 +205,17 @@ public:
 	inline bool GetNMI() { return nmi; }
 #pragma endregion
 
-	void LoadROM(const ROM &rom);
+	void loadROM(const ROM &rom);
 
 #pragma region Constructors
-	explicit CPU(Clock&, const std::function<u8 &(u16)> &mmu);
+	explicit CPU(Clock &, const MMU &mmu);
 	~CPU();
 #pragma endregion
 
 #pragma region Timing
 	int cycleCount;
 	int delta;
-	inline void Tick(int cycles = 1) {
+	inline void tick(int cycles = 1) {
 		cycleCount += cycles;
 		delta += cycles;
 	}
@@ -265,7 +275,7 @@ public:
 #pragma endregion
 #pragma endregion
 
-	void Execute();
+	void execute();
 
 #pragma region Instructions
 	template<AddressingModes mode>
@@ -409,6 +419,7 @@ public:
 	template<AddressingModes m>
 	constexpr inline bool Is8Bit() { return !(0 <= m && m < 2); }
 #pragma endregion
+	u16 oamDmaIdx = 0;
 };
 
 // Inlined functions

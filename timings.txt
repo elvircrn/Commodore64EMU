@@ -1,6 +1,6 @@
 Relative -> only used by branches, do not call Tick()
 
-Instructions that call Tick() directly:
+Instructions that call tick() directly:
     PHP +1 
     PHA +1
     PLA +2

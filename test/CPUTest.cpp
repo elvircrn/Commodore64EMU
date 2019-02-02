@@ -59,59 +59,6 @@ TEST_CASE("PatternLoad") {
 	ASRT(actual, expected);
 }
 
-TEST_CASE("FlagSet") {
-	u8 xx;
-	Clock clk;
-	CPU cpu(clk, [&xx](u16 x) -> u8 & { return xx; });
-	cpu.SetFlag(Flags::V, 1);
-	ASRT(cpu.GetFlag(Flags::V), true);
-}
-
-TEST_CASE("UpdateV") {
-	u8 xx;
-	Clock clk;
-	CPU cpu(clk, [&xx](u16 x) -> u8 & { return xx; });
-
-	cpu.UpdV(0x80, 0x80, 0);
-	ASRT(cpu.GetFlag(Flags::V), true);
-
-	cpu.UpdV(0x9, 0x5, 0xE);
-	ASRT(cpu.GetFlag(Flags::V), false);
-
-	cpu.UpdV(0x40, 0x40, 0x80);
-	ASRT(cpu.GetFlag(Flags::V), true);
-}
-
-TEST_CASE("UpdateC") {
-	u8 xx;
-	Clock clk;
-	CPU cpu(clk, [&xx](u16 x) -> u8 & { return xx; });
-
-	cpu.UpdC(0xff, 0xff, 0xff + 0xff);
-	ASRT(cpu.GetFlag(Flags::C), true);
-
-	cpu.UpdC(0, 1, 1);
-	ASRT(cpu.GetFlag(Flags::C), false);
-}
-
-TEST_CASE("UpdateNZ") {
-	u8 xx;
-	Clock clk;
-	CPU cpu(clk, [&xx](u16 x) -> u8 & { return xx; });
-
-	cpu.UpdN(0);
-	ASRT(cpu.GetFlag(Flags::N), false);
-
-	cpu.UpdN(0x80);
-	ASRT(cpu.GetFlag(Flags::N), true);
-
-	cpu.UpdZ(0);
-	ASRT(cpu.GetFlag(Flags::Z), true);
-
-	cpu.UpdZ(1);
-	ASRT(cpu.GetFlag(Flags::Z), false);
-}
-
 TEST_CASE("ROMHeaderTest") {
 	auto filePath = boost::filesystem::path(__FILE__)
 			.parent_path()
@@ -151,11 +98,10 @@ TEST_CASE("NESTestNoCycleCount") {
 	ROM rom(file);
 	PPU ppu(rom);
 	MMU mmu(ppu);
-	auto mmuFn = [&mmu](u16 addr) -> u8 & { return static_cast<u8 &>(mmu(addr)); };
-	CPU cpu(clk, mmuFn);
+	CPU cpu(clk, mmu);
 	Debugger debugger(&cpu);
-	cpu.PowerUp();
-	cpu.LoadROM(rom);
+	cpu.powerUp();
+	cpu.loadROM(rom);
 
 	auto res = boost::filesystem::path(__FILE__)
 			.parent_path()
@@ -186,7 +132,7 @@ TEST_CASE("NESTestNoCycleCount") {
 			ASRT(true, false);
 		}
 		try {
-			cpu.Execute();
+			cpu.execute();
 		}
 		catch (std::string &e) {
 			LoggerDump(debugger);

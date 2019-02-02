@@ -5,11 +5,16 @@
 
 PPU::PPU() : pattern(2, vector<u8>(0x1000)),
 						 nametables(4, vector<u8>(0x400)),
-						 palletes(0x20) {
+						 palletes(0x20),
+						 oam(256){
 }
 
 PPU::PPU(const ROM &rom) : PPU() {
 	LoadROM(rom);
+}
+
+bool PPU::isRendering() {
+	return false;
 }
 
 void PPU::LoadROM(const ROM &rom) {
@@ -22,7 +27,9 @@ void PPU::LoadROM(const ROM &rom) {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 0x400; j++) {
 			nametables[i][j] = rom.PRG(0, 0x400 * i + j);
+//			std::cout << (int) nametables[i][j] << ' '; TODO: Remove
 		}
+//		std::cout << '\n'; TODO: Remove
 	}
 }
 

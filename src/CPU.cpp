@@ -7,12 +7,12 @@
 #include <string>
 #include "NanoLog.h"
 
-void CPU::LoadROM(const ROM &rom) {
+void CPU::loadROM(const ROM &rom) {
 	for (int i = 0; i < 0x4000; i++)
 		mmu(0xC000 + i) = rom[i];
 }
 
-CPU::CPU(Clock &_clock, const std::function<u8 &(u16)> &_mmu)
+CPU::CPU(Clock &_clock, const MMU &_mmu)
 		: clock(_clock), mmu(_mmu), isOfficial(0xff), cycleCount(0) {
 	u8 official[] = {0x69, 0x65, 0x75, 0x6D, 0x7D, 0x79, 0x61, 0x71, 0x28, 0xEA,
 									 0x29, 0x25, 0x35, 0x2D, 0x3D, 0x39, 0x21, 0x31, 0x0A, 0x06,
@@ -35,7 +35,7 @@ CPU::CPU(Clock &_clock, const std::function<u8 &(u16)> &_mmu)
 
 CPU::~CPU() = default;
 
-void CPU::PowerUp() {
+void CPU::powerUp() {
 	// TODO: Check if IRQ should be disabled
 	p = 0x24; // IRQ disabled
 	a = 0;
@@ -46,22 +46,31 @@ void CPU::PowerUp() {
 }
 
 #include <iostream>
-void CPU::Execute() {
+void CPU::execute() {
 	clock.waitTick();
-	Clear();
-	Tick(2);
+	clear();
+	tick(2);
+
+	if (oamDmaIdx) {
+		oamDmaIdx--;
+		u8 high = Read(PPU::OAMDMA_ADDR);
+		u8 low = static_cast<u8>(255 - oamDmaIdx);
+		u16 addr = (high << 8) | low;
+		u8 ramVal = Read(addr);
+		mmu.write(PPU::OAMDATA_ADDR, ramVal);
+	}
 
 	u8 op = Read(pc++);
 	if constexpr (DEBUG) {
-		std::cout << "Tick tock\n"; // TODO: Remove
-		opHist.push_back(Read(pc));
-		pcHist.push_back(pc);
+		std::cout << "tick tock\n"; // TODO: Remove
+		opHist.push_back(op);
+		pcHist.push_back(pc - 1);
 		bitStack.clear();
 		instrHist.emplace_back(pc,
 													 Instructions::Name(Read(pc)),
 													 std::array<u8, 3>({Read(pc + 1), Read(pc + 2), Read(pc + 3)}));
 		for (int i = 0; i < 5; i++)
-			bitStack.push_back(Read(pc + i));
+			bitStack.push_back(Read(pc - 1 + i));
 		std::cout << Instructions::Name(op) << '\n'; // TODO: Remove
 	}
 
@@ -426,15 +435,15 @@ void CPU::Execute() {
 		break;
 
 	default: std::stringstream ss;
-		if constexpr (!ignoreUnknownInstr) {
-			for (int i = pc; i < pc + 10; i++)
+		if constexpr (DEBUG && !ignoreUnknownInstr) {
+			for (int i = pcHist.back(); i < pcHist.back() + 10; i++)
 				ss << std::hex << (int) Read(i) << ' ';
 			DebugDump();
-			throw "Instruction not found at pc: " + std::to_string(pc) + "\nDump: " + ss.str();
+			std::cout << "Instruction not found at pc: " + std::to_string(pc) + "\nDump: " + ss.str() << '\n';
 		}
 	}
 
-	Tick(zeroPageCrossed & calcCrossed);
+	tick(zeroPageCrossed & calcCrossed);
 	cycleCount += 4;
 
 	if (GetNMI()) {
@@ -525,7 +534,7 @@ u8 &CPU::GetOperand8() {
 //.... add with carry
 template<AddressingModes mode>
 void CPU::ADC() {
-	Tick(CalcBaseTicks<mode>());
+	tick(CalcBaseTicks<mode>());
 	calcCrossed = true;
 
 	u8 lhs = a;
@@ -546,8 +555,8 @@ void CPU::AND() {
 //....	arithmetic shift left
 template<AddressingModes mode>
 void CPU::ASL() {
-	Tick(CalcBaseTicks<mode>());
-	Tick(CalcShiftTicks<mode>());
+	tick(CalcBaseTicks<mode>());
+	tick(CalcShiftTicks<mode>());
 	UpdNZ(_ASL(GetOperand8<mode>()));
 }
 
@@ -566,7 +575,7 @@ void CPU::BCS() {
 	u16 loc = GetPureOperand<mode>();
 	calcCrossed = true;
 	if (C()) {
-		Tick();
+		tick();
 		pc = loc;
 	}
 }
@@ -576,7 +585,7 @@ void CPU::BEQ() {
 	u16 loc = GetPureOperand<mode>();
 	calcCrossed = true;
 	if (Z()) {
-		Tick();
+		tick();
 		pc = loc;
 	}
 }
@@ -595,7 +604,7 @@ void CPU::BMI() {
 	u16 loc = GetPureOperand<mode>();
 	calcCrossed = true;
 	if (N()) {
-		Tick();
+		tick();
 		pc = loc;
 	}
 }
@@ -605,7 +614,7 @@ void CPU::BNE() {
 	u16 loc = GetPureOperand<mode>();
 	calcCrossed = true;
 	if (!Z()) {
-		Tick();
+		tick();
 		pc = loc;
 	}
 }
@@ -615,7 +624,7 @@ void CPU::BPL() {
 	u16 loc = GetPureOperand<mode>();
 	calcCrossed = true;
 	if (!N()) {
-		Tick();
+		tick();
 		pc = loc;
 	}
 }
@@ -632,7 +641,7 @@ void CPU::BVC() {
 	u16 loc = GetPureOperand<mode>();
 	calcCrossed = true;
 	if (!V()) {
-		Tick();
+		tick();
 		pc = loc;
 	}
 }
@@ -642,7 +651,7 @@ void CPU::BVS() {
 	u16 loc = GetPureOperand<mode>();
 	calcCrossed = true;
 	if (V()) {
-		Tick();
+		tick();
 		pc = loc;
 	}
 }
@@ -685,7 +694,7 @@ void CPU::CPY() {
 
 template<AddressingModes mode>
 void CPU::DEC() {
-	Tick(CalcBaseTicks<mode>() + CalcIncDecTicks<mode>());
+	tick(CalcBaseTicks<mode>() + CalcIncDecTicks<mode>());
 	UpdNZ(--GetOperand8<mode>());
 }
 
@@ -699,14 +708,14 @@ void CPU::DEY() { UpdNZ(--y); }
 
 template<AddressingModes mode>
 void CPU::EOR() {
-	Tick(CalcBaseTicks<mode>());
+	tick(CalcBaseTicks<mode>());
 	calcCrossed = true;
 	UpdNZ(a ^= GetPureOperand<mode>());
 }
 
 template<AddressingModes mode>
 void CPU::INC() {
-	Tick(CalcBaseTicks<mode>() + CalcIncDecTicks<mode>());
+	tick(CalcBaseTicks<mode>() + CalcIncDecTicks<mode>());
 	UpdNZ(++GetOperand8<mode>());
 }
 
@@ -720,7 +729,7 @@ void CPU::INY() { UpdNZ(++y); }
 template<AddressingModes mode>
 void CPU::JMP() {
 	if (mode == AddressingModes::ABSOLUTE) {
-		Tick();
+		tick();
 		pc = Abs();
 	} else if (mode == AddressingModes::INDIRECT)
 		pc = Ind(Abs()); // Ind calls tick
@@ -731,26 +740,26 @@ template<AddressingModes mode>
 void CPU::JSR() {
 	Push16(pc + 1);
 	pc = Abs();
-	Tick(4);
+	tick(4);
 }
 
 template<AddressingModes mode>
 void CPU::LDA() {
 	calcCrossed = true;
-	Tick(CalcBaseTicks<mode>());
+	tick(CalcBaseTicks<mode>());
 	UpdNZ(a = GetOperand8<mode>());
 }
 
 template<AddressingModes mode>
 void CPU::LDX() {
-	Tick(CalcBaseTicks<mode>());
+	tick(CalcBaseTicks<mode>());
 	calcCrossed = true;
 	UpdNZ(x = GetOperand8<mode>());
 }
 
 template<AddressingModes mode>
 void CPU::LDY() {
-	Tick(CalcBaseTicks<mode>());
+	tick(CalcBaseTicks<mode>());
 	calcCrossed = true;
 	UpdNZ(y = (u8) GetPureOperand<mode>());
 }
@@ -773,26 +782,26 @@ void CPU::ORA() {
 
 template<AddressingModes mode>
 void CPU::PHA() {
-	Tick();
+	tick();
 	Push8(a);
 }
 
 template<AddressingModes mode>
 void CPU::PHP() {
-	Tick();
+	tick();
 	Push8(p | (1 << 4));
 }
 
 template<AddressingModes mode>
 void CPU::PLA() {
-	Tick(2);
+	tick(2);
 	a = Pop8();
 	UpdNZ(a);
 }
 
 template<AddressingModes mode>
 void CPU::PLP() {
-	Tick(2);
+	tick(2);
 	p = Pop8();
 	B(false);
 	// TODO: What?
@@ -801,8 +810,8 @@ void CPU::PLP() {
 
 template<AddressingModes mode>
 void CPU::ROL() {
-	Tick(CalcBaseTicks<mode>());
-	Tick(CalcShiftTicks<mode>());
+	tick(CalcBaseTicks<mode>());
+	tick(CalcShiftTicks<mode>());
 	u8 &mem = GetOperand8<mode>();
 	u8 t = mem;
 	mem <<= 1;
@@ -813,8 +822,8 @@ void CPU::ROL() {
 
 template<AddressingModes mode>
 void CPU::ROR() {
-	Tick(CalcBaseTicks<mode>());
-	Tick(CalcShiftTicks<mode>());
+	tick(CalcBaseTicks<mode>());
+	tick(CalcShiftTicks<mode>());
 	u8 &mem = GetOperand8<mode>();
 	u8 t = mem;
 	mem >>= 1;
@@ -833,24 +842,24 @@ combination of interrupt plus RTI allows truly reentrant coding.
 */
 template<AddressingModes mode>
 void CPU::RTI() {
-	if (DEBUG) {
+	if constexpr (DEBUG) {
 		std::cout << "RTI called\n"; // TODO: Remove
 	}
 	// NOTE: Changes the p register
 	PLP<mode>(); // pop8
-	Tick(2);
+	tick(2);
 	pc = Pop16(); // pop16
 }
 
 template<AddressingModes mode>
 void CPU::RTS() {
-	Tick(4);
+	tick(4);
 	pc = Pop16() + 1;
 }
 
 template<AddressingModes mode>
 void CPU::SBC() {
-	Tick(CalcBaseTicks<mode>());
+	tick(CalcBaseTicks<mode>());
 	calcCrossed = true;
 	u8 lhs = a;
 	u8 rhs = GetOperand8<mode>() ^0xff;
@@ -871,22 +880,22 @@ void CPU::SEI() { I(true); }
 
 template<AddressingModes mode>
 void CPU::STA() {
-	Tick(CalcBaseTicks<mode>());
-	Tick(CalcStoreTicks<mode>());
+	tick(CalcBaseTicks<mode>());
+	tick(CalcStoreTicks<mode>());
 	GetOperand8<mode>() = a;
 }
 
 template<AddressingModes mode>
 void CPU::STX() {
-	Tick(CalcBaseTicks<mode>());
-	Tick(CalcStoreTicks<mode>());
+	tick(CalcBaseTicks<mode>());
+	tick(CalcStoreTicks<mode>());
 	GetOperand8<mode>() = x;
 }
 
 template<AddressingModes mode>
 void CPU::STY() {
-	Tick(CalcBaseTicks<mode>());
-	Tick(CalcStoreTicks<mode>());
+	tick(CalcBaseTicks<mode>());
+	tick(CalcStoreTicks<mode>());
 	GetOperand8<mode>() = y;
 }
 
@@ -932,7 +941,7 @@ void CPU::LAX() {
 // INT is not a 6502 instruction. It is simply an interrupt handler.
 template<Interrupts inter>
 void CPU::INT() {
-	if (DEBUG) {
+	if constexpr (DEBUG) {
 		std::cout << "Interrupted, type: " << inter << '\n'; // TODO: Find a better way to log
 	}
 	// Note that BRK, although it is a one - byte instruction, needs an extra
@@ -943,10 +952,10 @@ void CPU::INT() {
 	// routine which BRK caused the particular software interrupt.
 	pc++;
 
-	Tick();
+	tick();
 
 	if constexpr (inter != Interrupts::BRK) {
-		Tick();
+		tick();
 	}
 
 	// The microprocessor uses the stack to save the reentrant
@@ -956,7 +965,7 @@ void CPU::INT() {
 		Push8(p | ((Interrupts::BRK == inter) << 4));
 	} else {
 		// s -= 3;
-		Tick(3);
+		tick(3);
 	}
 
 	// It should he noted that the interrupt disable is turned on at this 

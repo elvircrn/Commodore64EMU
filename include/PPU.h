@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <chrono>
-#include <iostream>
 
 using std::vector;
 
@@ -30,6 +29,7 @@ class PPU {
 	vector<vector<u8>> pattern;
 	vector<vector<u8>> nametables;
 	vector<u8> palletes;
+	u16 membuff = 0;
 
 #pragma region Registers
 	// Controls whether the background and sprites use the left half ($0000-$0FFF) or
@@ -46,6 +46,10 @@ class PPU {
 #pragma endregion
 
 public:
+	static constexpr u16 OAMADDR_ADDR = 0x2003;
+	static constexpr u16 OAMDATA_ADDR = 0x2004;
+	static constexpr u16 PPUADDR_ADDR = 0x2006;
+	static constexpr u16 OAMDMA_ADDR  = 0x4014;
 	static constexpr std::chrono::milliseconds CYCLE_LENGTH{500};
 #pragma region Constructors
 	PPU();
@@ -133,6 +137,21 @@ public:
 	inline bool isNMI() const { return BIT(PPUCTRL, 7); }
 	inline u8 increment() const { return BIT(PPUCTRL, 2) ? 32 : 1; }
 
+	bool write2006(const u8 &val) {
+		membuff = (membuff << 8) | val;
+		return true;
+	}
+
+	bool write2004(const u8 &val) {
+		if (isRendering()) {
+			OAMADDR += 4;
+		} else {
+			oam[OAMADDR++] = val;
+		}
+		return true;
+	}
+
+
 	/**
 		Rendering is fetched 8 BG pixels at a time, as follows:
 			* Nametable fetch
@@ -148,28 +167,32 @@ public:
 			* Turn the attribute data and the pattern table data into palette indices, and combine them with data from sprite data using priority.
 			* It also does a fetch of a 34th (nametable, attribute, pattern) tuple that is never used, but some mappers rely on this fetch for timing purposes.
 	 */
-	void drawStuff() {
+	void drawStuff(SDL_Renderer *renderer) {
 		// Fetch a nametable entry from $2000-$2FBF.
-		for (u16 nametableAddr = 0x2000; nametableAddr < 0x2FC0; nametableAddr++) {
-			u8 nametable = Rd(nametableAddr);
-			u16 patternTableAddr = (nametableAddr - 0x2000) / 16;
-
-			// Generate pattern tables
-			for (u8 offset = 0; offset < 8; offset++) {
-				u8 lower = Rd(patternTableAddr + offset);
-				u8 higher = Rd(patternTableAddr + offset + 8);
-				for (int i = 0; i < 8; i++) {
-					u8 pattern = (BIT(higher, i) << 1) | BIT(lower, i);
-				}
-			}
-
-			u8 patternLow = Rd(patternTableAddr), patternHigh = Rd(patternTableAddr + 8);
-
-			u8 p = (static_cast<u8>(BIT(patternHigh, 7) << 1)) | BIT(patternLow, 7); // p is in [0, 3]
-
-			u8 patternVal = (patternHigh << 8) + patternLow;
+		constexpr u16 OFFSET = 0x2000;
+		for (u16 colorAddr = 0; colorAddr < 64; colorAddr++) {
+			u16 addr = colorAddr/*+ TODO: something*/;
+			u8 color = Rd(addr);
 		}
-		std::cout << '\n';
+		for (u16 nameAddr = 0x0000; nameAddr < 0x03C0; nameAddr++) {
+			u8 nametable = Rd(OFFSET + nameAddr);
+		}
+
+		u16 nametableAddr = 0x2000, attributeAddr = 0x23C0, patternAddr = 0x0000;
+
+		// render a single scanline
+		for (u16 i = 0; i < 32; i++) {
+			u8 name = Rd(nametableAddr);
+			u8 attr = Rd(attributeAddr);
+			u8 lower = Rd(patternAddr);
+			u8 higher = Rd(patternAddr + 8);
+
+
+
+			nametableAddr++;
+			attributeAddr++;
+			patternAddr += 16;
+		}
 	}
 
 	// NOTE: Only for debugging pruposes
@@ -193,6 +216,8 @@ public:
 		}
 		return ret;
 	}
+
+	bool isRendering();
 };
 
 

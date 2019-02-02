@@ -16,12 +16,10 @@
 #include "GUI.h"
 #include "MMU.h"
 #include "NanoLog.h"
+#include "Palette.h"
 #include "Clock.h"
+#include "sdl_util.h"
 
-void putPixelRGB(SDL_Renderer *renderer, int x, int y, unsigned char r, unsigned char g, unsigned char b) {
-	SDL_SetRenderDrawColor(renderer, (Uint8) r, (Uint8) g, (Uint8) b, 255);
-	SDL_RenderDrawPoint(renderer, x, y);
-}
 
 void _patternTablesDemo(const PPU &ppu) {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -62,9 +60,11 @@ void _patternTablesDemo(const PPU &ppu) {
 					if (data[j][i]) {
 						for (size_t k = 0; k < PIXEL_DIM; k++) {
 							for (size_t l = 0; l < PIXEL_DIM; l++) {
+								u8 c = data[j][i];
+								u32 rgb = Palette::rgb[c * 4 + 4];
 								putPixelRGB(renderer.get(),
 														static_cast<int>(patternId * PATTERN_PIXEL_WIDTH + PIXEL_DIM * i + k),
-														static_cast<int>(PIXEL_DIM * j + l), 0xff, 0xff, 0xff);
+														static_cast<int>(PIXEL_DIM * j + l), (rgb & 0xFF), (rgb & 0xFF00) >> 8, (rgb & 0xFF0000) >> 16);
 							}
 						}
 					}
@@ -108,14 +108,6 @@ void patternTablesDemo() {
 	PPU ppu(rom);
 
 	auto data = ppu.getPatternTable(0x0000);
-
-
-	for (const auto &row : data) {
-		for (const auto &d : row) {
-			std::cout << (int) d << ' ';
-		}
-		std::cout << '\n';
-	}
 
 	_patternTablesDemo(ppu);
 }

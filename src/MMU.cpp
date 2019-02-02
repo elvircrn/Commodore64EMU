@@ -4,15 +4,6 @@
 #include "MMU.h"
 #include <iostream>
 u8 &MMU::operator()(u16 addr) {
-	int found = -1;
-	for (size_t i = 0; i < 256; i++) {
-		if (ram[0x200 + i] > 0) {
-			found = i;
-		}
-	}
-	if (found > 0) {
-		std::cout << found << '\n';
-	}
 	// Mirrored 2KB of internal RAM
 	if (addr < 0x2000) {
 		return ram[addr & 0x7FF];

@@ -200,7 +200,8 @@ void CPU::execute() {
 		break;
 	case 0x58: CLI<AddressingModes::IMPLIED>();
 		break;
-	case 0x78: SEI<AddressingModes::IMPLIED>();
+	case 0x78:
+		SEI<AddressingModes::IMPLIED>();
 		break;
 	case 0xB8: CLV<AddressingModes::IMPLIED>();
 		break;

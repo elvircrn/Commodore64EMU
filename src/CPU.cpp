@@ -9,7 +9,7 @@
 
 void CPU::loadROM(const ROM &rom) {
 	for (int i = 0; i < 0x4000; i++)
-		mmu(0xC000 + i) = rom[i];
+		mmu.write(0xC000 + i, rom[i]);
 }
 
 CPU::CPU(Clock &_clock, const MMU &_mmu)
@@ -46,6 +46,8 @@ void CPU::powerUp() {
 }
 
 #include <iostream>
+#include <CPU.h>
+
 void CPU::execute() {
 	clock.waitTick();
 	clear();
@@ -439,7 +441,7 @@ void CPU::execute() {
 		if constexpr (DEBUG && !ignoreUnknownInstr) {
 			for (int i = pcHist.back(); i < pcHist.back() + 10; i++)
 				ss << std::hex << (int) Read(i) << ' ';
-			DebugDump();
+			debugDump();
 			std::cout << "Instruction not found at pc: " + std::to_string(pc) + "\nDump: " + ss.str() << '\n';
 		}
 	}
@@ -453,7 +455,7 @@ void CPU::execute() {
 }
 
 #pragma region Debug and Logging
-void CPU::DebugDump() {
+void CPU::debugDump() {
 	for (int i = 0xfff0; i < 0x10000; i++)
 		vectors.emplace_back(HexString(i), Read(static_cast<u16>(i)));
 }
@@ -465,15 +467,15 @@ void CPU::DebugDump() {
 
 // Used for instructions that only use the operand for reading
 template<AddressingModes mode>
-u16 CPU::GetPureOperand() {
+u16 CPU::getPureOperand() {
 	if constexpr (mode < 2)
-		return GetOperand16<mode>();
+		return getOperand16<mode>();
 	else
 		return GetOperand8<mode>();
 }
 
 template<AddressingModes mode>
-u16 CPU::GetOperand16() {
+u16 CPU::getOperand16() {
 	// Used by branch instructions
 	// TODO: Check if -1 is needed
 	if constexpr (mode == AddressingModes::RELATIVE) {
@@ -487,9 +489,57 @@ u16 CPU::GetOperand16() {
 		throw "Invalid instruction";
 }
 
-#pragma region Instruction helpers
 template<AddressingModes mode>
-u8 &CPU::GetOperand8() {
+bool CPU::writeOperandVal(const u8 &val) {
+	// ADC $3420 -> A + contents of memory $3420
+	if constexpr (mode == AddressingModes::ABSOLUTE) {
+		u16 abs = Abs();
+		return write(abs, val);
+	}
+	// ADC #2 -> A + 2
+	else if (mode == AddressingModes::IMMEDIATE) {
+		throw "Attempting to assign to immediate value";
+	}
+	// ADC $3420,X -> A + contents of memory $3420 + X
+	else if (mode == AddressingModes::ABSOLUTE_INDEXED_X) {
+		return write(AbsX(), val);
+	}
+	// ADC $3420,Y	-> A + contents of memory $3420 + Y
+	else if (mode == AddressingModes::ABSOLUTE_INDEXED_Y) {
+		return write(AbsY(), val);
+	}
+	// ADC $F6 -> A + contents of memory $F6
+	// Zero page only considers the low bytes. TODO: Refactor
+	else if (mode == AddressingModes::ZERO_PAGE) {
+		return write(Imm() & 0xFF, val);
+	} else if (mode == AddressingModes::ZERO_PAGE_X) {
+		return write((Imm() + x) & 0xFF, val);
+	} else if (mode == AddressingModes::ZERO_PAGE_Y) {
+		return write((Imm() + y) & 0xFF, val);
+	}
+		// https://www.csh.rit.edu/~moffitt/6502.html#ADDR-IIND
+	else if (mode == AddressingModes::INDEXED_INDIRECT_X) {
+		u8 addr8 = Imm() + x;
+		u16 zp16 = Zp16(addr8);
+		return write(zp16, val);
+	} else if (mode == AddressingModes::INDIRECT_INDEXED) {
+		u16 zp16 = Zp16(Imm());
+		CrossesPage(zp16, y);
+		return write(zp16 + y, val);
+	} else if (mode == AddressingModes::ACCUMULATOR) {
+		a = val;
+	}
+		// ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
+		//case AddressingModes::INDIRECT_INDEXED:
+		//return Zp(Imm()) + y;
+	else {
+		throw "Wrong addressing mode implemented! " + std::to_string(mode);
+	}
+	return false;
+}
+
+template<AddressingModes mode>
+u8 CPU::GetOperand8() {
 	// ADC $3420 -> A + contents of memory $3420
 	if constexpr (mode == AddressingModes::ABSOLUTE) {
 		u16 abs = Abs();
@@ -508,11 +558,11 @@ u8 &CPU::GetOperand8() {
 		return Read(AbsY());
 		// ADC $F6 -> A + contents of memory $F6
 	else if (mode == AddressingModes::ZERO_PAGE)
-		return Zp(Imm());
+		return Read(Imm() & 0xFF);
 	else if (mode == AddressingModes::ZERO_PAGE_X)
-		return Zp(Imm() + x);
+		return Read((Imm() + x) & 0xFF);
 	else if (mode == AddressingModes::ZERO_PAGE_Y)
-		return Zp(Imm() + y);
+		return Read((Imm() + y) & 0xFF);
 		// https://www.csh.rit.edu/~moffitt/6502.html#ADDR-IIND
 	else if (mode == AddressingModes::INDEXED_INDIRECT_X) {
 		u8 addr8 = Imm() + x;
@@ -550,7 +600,7 @@ void CPU::ADC() {
 template<AddressingModes mode>
 void CPU::AND() {
 	calcCrossed = true;
-	UpdNZ(a &= GetPureOperand<mode>());
+	UpdNZ(a &= getPureOperand<mode>());
 }
 
 //....	arithmetic shift left
@@ -558,13 +608,16 @@ template<AddressingModes mode>
 void CPU::ASL() {
 	tick(CalcBaseTicks<mode>());
 	tick(CalcShiftTicks<mode>());
-	UpdNZ(_ASL(GetOperand8<mode>()));
+	u8 val = GetOperand8<mode>();
+	val = _ASL(val);
+	writeOperandVal<mode>(val);
+	UpdNZ(val);
 }
 
 // TODO: Consider refactoring into a non-templated function
 template<AddressingModes mode>
 void CPU::BCC() {
-	u16 loc = GetPureOperand<mode>();
+	u16 loc = getPureOperand<mode>();
 	calcCrossed = true;
 	if (!C()) {
 		pc = loc;
@@ -573,7 +626,7 @@ void CPU::BCC() {
 
 template<AddressingModes mode>
 void CPU::BCS() {
-	u16 loc = GetPureOperand<mode>();
+	u16 loc = getPureOperand<mode>();
 	calcCrossed = true;
 	if (C()) {
 		tick();
@@ -583,7 +636,7 @@ void CPU::BCS() {
 
 template<AddressingModes mode>
 void CPU::BEQ() {
-	u16 loc = GetPureOperand<mode>();
+	u16 loc = getPureOperand<mode>();
 	calcCrossed = true;
 	if (Z()) {
 		tick();
@@ -593,7 +646,7 @@ void CPU::BEQ() {
 
 template<AddressingModes mode>
 void CPU::BIT() {
-	u8 op = (u8) GetPureOperand<mode>();
+	u8 op = (u8) getPureOperand<mode>();
 	u8 res = a & op;
 	Z(!res);
 	N(op & (1 << 7));
@@ -602,7 +655,7 @@ void CPU::BIT() {
 
 template<AddressingModes mode>
 void CPU::BMI() {
-	u16 loc = GetPureOperand<mode>();
+	u16 loc = getPureOperand<mode>();
 	calcCrossed = true;
 	if (N()) {
 		tick();
@@ -612,7 +665,7 @@ void CPU::BMI() {
 
 template<AddressingModes mode>
 void CPU::BNE() {
-	u16 loc = GetPureOperand<mode>();
+	u16 loc = getPureOperand<mode>();
 	calcCrossed = true;
 	if (!Z()) {
 		tick();
@@ -622,7 +675,7 @@ void CPU::BNE() {
 
 template<AddressingModes mode>
 void CPU::BPL() {
-	u16 loc = GetPureOperand<mode>();
+	u16 loc = getPureOperand<mode>();
 	calcCrossed = true;
 	if (!N()) {
 		tick();
@@ -639,7 +692,7 @@ void CPU::BRK() {
 
 template<AddressingModes mode>
 void CPU::BVC() {
-	u16 loc = GetPureOperand<mode>();
+	u16 loc = getPureOperand<mode>();
 	calcCrossed = true;
 	if (!V()) {
 		tick();
@@ -649,7 +702,7 @@ void CPU::BVC() {
 
 template<AddressingModes mode>
 void CPU::BVS() {
-	u16 loc = GetPureOperand<mode>();
+	u16 loc = getPureOperand<mode>();
 	calcCrossed = true;
 	if (V()) {
 		tick();
@@ -672,7 +725,7 @@ void CPU::CLV() { V(0); }
 template<AddressingModes mode>
 void CPU::CMP() {
 	calcCrossed = true;
-	u8 mem = (u8) GetPureOperand<mode>();
+	u8 mem = (u8) getPureOperand<mode>();
 	UpdNZ(a - mem);
 	C(a >= mem);
 }
@@ -680,7 +733,7 @@ void CPU::CMP() {
 template<AddressingModes mode>
 void CPU::CPX() {
 	calcCrossed = true;
-	u8 mem = (u8) GetPureOperand<mode>();
+	u8 mem = (u8) getPureOperand<mode>();
 	UpdNZ(x - mem);
 	C(x >= mem);
 }
@@ -688,7 +741,7 @@ void CPU::CPX() {
 template<AddressingModes mode>
 void CPU::CPY() {
 	calcCrossed = true;
-	u8 mem = (u8) GetPureOperand<mode>();
+	u8 mem = (u8) getPureOperand<mode>();
 	UpdNZ(y - mem);
 	C(y >= mem);
 }
@@ -696,7 +749,10 @@ void CPU::CPY() {
 template<AddressingModes mode>
 void CPU::DEC() {
 	tick(CalcBaseTicks<mode>() + CalcIncDecTicks<mode>());
-	UpdNZ(--GetOperand8<mode>());
+	u8 val = GetOperand8<mode>();
+	val--;
+	writeOperandVal<mode>(val);
+	UpdNZ(val);
 }
 
 // No additional cycles
@@ -711,13 +767,16 @@ template<AddressingModes mode>
 void CPU::EOR() {
 	tick(CalcBaseTicks<mode>());
 	calcCrossed = true;
-	UpdNZ(a ^= GetPureOperand<mode>());
+	UpdNZ(a ^= getPureOperand<mode>());
 }
 
 template<AddressingModes mode>
 void CPU::INC() {
 	tick(CalcBaseTicks<mode>() + CalcIncDecTicks<mode>());
-	UpdNZ(++GetOperand8<mode>());
+	u8 val = GetOperand8<mode>();
+	val++;
+	writeOperandVal<mode>(val);
+	UpdNZ(val);
 }
 
 template<AddressingModes mode>
@@ -762,14 +821,16 @@ template<AddressingModes mode>
 void CPU::LDY() {
 	tick(CalcBaseTicks<mode>());
 	calcCrossed = true;
-	UpdNZ(y = (u8) GetPureOperand<mode>());
+	UpdNZ(y = (u8) getPureOperand<mode>());
 }
 
 template<AddressingModes mode>
 void CPU::LSR() {
-	u8 &op = GetOperand8<mode>();
-	C(op & 1);
-	UpdNZ(op >>= 1);
+	u8 op = GetOperand8<mode>();
+	C(static_cast<bool>(op & 1));
+	op >>= 1;
+	writeOperandVal<mode>(op);
+	UpdNZ(op);
 }
 
 template<AddressingModes mode, int waste>
@@ -813,10 +874,11 @@ template<AddressingModes mode>
 void CPU::ROL() {
 	tick(CalcBaseTicks<mode>());
 	tick(CalcShiftTicks<mode>());
-	u8 &mem = GetOperand8<mode>();
+	u8 mem = GetOperand8<mode>();
 	u8 t = mem;
 	mem <<= 1;
 	mem |= static_cast<u8>(C());
+	writeOperandVal<mode>(mem);
 	C(t & 0x80);
 	UpdNZ(mem);
 }
@@ -825,10 +887,11 @@ template<AddressingModes mode>
 void CPU::ROR() {
 	tick(CalcBaseTicks<mode>());
 	tick(CalcShiftTicks<mode>());
-	u8 &mem = GetOperand8<mode>();
+	u8 mem = GetOperand8<mode>();
 	u8 t = mem;
 	mem >>= 1;
 	mem |= (C() << 7);
+	writeOperandVal<mode>(mem);
 	C(t & 1);
 	UpdNZ(mem);
 }
@@ -863,7 +926,7 @@ void CPU::SBC() {
 	tick(CalcBaseTicks<mode>());
 	calcCrossed = true;
 	u8 lhs = a;
-	u8 rhs = GetOperand8<mode>() ^0xff;
+	u8 rhs = GetOperand8<mode>() ^ 0xff;
 	s16 res = lhs + rhs + C();
 	UpdCV(a, rhs, res);
 	a = static_cast<u8>(res);
@@ -883,21 +946,21 @@ template<AddressingModes mode>
 void CPU::STA() {
 	tick(CalcBaseTicks<mode>());
 	tick(CalcStoreTicks<mode>());
-	GetOperand8<mode>() = a;
+	writeOperandVal<mode>(a);
 }
 
 template<AddressingModes mode>
 void CPU::STX() {
 	tick(CalcBaseTicks<mode>());
 	tick(CalcStoreTicks<mode>());
-	GetOperand8<mode>() = x;
+	writeOperandVal<mode>(x);
 }
 
 template<AddressingModes mode>
 void CPU::STY() {
 	tick(CalcBaseTicks<mode>());
 	tick(CalcStoreTicks<mode>());
-	GetOperand8<mode>() = y;
+	writeOperandVal<mode>(y);
 }
 
 template<AddressingModes mode>
@@ -983,3 +1046,4 @@ void CPU::INT() {
 		nmi = false;
 
 }
+

@@ -49,14 +49,14 @@ public:
 	static constexpr u16 OAMADDR_ADDR = 0x2003;
 	static constexpr u16 OAMDATA_ADDR = 0x2004;
 	static constexpr u16 PPUADDR_ADDR = 0x2006;
-	static constexpr u16 OAMDMA_ADDR  = 0x4014;
+	static constexpr u16 OAMDMA_ADDR = 0x4014;
 	static constexpr std::chrono::milliseconds CYCLE_LENGTH{500};
 #pragma region Constructors
 	PPU();
 	PPU(const ROM &rom);
 #pragma endregion
 
-	inline u8 &RdReg(u16 addr) {
+	inline u8 &readReg(u16 addr) {
 		if (addr == 0x2000)
 			return PPUCTRL;
 		else if (addr == 0x2001)
@@ -108,21 +108,6 @@ public:
 		return mem[addr];
 	}
 
-	inline u8 RdReg(u16 addr) const {
-		switch (addr) {
-		case 0x2000: return PPUCTRL;
-		case 0x2001: return PPUMASK;
-		case 0x2002: return PPUSTATUS;
-		case 0x2003: return OAMADDR;
-		case 0x2004: return OAMDATA;
-		case 0x2005: return PPUSCROLL;
-		case 0x2006: return PPUADDR;
-		case 0x2007: return PPUDATA;
-		case 0x4014: return OAMDMA;
-		default: return mem[addr];
-		}
-	}
-
 	inline u8 &operator[](u16 addr) { return Rd(addr); }
 	inline u8 operator[](u8 addr) const { return Rd(addr); }
 
@@ -137,9 +122,26 @@ public:
 	inline bool isNMI() const { return BIT(PPUCTRL, 7); }
 	inline u8 increment() const { return BIT(PPUCTRL, 2) ? 32 : 1; }
 
-	bool write2006(const u8 &val) {
-		membuff = (membuff << 8) | val;
-		return true;
+	bool writeReg(const u16 &addr, const u8 &val) {
+		if (addr == 0x2000)
+			PPUCTRL = val;
+		else if (addr == 0x2001)
+			PPUMASK = val;
+		else if (addr == 0x2002)
+			PPUSTATUS = val;
+		else if (addr == 0x2003)
+			OAMADDR = val;
+		else if (addr == 0x2004) {
+			return write2004(val);
+		} else if (addr == 0x2005)
+			PPUSCROLL = val;
+		else if (addr == 0x2006) {
+			return write2006(val);
+		} else if (addr == 0x2007)
+			PPUDATA = val;
+		else if (addr == 0x4014)
+			OAMDMA = val;
+		throw "Register not found";
 	}
 
 	bool write2004(const u8 &val) {
@@ -151,6 +153,10 @@ public:
 		return true;
 	}
 
+	bool write2006(const u8 &val) {
+		membuff = (membuff << 8) | val;
+		return true;
+	}
 
 	/**
 		Rendering is fetched 8 BG pixels at a time, as follows:
@@ -186,8 +192,6 @@ public:
 			u8 attr = Rd(attributeAddr);
 			u8 lower = Rd(patternAddr);
 			u8 higher = Rd(patternAddr + 8);
-
-
 
 			nametableAddr++;
 			attributeAddr++;

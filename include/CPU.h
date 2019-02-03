@@ -67,42 +67,66 @@ class CPU {
 	u16 buff16;
 	u8 buff8;
 
+	// Absolute along with its variants, and immediate reads mutate the program counter, therefore
+	// the value obtained via these two methods should only be calculated once during the instruction
+	// cycle.
+	std::experimental::optional<u16> instructionDataLatch;
+
 	// Instruction helpers
-	inline u8 _ASL(u8 &x) {
+	inline u8 _ASL(const u8 &x) {
 		C(x & 0x80);
-		return (x <<= 1);
+		return (x << 1);
 	}
 	inline u16 _ASL(u16 &x) {
 		C(x & 0x8000);
-		return (x <<= 1);
+		return (x << 1);
 	}
 
 	// Addressing helpers
-	inline u8 Imm() { return Read(pc++); }
-	inline u16 Abs() { return Read16((pc += 2) - 2); }
+	inline u8 Imm() {
+		if (!instructionDataLatch) {
+			instructionDataLatch = Read(pc++);
+		}
+		return static_cast<u8>(instructionDataLatch.value());
+	}
+
+	inline u16 Abs() {
+		if (!instructionDataLatch) {
+			pc += 2;
+			instructionDataLatch = Read16(static_cast<u16>(pc - 2));
+		}
+		return instructionDataLatch.value();
+	}
+
 	inline u16 AbsX() {
 		u16 abs = Abs();
 		CrossesPage(abs, x);
 		return abs + x;
 	}
+
 	inline u16 AbsY() {
 		u16 abs = Abs();
 		CrossesPage(abs, y);
 		return abs + y;
 	}
-	inline u8 &Zp(u8 addr) { return static_cast<u8 &>(mmu(addr)); }
 	inline u16 Zp16(u8 addr) {
-		return (mmu(static_cast<u16>((addr + 1) & 0xff)) << 8) + mmu(addr);
+		return (mmu.read(static_cast<u16>((addr + 1) & 0xff)) << 8) + mmu.read(addr);
 	}
 	inline void CrossesPage(u16 addr, u8 offset) {
 		zeroPageCrossed |= ((addr & 0xff00) != ((addr + offset) & 0xff00));
 	}
-	inline void Push8(u8 val) { Stk(sp--) = val; }
+	// 		return static_cast<u8 &>(mmu(static_cast<u16>(0x0100 + static_cast<u32>(addr))));
+	inline void Push8(u8 val) {
+		mmu.write(static_cast<u16>(0x0100 + static_cast<u32>(sp--)), val);
+	}
 	inline void Push16(u16 val) {
 		Push8(static_cast<u8>(val >> 8));
 		Push8(static_cast<u8>(val & 0xFF));
 	}
-	inline u8 Pop8() { return Stk(++sp); }
+	inline u8 Pop8() {
+		sp++;
+		return mmu.read(static_cast<u16>(0x0100 + static_cast<u32>(sp)));
+	}
 	inline u16 Pop16() {
 		u8 lo = Pop8();
 		u16 hi = Pop8() << 8;
@@ -151,7 +175,7 @@ public:
 	std::vector<std::pair<std::string, u16>> vectors;
 	std::vector<std::tuple<u16, std::string, std::array<u8, 3>>> instrHist;
 	inline bool IsOfficial() { return isOfficial[Read(pc)]; }
-	void DebugDump();
+	void debugDump();
 #pragma endregion
 
 #pragma region Setup
@@ -162,6 +186,7 @@ public:
 		zeroPageCrossed = false;
 		calcCrossed = false;
 		delta = 0;
+		instructionDataLatch.reset();
 	}
 #pragma endregion
 
@@ -171,12 +196,16 @@ public:
 	}
 
 	// Default memory layout, no reference to PPU
-	inline u8 &Read(u16 addr) {
-		u8 &result = mmu(addr);
+	inline u8 Read(u16 addr) const {
+		return mmu.read(addr);
+	}
+
+	inline bool write(const u16 &addr, const u8 &value) {
 		if (!oamDmaIdx && isOAMDMA(addr)) {
 			oamDmaIdx = 256;
 		}
-		return result;
+		mmu.write(addr, value);
+		return true;
 	}
 
 	inline u16 Read16(u16 addr) { return Read(addr) + (Read(addr + 1) << 8); }
@@ -186,7 +215,6 @@ public:
 		u8 hi = Read((addr & 0xff00) + LO(addr + 1));
 		return lo + (hi << 8);
 	}
-	inline u8 &Stk(u8 addr) { return static_cast<u8 &>(mmu(static_cast<u16>(0x0100 + static_cast<u32>(addr)))); }
 #pragma endregion
 
 #pragma region Flags
@@ -410,11 +438,13 @@ public:
 
 #pragma region Operand calculator
 	template<AddressingModes m>
-	u16 GetOperand16();
+	u16 getOperand16();
 	template<AddressingModes m>
-	u8 &GetOperand8();
+	u8 GetOperand8();
 	template<AddressingModes m>
-	u16 GetPureOperand();
+	bool writeOperandVal(const u8 &val);
+	template<AddressingModes m>
+	u16 getPureOperand();
 
 	template<AddressingModes m>
 	constexpr inline bool Is8Bit() { return !(0 <= m && m < 2); }

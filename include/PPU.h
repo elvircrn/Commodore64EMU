@@ -141,7 +141,9 @@ public:
 			PPUDATA = val;
 		else if (addr == 0x4014)
 			OAMDMA = val;
-		throw "Register not found";
+		else
+			return false;
+		return true;
 	}
 
 	bool write2004(const u8 &val) {

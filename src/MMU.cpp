@@ -33,6 +33,9 @@ bool MMU::write(u16 addr, u8 val) {
 	} else if (addr == 0x4014) {
 		return ppu.writeReg(addr, val);
 	} else {
+		if (addr == 0x4016) {
+
+		}
 		ram[addr] = val;
 		return true;
 	}

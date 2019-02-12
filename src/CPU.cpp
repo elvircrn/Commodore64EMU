@@ -47,6 +47,7 @@ void CPU::powerUp() {
 
 #include <iostream>
 #include <CPU.h>
+#include <Debugger.h>
 
 void CPU::execute() {
 	clock.waitTick();
@@ -60,11 +61,12 @@ void CPU::execute() {
 		u16 addr = (high << 8) | low;
 		u8 ramVal = Read(addr);
 		mmu.write(PPU::OAMDATA_ADDR, ramVal);
+		return;
 	}
 
 	u8 op = Read(pc++);
 	if constexpr (DEBUG) {
-		std::cout << "tick tock\n"; // TODO: Remove
+		std::cout << Debugger(this).GetNESTestLine() << '\n';
 		opHist.push_back(op);
 		pcHist.push_back(pc - 1);
 		bitStack.clear();

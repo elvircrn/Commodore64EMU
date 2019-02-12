@@ -37,7 +37,7 @@ class PPU {
 	u8 PPUCTRL;     // VPHB SINN
 	u8 PPUMASK;     // BGRs bMmG
 	u8 PPUSTATUS;   // VSO- ----
-	u8 OAMADDR;     // aaaa aaaa
+	u8 OAMADDR = 0;     // aaaa aaaa
 	u8 OAMDATA;     // dddd dddd
 	u8 PPUSCROLL;   // xxxx xxxx
 	u8 PPUADDR;     // aaaa aaaa
@@ -46,6 +46,7 @@ class PPU {
 #pragma endregion
 
 public:
+	static constexpr u16 PPUCTRL_ADDR = 0x2000;
 	static constexpr u16 OAMADDR_ADDR = 0x2003;
 	static constexpr u16 OAMDATA_ADDR = 0x2004;
 	static constexpr u16 PPUADDR_ADDR = 0x2006;
@@ -57,13 +58,17 @@ public:
 #pragma endregion
 
 	inline u8 &readReg(u16 addr) {
-		if (addr == 0x2000)
+		if (addr == 0x2000) // Done
 			return PPUCTRL;
-		else if (addr == 0x2001)
+		else if (addr == 0x2001) // Done
 			return PPUMASK;
-		else if (addr == 0x2002)
+			// When register at 0x2002 is read, bit 7(V blank bit) is cleared.
+		else if (addr == 0x2002) {
+			// TODO: Check if we should return immediately
+			u8 ret = PPUSTATUS;
+			PPUSTATUS = static_cast<u8>(PPUSTATUS & (~(1 << 7)));
 			return PPUSTATUS;
-		else if (addr == 0x2003)
+		} else if (addr == 0x2003)
 			return OAMADDR;
 		else if (addr == 0x2004)
 			return OAMDATA;
@@ -120,29 +125,34 @@ public:
 
 	// PPU Control registers mappings
 	inline bool isNMI() const { return BIT(PPUCTRL, 7); }
-	inline u8 increment() const { return BIT(PPUCTRL, 2) ? 32 : 1; }
+	inline bool startVBlank() {
+		return writeReg(PPUCTRL_ADDR, PPUCTRL | ((u8) 1 << 7));
+	}
 
-	bool writeReg(const u16 &addr, const u8 &val) {
-		if (addr == 0x2000)
+	inline u8 increment() const { return static_cast<u8>(BIT(PPUCTRL, 2) ? 32 : 1); }
+
+	inline bool writeReg(const u16 &addr, const u8 &val) {
+		if (addr == 0x2000) { // Done
 			PPUCTRL = val;
-		else if (addr == 0x2001)
+		} else if (addr == 0x2001) { // Done
 			PPUMASK = val;
-		else if (addr == 0x2002)
+		} else if (addr == 0x2002) { // Done, probably should not be called
 			PPUSTATUS = val;
-		else if (addr == 0x2003)
+		} else if (addr == 0x2003) {
 			OAMADDR = val;
-		else if (addr == 0x2004) {
+		} else if (addr == 0x2004) {
 			return write2004(val);
 		} else if (addr == 0x2005)
 			PPUSCROLL = val;
 		else if (addr == 0x2006) {
 			return write2006(val);
-		} else if (addr == 0x2007)
+		} else if (addr == 0x2007) {
 			PPUDATA = val;
-		else if (addr == 0x4014)
+		} else if (addr == 0x4014) {
 			OAMDMA = val;
-		else
+		} else {
 			return false;
+		}
 		return true;
 	}
 

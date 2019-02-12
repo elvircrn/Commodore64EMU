@@ -53,11 +53,13 @@ int main(int argc, char *args[]) {
 	}
 
 	file.unsetf(std::ios::skipws);
+	SDL_Event event;
 
 	Clock clk(std::chrono::milliseconds(1));
 	ROM rom(file);
 	PPU ppu(rom);
-	MMU mmu(ppu);
+	IO io(event);
+	MMU mmu(ppu, io);
 
 	try {
 		CPU cpu(clk, mmu);
@@ -80,10 +82,10 @@ int main(int argc, char *args[]) {
 		});
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // Wait until CPU is initialized.
-		SDL_Event event;
 		for (;;) {
-			cpu.SetNmi(true);
-			std::this_thread::sleep_for(std::chrono::milliseconds(300));
+			ppu.startVBlank();
+			cpu.setNMI(true);
+			std::this_thread::sleep_for(std::chrono::milliseconds(900));
 			SDL_PollEvent(&event);
 			if (event.type == SDL_QUIT)
 				break;

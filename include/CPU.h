@@ -168,7 +168,7 @@ public:
 	inline u8 P(u8 _p) { return p = _p; }
 
 #pragma region Debug
-	static constexpr bool DEBUG = false;
+	static constexpr bool DEBUG = true;
 	std::vector<u16> pcHist;
 	std::vector<u8> opHist;
 	std::vector<u8> bitStack;
@@ -229,7 +229,7 @@ public:
 	inline void UpdZ(u8);
 	inline void UpdNZ(u8);
 
-	inline void SetNmi(bool _nmi) { nmi = _nmi; }
+	inline void setNMI(bool _nmi) { nmi = _nmi; }
 	inline bool GetNMI() { return nmi; }
 #pragma endregion
 

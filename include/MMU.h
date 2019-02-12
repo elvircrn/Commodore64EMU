@@ -5,6 +5,7 @@
 #include <vector>
 #include "core.h"
 #include "PPU.h"
+#include "IO.h"
 
 class MMU {
 	constexpr static int RAM_SIZE = 65536;
@@ -15,8 +16,10 @@ class MMU {
 	// We only need a pointer to PPU, because we do not actually own the PPU object.
 	PPU &ppu;
 
+	IO &io;
+
 public:
-	explicit MMU(PPU &_ppu) : ram(RAM_SIZE), ppu(_ppu) {}
+	explicit MMU(PPU &_ppu, IO &_io) : ram(RAM_SIZE), ppu(_ppu), io(_io) {}
 
 	u8 read(const u16 &addr) const;
 	bool write(u16 addr, u8 val);

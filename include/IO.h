@@ -24,15 +24,19 @@ class IO {
 public:
 	explicit IO(SDL_Event &_evt) : evt(_evt) {}
 
-	void write4016() {
+	void write4016(const u8 &val) {
 
 	}
 
-	void write4017() {
-
+	void write4017(const u8 &val) {
 	}
 
 	u8 read4016() {
+		return 0;
+	}
+
+	u8 read4017() {
+		return 0;
 	}
 
 	void fillBuffer(const Joypad &joypad) {

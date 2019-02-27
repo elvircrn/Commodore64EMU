@@ -5,8 +5,7 @@
 #include "SDL.h"
 
 class IO {
-	enum Joypad { JOYPAD_ONE, JOYPAD_TWO };
-
+	u8 buttonId{8};
 	SDL_Event &evt;
 	std::array<u8, 2> buttonBuffers{};
 
@@ -22,17 +21,21 @@ class IO {
 	};
 
 public:
+	enum Joypad { JOYPAD_ONE, JOYPAD_TWO };
 	explicit IO(SDL_Event &_evt) : evt(_evt) {}
 
 	void write4016(const u8 &val) {
-
+		if (val > 0) {
+			buttonId = static_cast<u8>((buttonId + 1) % 8);
+			fillBuffer(JOYPAD_ONE);
+		}
 	}
 
 	void write4017(const u8 &val) {
 	}
 
 	u8 read4016() {
-		return 0;
+		return static_cast<u8>((buttonBuffers[JOYPAD_ONE] & (1 << buttonId)) > 0);
 	}
 
 	u8 read4017() {

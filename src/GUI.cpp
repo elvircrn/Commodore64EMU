@@ -1,4 +1,3 @@
-#include "NanoLog.h"
 #include <string>
 
 #include "SDL2/SDL.h"

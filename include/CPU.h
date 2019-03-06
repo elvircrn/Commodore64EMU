@@ -12,7 +12,6 @@
 
 #include "core.h"
 #include "ROM.h"
-#include "PPU.h"
 
 // Interrupt types along with their respective vectors
 enum Interrupts { BRK, IRQ, NMI, RST };

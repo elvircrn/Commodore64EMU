@@ -6,8 +6,8 @@
 #include "Debugger.h"
 
 #include <fstream>
-#include "NanoLog.h"
 #include <iomanip>
+#include <iostream>
 #include "MMU.h"
 
 namespace NESEmulatorTest {
@@ -52,11 +52,6 @@ TEST_CASE("PatternLoad") {
 	file.unsetf(std::ios::skipws);
 
 	ROM rom(file);
-	PPU ppu(rom);
-
-	auto actual = ppu.getPatternTable(0x0000);
-
-	ASRT(actual, expected);
 }
 
 TEST_CASE("ROMHeaderTest") {
@@ -68,7 +63,7 @@ TEST_CASE("ROMHeaderTest") {
 	std::ifstream file(filePath, std::ios::binary);
 
 	if (!file) {
-		LOG_INFO << "Failed to read rom given: " << filePath << '\n';
+		std::cout << "Failed to read rom given: " << filePath << '\n';
 		ASRT(true, false);
 	}
 
@@ -89,15 +84,16 @@ TEST_CASE("NESTestNoCycleCount") {
 	std::ifstream file(filePath, std::ios::binary);
 
 	if (!file) {
-		LOG_INFO << "Failed to read rom given: " << filePath << '\n';
+		std::cout << "Failed to read rom given: " << filePath << '\n';
 		ASRT(true, false);
 	}
 
 	file.unsetf(std::ios::skipws);
 	Clock clk;
 	ROM rom(file);
-	PPU ppu(rom);
-	MMU mmu(ppu);
+	SDL_Event e{};
+	IO io(e);
+	MMU mmu(io);
 	CPU cpu(clk, mmu);
 	Debugger debugger(&cpu);
 	cpu.powerUp();

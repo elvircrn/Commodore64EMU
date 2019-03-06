@@ -2,15 +2,10 @@
 
 #include "core.h"
 #include "CPU.h"
-#include "PPU.h"
 
-class NES
-{
+class C64 {
 	CPU cpu;
-	PPU ppu;
 public:
-
-	NES();
 
 	void LoadROM(std::ifstream &filename);
 };

@@ -5,7 +5,6 @@
 #include <tuple>
 #include <sstream>
 #include <string>
-#include "NanoLog.h"
 
 void CPU::loadROM(const ROM &rom) {
 	for (int i = 0; i < 0x4000; i++)
@@ -53,16 +52,6 @@ void CPU::execute() {
 	clock.waitTick();
 	clear();
 	tick(2);
-
-	if (oamDmaIdx) {
-		oamDmaIdx--;
-		u8 high = Read(PPU::OAMDMA_ADDR);
-		u8 low = static_cast<u8>(255 - oamDmaIdx);
-		u16 addr = (high << 8) | low;
-		u8 ramVal = Read(addr);
-		mmu.write(PPU::OAMDATA_ADDR, ramVal);
-		return;
-	}
 
 	u8 op = Read(pc++);
 	if constexpr (DEBUG) {

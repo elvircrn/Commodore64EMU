@@ -1,6 +1,8 @@
 [requires]
 sdl2/2.0.9@bincrafters/stable
 boost_filesystem/1.67.0@bincrafters/stable
+sdl2_ttf/2.0.15@bincrafters/stable
+
 
 [generators]
 cmake

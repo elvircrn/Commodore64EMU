@@ -11,6 +11,7 @@ class Clock {
 	std::atomic<int> stamp;
 	std::chrono::nanoseconds t = std::chrono::nanoseconds::zero();
 	std::unordered_map<std::thread::id, std::atomic<int>> stamps;
+	bool enabled = false;
 public:
 	Clock();
 	Clock(std::chrono::nanoseconds _t);

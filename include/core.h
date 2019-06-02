@@ -18,7 +18,7 @@ using optional = std::experimental::optional<T>;
 
 inline u8 LO(const u16 &addr) { return static_cast<u8>(addr & 0xff); }
 inline u8 HI(const u16 &addr) { return static_cast<u8>((addr >> 8) & 0xff); }
-inline bool BIT(const u8 &bits, const u8 &n) { return (bits & (1 << n)) > 0; }
+inline bool BIT(const u8 &bits, const u8 &n) { return (bits & (1u << n)) > 0; }
 
 template<class T>
 inline std::string HexString(T num)

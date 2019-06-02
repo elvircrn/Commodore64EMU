@@ -6,41 +6,20 @@
 #include <sstream>
 
 #include "core.h"
+#include <array>
 
 using std::vector;
+using std::array;
 
 class ROM {
-	constexpr static size_t MAX_ROM_SIZE = 1024 * 1024;
-
-	// Number of chr and prg memory banks
-	u8 mapper;
-
-	// Reset vector
-	u16 rst;
-
-	vector<u8> header;
-
-	vector<vector<u8>> chr;
-	vector<vector<u8>> prg;
-
-	u32 size;
-
 public:
 	ROM();
-	ROM(std::ifstream &filename);
+	ROM(std::ifstream &kernalFile, std::ifstream &basicFile);
+	ROM(vector<u8> kernal, vector<u8> basic, vector<u8> chargen);
 
-	u8 &operator[](const int addr) noexcept;
-	u8 operator[](const int addr) const noexcept;
-
-	inline u32 Size() { return size; }
-	inline int CHRCnt() { return chr.size(); }
-	inline int PRGCnt() { return prg.size(); }
-	inline int Mapper() { return mapper; }
-
-	std::string Info();
-
-	inline u8 CHR(int bank, int addr) const { return chr[bank][addr]; }
-	inline u8 PRG(int bank, int addr) const { return prg[bank][addr]; }
+	vector<u8> kernal;
+	vector<u8> basic;
+	vector<u8> chargen;
 };
 
 

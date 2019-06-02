@@ -8,6 +8,8 @@
 
 # Build
 
+I use [CMRC](https://vector-of-bool.github.io/2017/01/21/cmrc.html) for resource management.
+
 For some god-forsaken reason, gcc builds fail both on Mac and Windows. MSVC and clang should
 work as expected, bearing in mind the specifics of each one's C++ implementation.
 
@@ -33,7 +35,7 @@ conan install . -if=C:/Users/elvircrn/CMakeBuilds/0730974a-797b-6738-a0b9-9daee0
 # Mac OS X
 
 ```
-sudo conan install . --install-folder=cmake-build-debug  --build=missing -s compiler=apple-clang -s compiler.version=9.1 -s compiler.libcxx=libc++ -s build_type=Debug
+conan install . --install-folder=cmake-build-debug  --build=missing -s compiler=apple-clang -s compiler.version=9.1 -s compiler.libcxx=libc++ -s build_type=Debug
 ```
 
 # TODOs

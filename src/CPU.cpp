@@ -6,12 +6,7 @@
 #include <sstream>
 #include <string>
 
-void CPU::loadROM(const ROM &rom) {
-	for (int i = 0; i < 0x4000; i++)
-		mmu.write(0xC000 + i, rom[i]);
-}
-
-CPU::CPU(Clock &_clock, const MMU &_mmu)
+CPU::CPU(Clock &_clock, MMU &_mmu)
 		: clock(_clock), mmu(_mmu), isOfficial(0xff), cycleCount(0) {
 	u8 official[] = {0x69, 0x65, 0x75, 0x6D, 0x7D, 0x79, 0x61, 0x71, 0x28, 0xEA,
 									 0x29, 0x25, 0x35, 0x2D, 0x3D, 0x39, 0x21, 0x31, 0x0A, 0x06,
@@ -30,18 +25,19 @@ CPU::CPU(Clock &_clock, const MMU &_mmu)
 									 0x86, 0x96, 0x8E, 0x84, 0x94, 0x8C, 0x9A, 0xBA, 0x48, 0x68, 0x08};
 	for (u8 o : official)
 		isOfficial[o] = true;
+	init();
 }
 
 CPU::~CPU() = default;
 
-void CPU::powerUp() {
+void CPU::init() {
 	// TODO: Check if IRQ should be disabled
 	p = 0x24; // IRQ disabled
 	a = 0;
 	x = 0;
 	y = 0;
 	sp = 0xfd;
-	pc = 0xC000;
+	pc = Read16(vect[Interrupts::RST]);
 }
 
 #include <iostream>

@@ -55,7 +55,7 @@ class CPU {
 	bool nmi = false;
 
 	// Memory
-	MMU mmu;
+	MMU &mmu;
 
 	// Instructions
 	std::vector<bool> isOfficial;
@@ -167,7 +167,7 @@ public:
 	inline u8 P(u8 _p) { return p = _p; }
 
 #pragma region Debug
-	static constexpr bool DEBUG = true;
+	static constexpr bool DEBUG = false;
 	std::vector<u16> pcHist;
 	std::vector<u8> opHist;
 	std::vector<u8> bitStack;
@@ -179,7 +179,7 @@ public:
 
 #pragma region Setup
 	// TODO: Consider refactoring into an external class?
-	void powerUp();
+	void init();
 	// Called before instruction execution
 	inline void clear() {
 		zeroPageCrossed = false;
@@ -232,10 +232,8 @@ public:
 	inline bool GetNMI() { return nmi; }
 #pragma endregion
 
-	void loadROM(const ROM &rom);
-
 #pragma region Constructors
-	explicit CPU(Clock &, const MMU &mmu);
+	explicit CPU(Clock &, MMU &mmu);
 	~CPU();
 #pragma endregion
 

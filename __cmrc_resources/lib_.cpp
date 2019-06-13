@@ -7,6 +7,9 @@ namespace resources {
 
 namespace res_chars {
 // These are the files which are available in this resource library
+// Pointers to res/6502_functional_test.bin
+extern const char* const f_3dd1_res_6502_functional_test_bin_begin;
+extern const char* const f_3dd1_res_6502_functional_test_bin_end;
 // Pointers to rom/kernal.rom
 extern const char* const f_8043_rom_kernal_rom_begin;
 extern const char* const f_8043_rom_kernal_rom_end;
@@ -34,10 +37,18 @@ get_root_index() {
     };
     dir_inl root_directory_dir{root_directory_};
     (void)root_directory_dir;
-    static auto f_5f39_rom_dir = root_directory_dir.directory.add_subdir("rom");
-    root_index.emplace("rom", &f_5f39_rom_dir.index_entry);
     static auto f_9b20_res_dir = root_directory_dir.directory.add_subdir("res");
     root_index.emplace("res", &f_9b20_res_dir.index_entry);
+    static auto f_5f39_rom_dir = root_directory_dir.directory.add_subdir("rom");
+    root_index.emplace("rom", &f_5f39_rom_dir.index_entry);
+    root_index.emplace(
+        "res/6502_functional_test.bin",
+        f_9b20_res_dir.directory.add_file(
+            "6502_functional_test.bin",
+            res_chars::f_3dd1_res_6502_functional_test_bin_begin,
+            res_chars::f_3dd1_res_6502_functional_test_bin_end
+        )
+    );
     root_index.emplace(
         "rom/kernal.rom",
         f_5f39_rom_dir.directory.add_file(

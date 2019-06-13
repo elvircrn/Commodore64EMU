@@ -28,6 +28,28 @@ CPU::CPU(Clock &_clock, MMU &_mmu)
 	init();
 }
 
+CPU::CPU(Clock &_clock, MMU &_mmu, u16 _pc)
+		: clock(_clock), mmu(_mmu), isOfficial(0xff), cycleCount(0) {
+	u8 official[] = {0x69, 0x65, 0x75, 0x6D, 0x7D, 0x79, 0x61, 0x71, 0x28, 0xEA,
+									 0x29, 0x25, 0x35, 0x2D, 0x3D, 0x39, 0x21, 0x31, 0x0A, 0x06,
+									 0x16, 0x0E, 0x1E, 0x24, 0x2C, 0x10, 0x30, 0x50, 0x70, 0x90,
+									 0xB0, 0xD0, 0xF0, 0x00, 0xC9, 0xC5, 0xD5, 0xCD, 0xDD, 0xD9,
+									 0xC1, 0xD1, 0xE0, 0xE4, 0xEC, 0xC0, 0xC4, 0xCC, 0xC6, 0xD6,
+									 0xCE, 0xDE, 0x49, 0x45, 0x55, 0x4D, 0x5D, 0x59, 0x41, 0x51,
+									 0x18, 0x38, 0x58, 0x78, 0xB8, 0xD8, 0xF8, 0xE6, 0xF6, 0xEE,
+									 0xFE, 0x4C, 0x6C, 0x20, 0xA9, 0xA5, 0xB5, 0xAD, 0xBD, 0xB9,
+									 0xA1, 0xB1, 0xA2, 0xA6, 0xB6, 0xAE, 0xBE, 0xA0, 0xA4, 0xB4,
+									 0xAC, 0xBC, 0x4A, 0x46, 0x56, 0x4E, 0x5E, 0x09, 0x05, 0x15,
+									 0x0D, 0x1D, 0x19, 0x01, 0x11, 0xAA, 0x8A, 0xCA, 0xE8, 0xA8,
+									 0x98, 0x88, 0xC8, 0x2A, 0x26, 0x36, 0x2E, 0x3E, 0x6A, 0x66,
+									 0x76, 0x6E, 0x7E, 0x40, 0x60, 0xE9, 0xE5, 0xF5, 0xED, 0xFD,
+									 0xF9, 0xE1, 0xF1, 0x85, 0x95, 0x8D, 0x9D, 0x99, 0x81, 0x91,
+									 0x86, 0x96, 0x8E, 0x84, 0x94, 0x8C, 0x9A, 0xBA, 0x48, 0x68, 0x08};
+	for (u8 o : official)
+		isOfficial[o] = true;
+	init(_pc);
+}
+
 CPU::~CPU() = default;
 
 void CPU::init() {
@@ -38,6 +60,16 @@ void CPU::init() {
 	y = 0;
 	sp = 0xfd;
 	pc = Read16(vect[Interrupts::RST]);
+}
+
+void CPU::init(u16 _pc) {
+	// TODO: Check if IRQ should be disabled
+	p = 0x24; // IRQ disabled
+	a = 0;
+	x = 0;
+	y = 0;
+	sp = 0xfd;
+	pc = _pc;
 }
 
 #include <iostream>
@@ -51,7 +83,7 @@ void CPU::execute() {
 
 	u8 op = Read(pc++);
 	if constexpr (DEBUG) {
-		std::cout << Debugger(this).GetNESTestLine() << '\n';
+//		std::cout << Debugger(this).GetNESTestLine() << '\n';
 		opHist.push_back(op);
 		pcHist.push_back(pc - 1);
 		bitStack.clear();
@@ -60,7 +92,8 @@ void CPU::execute() {
 													 std::array<u8, 3>({Read(pc + 1), Read(pc + 2), Read(pc + 3)}));
 		for (int i = 0; i < 5; i++)
 			bitStack.push_back(Read(pc - 1 + i));
-		std::cout << Instructions::Name(op) << '\n'; // TODO: Remove
+//		std::cout << Instructions::Name(op) << '\n'; // TODO: Remove
+		std::cout << std::uppercase << std::hex << PC() << '\n'; // TODO: Remove
 	}
 
 	switch (op) {
@@ -371,59 +404,6 @@ void CPU::execute() {
 	case 0xEA: NOP<AddressingModes::IMPLIED>();
 		break;
 
-		//Unofficial opcodes
-		// NOP - skip 0, 2 cycles
-	case 0x1A: NOP<AddressingModes::IMPLIED>();
-		break;
-	case 0x3A: NOP<AddressingModes::IMPLIED>();
-		break;
-	case 0x5A: NOP<AddressingModes::IMPLIED>();
-		break;
-	case 0x7A: NOP<AddressingModes::IMPLIED>();
-		break;
-	case 0xDA: NOP<AddressingModes::IMPLIED>();
-		break;
-	case 0xFA: NOP<AddressingModes::IMPLIED>();
-		break;
-
-		// NOP - skip 1
-	case 0x04: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0x44: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0x64: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0x14: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0x34: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0x54: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0x74: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0xD4: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0xF4: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0x80: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-
-		// NOP - skip 2
-	case 0x0C: NOP<AddressingModes::IMPLIED, 2>();
-		break;
-	case 0x1C: NOP<AddressingModes::IMPLIED, 2>();
-		break;
-	case 0x3C: NOP<AddressingModes::IMPLIED, 2>();
-		break;
-	case 0x5C: NOP<AddressingModes::IMPLIED, 2>();
-		break;
-	case 0x7C: NOP<AddressingModes::IMPLIED, 2>();
-		break;
-	case 0xDC: NOP<AddressingModes::IMPLIED, 2>();
-		break;
-	case 0xFC: NOP<AddressingModes::IMPLIED, 2>();
-		break;
-
 	default: std::stringstream ss;
 		if constexpr (DEBUG && !ignoreUnknownInstr) {
 			for (int i = pcHist.back(); i < pcHist.back() + 10; i++)
@@ -458,16 +438,16 @@ u16 CPU::getPureOperand() {
 	if constexpr (mode < 2)
 		return getOperand16<mode>();
 	else
-		return GetOperand8<mode>();
+		return getOperand8<mode>();
 }
 
 template<AddressingModes mode>
 u16 CPU::getOperand16() {
 	// Used by branch instructions
-	// TODO: Check if -1 is needed
+	// TODO: Check if -1 is needed; Probably not?
 	if constexpr (mode == AddressingModes::RELATIVE) {
 		u8 imm = Imm();
-		return pc + imm;
+		return pc + (s8) imm;
 	}
 		// TODO: Check if -2 is needed
 	else if (mode == AddressingModes::INDIRECT)
@@ -526,7 +506,7 @@ bool CPU::writeOperandVal(const u8 &val) {
 }
 
 template<AddressingModes mode>
-u8 CPU::GetOperand8() {
+u8 CPU::getOperand8() {
 	// ADC $3420 -> A + contents of memory $3420
 	if constexpr (mode == AddressingModes::ABSOLUTE) {
 		u16 abs = Abs();
@@ -576,7 +556,7 @@ void CPU::ADC() {
 	calcCrossed = true;
 
 	u8 lhs = a;
-	u8 rhs = GetOperand8<mode>();
+	u8 rhs = getOperand8<mode>();
 	s16 res = lhs + rhs + C();
 	a = static_cast<u8>(res & 0xff);
 	UpdCV(lhs, rhs, res);
@@ -595,7 +575,7 @@ template<AddressingModes mode>
 void CPU::ASL() {
 	tick(CalcBaseTicks<mode>());
 	tick(CalcShiftTicks<mode>());
-	u8 val = GetOperand8<mode>();
+	u8 val = getOperand8<mode>();
 	val = _ASL(val);
 	writeOperandVal<mode>(val);
 	UpdNZ(val);
@@ -736,7 +716,7 @@ void CPU::CPY() {
 template<AddressingModes mode>
 void CPU::DEC() {
 	tick(CalcBaseTicks<mode>() + CalcIncDecTicks<mode>());
-	u8 val = GetOperand8<mode>();
+	u8 val = getOperand8<mode>();
 	val--;
 	writeOperandVal<mode>(val);
 	UpdNZ(val);
@@ -760,7 +740,7 @@ void CPU::EOR() {
 template<AddressingModes mode>
 void CPU::INC() {
 	tick(CalcBaseTicks<mode>() + CalcIncDecTicks<mode>());
-	u8 val = GetOperand8<mode>();
+	u8 val = getOperand8<mode>();
 	val++;
 	writeOperandVal<mode>(val);
 	UpdNZ(val);
@@ -794,14 +774,14 @@ template<AddressingModes mode>
 void CPU::LDA() {
 	calcCrossed = true;
 	tick(CalcBaseTicks<mode>());
-	UpdNZ(a = GetOperand8<mode>());
+	UpdNZ(a = getOperand8<mode>());
 }
 
 template<AddressingModes mode>
 void CPU::LDX() {
 	tick(CalcBaseTicks<mode>());
 	calcCrossed = true;
-	UpdNZ(x = GetOperand8<mode>());
+	UpdNZ(x = getOperand8<mode>());
 }
 
 template<AddressingModes mode>
@@ -813,7 +793,7 @@ void CPU::LDY() {
 
 template<AddressingModes mode>
 void CPU::LSR() {
-	u8 op = GetOperand8<mode>();
+	u8 op = getOperand8<mode>();
 	C(static_cast<bool>(op & 1));
 	op >>= 1;
 	writeOperandVal<mode>(op);
@@ -826,7 +806,7 @@ void CPU::NOP() { pc += waste; }
 template<AddressingModes mode>
 void CPU::ORA() {
 	calcCrossed = true;
-	UpdNZ(a |= GetOperand8<mode>());
+	UpdNZ(a |= getOperand8<mode>());
 }
 
 template<AddressingModes mode>
@@ -861,7 +841,7 @@ template<AddressingModes mode>
 void CPU::ROL() {
 	tick(CalcBaseTicks<mode>());
 	tick(CalcShiftTicks<mode>());
-	u8 mem = GetOperand8<mode>();
+	u8 mem = getOperand8<mode>();
 	u8 t = mem;
 	mem <<= 1;
 	mem |= static_cast<u8>(C());
@@ -874,7 +854,7 @@ template<AddressingModes mode>
 void CPU::ROR() {
 	tick(CalcBaseTicks<mode>());
 	tick(CalcShiftTicks<mode>());
-	u8 mem = GetOperand8<mode>();
+	u8 mem = getOperand8<mode>();
 	u8 t = mem;
 	mem >>= 1;
 	mem |= (C() << 7);
@@ -913,7 +893,7 @@ void CPU::SBC() {
 	tick(CalcBaseTicks<mode>());
 	calcCrossed = true;
 	u8 lhs = a;
-	u8 rhs = GetOperand8<mode>() ^ 0xff;
+	u8 rhs = getOperand8<mode>() ^ 0xff;
 	s16 res = lhs + rhs + C();
 	UpdCV(a, rhs, res);
 	a = static_cast<u8>(res);
@@ -993,7 +973,7 @@ void CPU::LAX() {
 template<Interrupts inter>
 void CPU::INT() {
 	if constexpr (DEBUG) {
-		std::cout << "Interrupted, type: " << inter << '\n'; // TODO: Find a better way to log
+//		std::cout << "Interrupted, type: " << inter << '\n'; // TODO: Find a better way to log
 	}
 	// Note that BRK, although it is a one - byte instruction, needs an extra
 	// byte of padding after it.This is because the return address it puts on

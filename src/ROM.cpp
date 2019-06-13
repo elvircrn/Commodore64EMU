@@ -10,5 +10,5 @@ ROM::ROM(std::ifstream &kernalStream, std::ifstream &basicStream) :
 		basic{StreamUtil::toVectorU8(kernalStream)} {
 }
 
-ROM::ROM(vector<u8> _kernal, vector<u8> _basic, vector<u8> _chargen)
-		: kernal(std::move(_kernal)), basic(std::move(_basic)), chargen(std::move(_chargen)) {}
+ROM::ROM(vector<u8> _kernal, vector<u8> _basic, vector<u8> _chargen, vector<u8> _io)
+		: kernal(std::move(_kernal)), basic(std::move(_basic)), chargen(std::move(_chargen)), io(std::move(_io)) {}

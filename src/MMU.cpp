@@ -5,56 +5,63 @@
 #include <iostream>
 
 u8 MMU::read(const u16 &addr) const {
-	u16 hi = addr & 0xff00;
-	u16 lo = addr & 0x00ff;
-	if (addr > 0xDFFF) {
-		if (isKernal(ram[1])) {
-			return rom.kernal[addr - 0xE000];
-		} else {
-			return ram[addr - 0xE000];
-		}
-	} else if (addr > 0xCFFF) {
-		if (isCharGen(ram[1])) {
-			return rom.chargen[addr - 0xCFFF];
-		} else { // TODO: Check if this is correct
-			return vic[addr - 0xCFFF];
-		}
-	} else if (addr > 0xBFFF) {
+	u8 bankMask = ram[1];
+
+	if (addr < 0xa000) {
 		return ram[addr];
-	} else if (addr > 0x9FFF) {
-		if (isBASIC(ram[1])) {
-			return rom.basic[addr - 0x9FFF];
+	} else if (addr < 0xc000) {
+		if (isBASIC(bankMask)) {
+			return rom.basic[addr - 0xa000];
 		} else {
-			return ram[addr - 0x9FFF];
+			return ram[addr];
 		}
-	} else {
+	} else if (addr < 0xd000) {
 		return ram[addr];
+	} else if (addr < 0xe000) {
+		if (isCharGen(bankMask)) {
+			return rom.chargen[addr - 0xd000];
+		} else if (isIO(bankMask)) {
+			return rom.io[addr - 0xd000];
+		}
+	} else if (addr <= 0xffff) {
+		if (isKernal(bankMask)) {
+			return rom.kernal[addr - 0xe000];
+		} else {
+			return ram[addr];
+		}
 	}
+	return ram[addr];
 }
 
 bool MMU::write(u16 addr, u8 val) {
-	if (addr > 0xDFFF) {
-		if (isKernal(addr)) {
-			rom.kernal[addr - 0xE000] = val;
+	u8 bankMask = ram[1];
+
+	if (addr < 0xa000) {
+		return ram[addr] = val;
+	} else if (addr < 0xc000) {
+		if (isBASIC(bankMask)) {
+			return rom.basic[addr - 0xa000] = val;
 		} else {
-			ram[addr - 0xE000] = val;
+			return ram[addr] = val;
 		}
-	} else if (addr > 0xCFFF) {
-		if (isCharGen(ram[1])) {
-			rom.chargen[addr - 0xCFFF] = val;
-		} else { // TODO: I/O mapping
-			ram[addr] = val;
+	} else if (addr < 0xd000) {
+		return ram[addr] = val;
+	} else if (addr < 0xe000) {
+		if (isCharGen(bankMask)) {
+			return rom.chargen[addr - 0xd000] = val;
+		} else if (isIO(bankMask)) {
+			return rom.io[addr - 0xd000] = val;
 		}
-	} else if (addr > 0xBFFF) {
-		ram[addr] = val;
-	} else if (addr > 0x9FFF) {
-		if (isBASIC(addr)) {
-			rom.basic[addr - 0x9FFF] = val;
+	} else if (addr <= 0xffff) {
+		if (isKernal(bankMask)) {
+			return rom.kernal[addr - 0xe000] = val;
 		} else {
-			ram[addr - 0x9FFF] = val;
+			return ram[addr] = val;
 		}
-	} else {
-		ram[addr] = val;
 	}
-	return true;
+	return ram[addr] = val;
+}
+
+void MMU::writeRAM(u16 addr, u8 val) {
+	ram[addr] = val;
 }

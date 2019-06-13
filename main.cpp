@@ -10,6 +10,7 @@
 #include "boost/filesystem.hpp"
 #include <SDL2/SDL.h>
 #include <SDL_ttf.h>
+#include "MMULoader.h"
 
 #include "CPU.h"
 #include "StreamUtil.h"
@@ -42,6 +43,62 @@ public:
 	}
 };
 
+int _main() {
+	freopen("/tmp/outmy.txt", "w", stdout);
+	std::vector<u8> vicIO(0xffff);
+	Clock clk{}; //	Clock clk(std::chrono::milliseconds(1));
+	ROM rom{};
+	auto fs = cmrc::resources::get_filesystem();
+	MMU mmu{rom};
+
+	MMULoader mmuLoader{fs, mmu};
+	mmuLoader.dumpToRAM("res/6502_functional_test.bin", 0x400);
+
+	CPU cpu(clk, mmu, 0x400);
+
+	cpu.write(1, 0);
+
+	bool passed{};
+
+	long long int cnt{};
+	u16 pcPrev{};
+
+	while (true) {
+		cpu.execute();
+
+		cnt++;
+
+		if (cnt == 1000000) {
+			std::cout << "progress\n";
+			cnt = 0;
+		}
+
+		if (cpu.PC() == 0x3463) {
+			passed = true;
+			std::cout << std::hex << cpu.PC() << '\n';
+			break;
+		} else if (cpu.PC() == pcPrev) {
+			std::cout << "loop\n";
+			std::cout << std::hex << pcPrev << '\n';
+			break;
+		}
+
+		pcPrev = cpu.PC();
+	}
+
+	std::cout << std::endl;
+	for (size_t i = cpu.pcHist.size() - 5; i < cpu.pcHist.size(); i++) {
+		std::cout << cpu.pcHist[i] << '\n';
+	}
+	if (passed) {
+		std::cout << "Passed!";
+	} else {
+		std::cout << "Failed!";
+	}
+
+	return 0;
+}
+
 int main(int argc, char *args[]) {
 	auto fs = cmrc::resources::get_filesystem();
 	std::ios_base::sync_with_stdio(false);
@@ -71,36 +128,53 @@ int main(int argc, char *args[]) {
 	std::vector<u8> kernal{kernalStream.begin(), kernalStream.end()};
 	std::vector<u8> basic{basicStream.begin(), basicStream.end()};
 	std::vector<u8> chargen{chargenStream.begin(), chargenStream.end()};
+	std::vector<u8> vicIO(0xffff);
 
 	SDL_Event event;
 
 	Clock clk{}; //	Clock clk(std::chrono::milliseconds(1));
-	ROM rom(kernal, basic, chargen);
-	IO io(event);
-	MMU mmu(io, rom);
+	ROM rom(kernal, basic, chargen, vicIO);
+	MMU mmu(rom);
 	CPU cpu(clk, mmu);
 
 
-	short buff{};
+	auto t = std::thread([&cpu]() {
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // Wait until CPU is initialized.
+		while (true) {
+			cpu.setNMI(true);
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(9));
+		}
+	});
+
+	unsigned buff{};
 	try {
 		while (true) {
-			++buff;
+			textRenderer.drawAndUpdate("asdasd");
 			cpu.execute();
-
-			if (buff == 0) {
-				std::string str{};
-				for (size_t i = 0; i < 30; i++) {
-					unsigned char c = mmu.read(0x0400 + i);
-					std::cout << (int) c << ' ';
-					str.push_back(c);
+			char chars[] = {'!','"','#','$','%','&','\'','(',')','*','+',',','-','.','/','0','1','2','3','4','5','6','7','8','9',':',';','<','=','>','?','@','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
+			++buff;
+			if (buff == 1000000) {
+				buff = 0;
+				for (size_t i = 0; i < 25; i++) {
+					for (size_t j = 0; j< 40; j++) {
+						unsigned char c = mmu.read(0x400 + i * 25 + j);
+						
+						std::cout << (char) chars[(int) c - 0x21] << ' ';
+//						std::cout << std::hex << std::uppercase << (int) c << ' ';
+					}
+					std::cout << '\n';
 				}
+
 				std::cout << '\n';
-			}
+				std::cout << '\n';
+			 }
 		}
 	} catch (const std::string &error) {
 		std::cout << error << '\n';
 	}
 
+	t.join();
 	SDL_Quit();
 
 	return 0;

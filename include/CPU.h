@@ -180,6 +180,7 @@ public:
 #pragma region Setup
 	// TODO: Consider refactoring into an external class?
 	void init();
+	void init(u16 pc);
 	// Called before instruction execution
 	inline void clear() {
 		zeroPageCrossed = false;
@@ -234,6 +235,7 @@ public:
 
 #pragma region Constructors
 	explicit CPU(Clock &, MMU &mmu);
+	explicit CPU(Clock &, MMU &mmu, u16 _pc);
 	~CPU();
 #pragma endregion
 
@@ -437,7 +439,7 @@ public:
 	template<AddressingModes m>
 	u16 getOperand16();
 	template<AddressingModes m>
-	u8 GetOperand8();
+	u8 getOperand8();
 	template<AddressingModes m>
 	bool writeOperandVal(const u8 &val);
 	template<AddressingModes m>

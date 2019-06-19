@@ -7,9 +7,9 @@
 #include <unordered_map>
 #include <thread>
 
-template<bool enabled = false>
 class Clock {
 	std::atomic<int> stamp{};
+	bool enabled = false;
 	std::chrono::nanoseconds t = std::chrono::nanoseconds::zero();
 	std::unordered_map<std::thread::id, std::atomic<int>> stamps;
 public:

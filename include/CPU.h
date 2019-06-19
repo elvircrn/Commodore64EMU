@@ -39,7 +39,6 @@ enum AddressingModes {
 };
 
 // TODO: Check if every instructions increases the PC by at least 1.
-template<bool ClockEnabled>
 class CPU {
 	static constexpr bool ignoreUnknownInstr = true;
 	Clock &clock;

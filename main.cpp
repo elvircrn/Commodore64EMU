@@ -53,7 +53,7 @@ int main() {
 			std::chrono::high_resolution_clock::now() );
 
 	std::vector<u8> vicIO(0xffff);
-	Clock<false> clk{}; //	Clock clk(std::chrono::milliseconds(1));
+	Clock clk{}; //	Clock clk(std::chrono::milliseconds(1));
 	ROM rom{};
 	auto fs = cmrc::resources::get_filesystem();
 	MMU mmu{rom};

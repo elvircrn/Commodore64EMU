@@ -8,9 +8,8 @@
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
 
 
-template<bool enabled>
-void Clock<enabled>::startTicking() {
-	if constexpr (enabled) {
+void Clock::startTicking() {
+	if (enabled) {
 		if (t != std::chrono::nanoseconds::zero()) {
 			for (;; stamp++) {
 				std::this_thread::sleep_for(t);
@@ -20,9 +19,8 @@ void Clock<enabled>::startTicking() {
 }
 #pragma clang diagnostic pop
 
-template<bool enabled>
-void Clock<enabled>::waitTick(uint32_t ticks) {
-	if constexpr (enabled) {
+void Clock::waitTick(uint32_t ticks) {
+	if (enabled) {
 		if (t != std::chrono::nanoseconds::zero()) {
 			while (ticks--) {
 				while (stamps[std::this_thread::get_id()] == stamp) {
@@ -33,5 +31,4 @@ void Clock<enabled>::waitTick(uint32_t ticks) {
 	}
 }
 
-template<bool enabled>
-Clock<enabled>::Clock(std::chrono::nanoseconds t) : t(t), stamp{} { }
+Clock::Clock(std::chrono::nanoseconds t) : stamp{}, enabled(true), t(t) { }

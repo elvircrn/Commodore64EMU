@@ -9,6 +9,13 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(ASSET_COPY_DIR $<TARGET_FILE_DIR:NESEmu>/res)
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O3")
+
 
 file(GLOB source_files
         "include/*.h"

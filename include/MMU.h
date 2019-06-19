@@ -19,7 +19,7 @@ public:
 	explicit MMU(ROM &_rom) : rom(_rom), ram(RAM_SIZE) {
 		// The default is mode 31 (no cartridge) as all latch bits are logically high (set to 1).
 		// https://www.c64-wiki.com/wiki/Bank_Switching
-		ram[1] = (1 << 8) - 1;
+		ram[1] = (1u << 8u) - 1u;
 	}
 
 	u8 read(const u16 &addr) const;

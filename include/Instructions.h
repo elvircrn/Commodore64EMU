@@ -156,6 +156,7 @@ public:
 		case 0x08: return "PHP";
 		case 0x28: return "PLP";
 		case 0xEA: return "NOP";
+		case 0xFF: return "";
 		default: return "";
 		}
 	}

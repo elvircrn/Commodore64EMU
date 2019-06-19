@@ -11,10 +11,10 @@
 				<Option working_dir="/Users/elvir/CLionProjects/NESEmu"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 all"/>
-					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="NESEmuLib">
@@ -66,19 +66,17 @@
 					<Add directory="/Users/elvir/.conan/data/boost_config/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/config/include"/>
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
-					<Add directory="/usr/local/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
 					<Add directory="/usr/include"/>
 					<Add directory="/System/Library/Frameworks"/>
 					<Add directory="/Library/Frameworks"/>
-					<Add directory="/usr/local/Cellar/llvm/8.0.0/lib/clang/8.0.0/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 NESEmuLib"/>
-					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 NESEmuLib"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="NESEmuLib/fast">
@@ -130,29 +128,27 @@
 					<Add directory="/Users/elvir/.conan/data/boost_config/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/config/include"/>
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
-					<Add directory="/usr/local/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
 					<Add directory="/usr/include"/>
 					<Add directory="/System/Library/Frameworks"/>
 					<Add directory="/Library/Frameworks"/>
-					<Add directory="/usr/local/Cellar/llvm/8.0.0/lib/clang/8.0.0/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 NESEmuLib/fast"/>
-					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 NESEmuLib/fast"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="edit_cache">
 				<Option working_dir="/Users/elvir/CLionProjects/NESEmu"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 edit_cache"/>
-					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="resources">
@@ -205,19 +201,17 @@
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
-					<Add directory="/usr/local/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
 					<Add directory="/usr/include"/>
 					<Add directory="/System/Library/Frameworks"/>
 					<Add directory="/Library/Frameworks"/>
-					<Add directory="/usr/local/Cellar/llvm/8.0.0/lib/clang/8.0.0/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 resources"/>
-					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 resources"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="resources/fast">
@@ -270,29 +264,27 @@
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
-					<Add directory="/usr/local/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
 					<Add directory="/usr/include"/>
 					<Add directory="/System/Library/Frameworks"/>
 					<Add directory="/Library/Frameworks"/>
-					<Add directory="/usr/local/Cellar/llvm/8.0.0/lib/clang/8.0.0/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 resources/fast"/>
-					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 resources/fast"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="rebuild_cache">
 				<Option working_dir="/Users/elvir/CLionProjects/NESEmu"/>
 				<Option type="4"/>
 				<MakeCommands>
-					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="NESEmu">
@@ -345,19 +337,17 @@
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
-					<Add directory="/usr/local/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
 					<Add directory="/usr/include"/>
 					<Add directory="/System/Library/Frameworks"/>
 					<Add directory="/Library/Frameworks"/>
-					<Add directory="/usr/local/Cellar/llvm/8.0.0/lib/clang/8.0.0/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 NESEmu"/>
-					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 NESEmu"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="NESEmu/fast">
@@ -410,19 +400,17 @@
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
-					<Add directory="/usr/local/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
 					<Add directory="/usr/include"/>
 					<Add directory="/System/Library/Frameworks"/>
 					<Add directory="/Library/Frameworks"/>
-					<Add directory="/usr/local/Cellar/llvm/8.0.0/lib/clang/8.0.0/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 NESEmu/fast"/>
-					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 NESEmu/fast"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="test_resources">
@@ -475,19 +463,17 @@
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
-					<Add directory="/usr/local/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
 					<Add directory="/usr/include"/>
 					<Add directory="/System/Library/Frameworks"/>
 					<Add directory="/Library/Frameworks"/>
-					<Add directory="/usr/local/Cellar/llvm/8.0.0/lib/clang/8.0.0/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 test_resources"/>
-					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 test_resources"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="test_resources/fast">
@@ -540,19 +526,17 @@
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
-					<Add directory="/usr/local/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
 					<Add directory="/usr/include"/>
 					<Add directory="/System/Library/Frameworks"/>
 					<Add directory="/Library/Frameworks"/>
-					<Add directory="/usr/local/Cellar/llvm/8.0.0/lib/clang/8.0.0/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 test_resources/fast"/>
-					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 test_resources/fast"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="NESTest">
@@ -605,19 +589,17 @@
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
-					<Add directory="/usr/local/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
 					<Add directory="/usr/include"/>
 					<Add directory="/System/Library/Frameworks"/>
 					<Add directory="/Library/Frameworks"/>
-					<Add directory="/usr/local/Cellar/llvm/8.0.0/lib/clang/8.0.0/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 NESTest"/>
-					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 NESTest"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 			<Target title="NESTest/fast">
@@ -670,19 +652,17 @@
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
 					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
-					<Add directory="/usr/local/include"/>
-					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.0/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
 					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
 					<Add directory="/usr/include"/>
 					<Add directory="/System/Library/Frameworks"/>
 					<Add directory="/Library/Frameworks"/>
-					<Add directory="/usr/local/Cellar/llvm/8.0.0/lib/clang/8.0.0/include"/>
 				</Compiler>
 				<MakeCommands>
-					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 NESTest/fast"/>
-					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j8 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 NESTest/fast"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
 		</Build>
@@ -768,6 +748,11 @@
 			<Option target="NESTest"/>
 		</Unit>
 		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/StreamUtil.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/bitfield.h">
 			<Option target="NESEmuLib"/>
 			<Option target="NESEmu"/>
 			<Option target="NESTest"/>

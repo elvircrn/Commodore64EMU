@@ -1,17 +1,20 @@
 #include <utility>
-
 #include <cstdio>
 #include <cstdlib>
+#include <iomanip>
+#include <tuple>
 #include <thread>
 #include <iostream>
 #include <chrono>
-#include "cmrc/cmrc.hpp"
+#include <iomanip>
 
-#include "boost/filesystem.hpp"
 #include <SDL2/SDL.h>
 #include <SDL_ttf.h>
-#include "MMULoader.h"
+#include "cmrc/cmrc.hpp"
+#include "boost/filesystem.hpp"
+#include "bitfield.h"
 
+#include "MMULoader.h"
 #include "CPU.h"
 #include "StreamUtil.h"
 #include "GUI.h"
@@ -43,10 +46,14 @@ public:
 	}
 };
 
-int _main() {
-	freopen("/tmp/outmy.txt", "w", stdout);
+int main() {
+	std::ios oldState(nullptr);
+	oldState.copyfmt(std::cout);
+	std::chrono::high_resolution_clock::time_point start(
+			std::chrono::high_resolution_clock::now() );
+
 	std::vector<u8> vicIO(0xffff);
-	Clock clk{}; //	Clock clk(std::chrono::milliseconds(1));
+	Clock<false> clk{}; //	Clock clk(std::chrono::milliseconds(1));
 	ROM rom{};
 	auto fs = cmrc::resources::get_filesystem();
 	MMU mmu{rom};
@@ -60,18 +67,10 @@ int _main() {
 
 	bool passed{};
 
-	long long int cnt{};
 	u16 pcPrev{};
 
 	while (true) {
 		cpu.execute();
-
-		cnt++;
-
-		if (cnt == 1000000) {
-			std::cout << "progress\n";
-			cnt = 0;
-		}
 
 		if (cpu.PC() == 0x3463) {
 			passed = true;
@@ -87,19 +86,31 @@ int _main() {
 	}
 
 	std::cout << std::endl;
-	for (size_t i = cpu.pcHist.size() - 5; i < cpu.pcHist.size(); i++) {
-		std::cout << cpu.pcHist[i] << '\n';
-	}
-	if (passed) {
-		std::cout << "Passed!";
-	} else {
-		std::cout << "Failed!";
+	for (size_t i = cpu.instrHist.size() - 50; i < cpu.instrHist.size(); i++) {
+		auto v = std::get<2>(cpu.instrHist[i]);
+		std::cout << std::hex << std::setw(2) << std::setfill('0') << std::get<0>(cpu.instrHist[i]) << ' '
+							<< std::get<1>(cpu.instrHist[i]) << ' ';
+		for (const auto &data : v) {
+			std::cout << ' ' << std::hex << std::setw(2) << std::setfill('0') << (int) data;
+		}
+		std::cout << '\n';
 	}
 
+	std::cout.copyfmt(oldState);
+
+	if (passed) {
+		std::cout << "Passed!\n";
+	} else {
+		std::cout << "Failed!\n";
+	}
+
+	auto microseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+	std::cout << microseconds.count() << "ms\n";
 	return 0;
 }
 
-int main(int argc, char *args[]) {
+int _main(int argc, char *args[]) {
+
 	auto fs = cmrc::resources::get_filesystem();
 	std::ios_base::sync_with_stdio(false);
 	sdl2::TTFContext ttfContext{};
@@ -137,29 +148,31 @@ int main(int argc, char *args[]) {
 	MMU mmu(rom);
 	CPU cpu(clk, mmu);
 
-
 	auto t = std::thread([&cpu]() {
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // Wait until CPU is initialized.
 		while (true) {
 			cpu.setNMI(true);
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(9));
+			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		}
 	});
 
 	unsigned buff{};
 	try {
 		while (true) {
-			textRenderer.drawAndUpdate("asdasd");
+//			textRenderer.drawAndUpdate("asdasd");
 			cpu.execute();
-			char chars[] = {'!','"','#','$','%','&','\'','(',')','*','+',',','-','.','/','0','1','2','3','4','5','6','7','8','9',':',';','<','=','>','?','@','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
+			char chars[] =
+					{'!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5',
+					 '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+					 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 			++buff;
-			if (buff == 1000000) {
+			if (buff == 10000) {
 				buff = 0;
 				for (size_t i = 0; i < 25; i++) {
-					for (size_t j = 0; j< 40; j++) {
+					for (size_t j = 0; j < 40; j++) {
 						unsigned char c = mmu.read(0x400 + i * 25 + j);
-						
+
 						std::cout << (char) chars[(int) c - 0x21] << ' ';
 //						std::cout << std::hex << std::uppercase << (int) c << ' ';
 					}
@@ -168,7 +181,8 @@ int main(int argc, char *args[]) {
 
 				std::cout << '\n';
 				std::cout << '\n';
-			 }
+			}
+//			SDL_Delay(3000);
 		}
 	} catch (const std::string &error) {
 		std::cout << error << '\n';

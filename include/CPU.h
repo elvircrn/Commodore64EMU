@@ -39,6 +39,7 @@ enum AddressingModes {
 };
 
 // TODO: Check if every instructions increases the PC by at least 1.
+template<bool ClockEnabled>
 class CPU {
 	static constexpr bool ignoreUnknownInstr = true;
 	Clock &clock;
@@ -79,6 +80,34 @@ class CPU {
 	inline u16 _ASL(u16 &x) {
 		C(x & 0x8000);
 		return (x << 1);
+	}
+
+
+
+/**
+ * Get @nib-th nibble of @val.
+ * @param val Value that contains the nibble
+ * @param nibIdx Nibble index
+ * @return
+ */
+	inline u8 getNibble(u16 val, u8 nibIdx) {
+		return (val >> (4u * nibIdx)) & 0xfu;
+	}
+
+	inline u16 toBinary(u16 in) {
+		return (((in / 1000u) % 10) << 16u) + (((in / 100u) % 10) << 8u) +  (((in / 10u) % 10) << 4u) + (in % 10u);
+	}
+
+	inline u8 toBCD(u8 in) {
+		u8 pow = 1, res{};
+		for (size_t i = 0; i < 2; pow *= 10, i++) {
+			u8 nib = getNibble(in, i);
+			if (nib > 9) {
+				nib += 6;
+			}
+			res += nib * pow;
+		}
+		return res;
 	}
 
 	// Addressing helpers
@@ -172,7 +201,7 @@ public:
 	std::vector<u8> opHist;
 	std::vector<u8> bitStack;
 	std::vector<std::pair<std::string, u16>> vectors;
-	std::vector<std::tuple<u16, std::string, std::array<u8, 3>>> instrHist;
+	std::vector<std::tuple<u16, std::string, std::array<u8, 4>>> instrHist;
 	inline bool IsOfficial() { return isOfficial[Read(pc)]; }
 	void debugDump();
 #pragma endregion
@@ -221,9 +250,9 @@ public:
 	inline void SetFlag(Flags, bool);
 	inline bool GetFlag(Flags) const;
 
-	inline void UpdC(u8, u8, s16);
-	inline void UpdV(u8, u8, s16);
-	inline void UpdCV(u8, u8, s16);
+	inline void UpdC(u8, u8, u16);
+	inline void UpdV(u8, u8, u16);
+	inline void UpdCV(u8, u8, u16);
 
 	inline void UpdN(u8);
 	inline void UpdZ(u8);
@@ -456,24 +485,24 @@ public:
 
 // Flags
 inline void CPU::SetFlag(Flags f, bool bit) {
-	p ^= (-(static_cast<int>(bit)) ^ p) & (1 << f);
+	p ^= (-(static_cast<int>(bit)) ^ p) & (1u << f);
 }
 
 inline bool CPU::GetFlag(Flags f) const {
 	return (p & (1 << f)) > 0;
 }
 
-inline void CPU::UpdV(u8 x, u8 y, s16 r) {
-	V(static_cast<bool>(~(x ^ y) & (r ^ x) & 0x80));
+inline void CPU::UpdV(u8 x, u8 y, u16 r) {
+	V(static_cast<bool>(~(x ^ y) & (r ^ x) & 0x80u));
 }
 
-inline void CPU::UpdC(u8 x, u8 y, s16 r) {
+inline void CPU::UpdC(u8 x, u8 y, u16 r) {
 	C(0xff < r);
 }
 
-inline void CPU::UpdCV(u8 x, u8 y, s16 r) {
-	UpdV(x, y, r);
-	UpdC(x, y, r);
+inline void CPU::UpdCV(u8 pX, u8 pY, u16 r) {
+	UpdV(pX, pY, r);
+	UpdC(pX, pY, r);
 }
 
 inline void CPU::UpdN(u8 x) {

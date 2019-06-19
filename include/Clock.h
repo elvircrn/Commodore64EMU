@@ -7,14 +7,14 @@
 #include <unordered_map>
 #include <thread>
 
+template<bool enabled = false>
 class Clock {
-	std::atomic<int> stamp;
+	std::atomic<int> stamp{};
 	std::chrono::nanoseconds t = std::chrono::nanoseconds::zero();
 	std::unordered_map<std::thread::id, std::atomic<int>> stamps;
-	bool enabled = false;
 public:
-	Clock();
-	Clock(std::chrono::nanoseconds _t);
+	Clock() = default;
+	explicit Clock(std::chrono::nanoseconds _t);
 
 	void startTicking();
 

@@ -88,12 +88,11 @@ void CPU::execute() {
 		pcHist.push_back(pc - 1);
 		bitStack.clear();
 		instrHist.emplace_back(pc,
-													 Instructions::Name(Read(pc)),
-													 std::array<u8, 3>({Read(pc + 1), Read(pc + 2), Read(pc + 3)}));
+													 Instructions::Name(Read(pc - 1)),
+													 std::array<u8, 4>({Read(pc - 1), Read(pc), Read(pc + 1), Read(pc + 2)}));
 		for (int i = 0; i < 5; i++)
 			bitStack.push_back(Read(pc - 1 + i));
 //		std::cout << Instructions::Name(op) << '\n'; // TODO: Remove
-		std::cout << std::uppercase << std::hex << PC() << '\n'; // TODO: Remove
 	}
 
 	switch (op) {
@@ -404,7 +403,8 @@ void CPU::execute() {
 	case 0xEA: NOP<AddressingModes::IMPLIED>();
 		break;
 
-	default: std::stringstream ss;
+	default:
+		std::stringstream ss;
 		if constexpr (DEBUG && !ignoreUnknownInstr) {
 			for (int i = pcHist.back(); i < pcHist.back() + 10; i++)
 				ss << std::hex << (int) Read(i) << ' ';
@@ -452,8 +452,6 @@ u16 CPU::getOperand16() {
 		// TODO: Check if -2 is needed
 	else if (mode == AddressingModes::INDIRECT)
 		return Ind(Abs());
-	else
-		throw "Invalid instruction";
 }
 
 template<AddressingModes mode>
@@ -465,7 +463,7 @@ bool CPU::writeOperandVal(const u8 &val) {
 	}
 	// ADC #2 -> A + 2
 	else if (mode == AddressingModes::IMMEDIATE) {
-		throw "Attempting to assign to immediate value";
+//		throw "Attempting to assign to immediate value";
 	}
 	// ADC $3420,X -> A + contents of memory $3420 + X
 	else if (mode == AddressingModes::ABSOLUTE_INDEXED_X) {
@@ -499,9 +497,6 @@ bool CPU::writeOperandVal(const u8 &val) {
 		// ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
 		//case AddressingModes::INDIRECT_INDEXED:
 		//return Zp(Imm()) + y;
-	else {
-		throw "Wrong addressing mode implemented! " + std::to_string(mode);
-	}
 	return false;
 }
 
@@ -513,39 +508,38 @@ u8 CPU::getOperand8() {
 		return Read(abs);
 	}
 		// ADC #2 -> A + 2
-	else if (mode == AddressingModes::IMMEDIATE) {
+	else if constexpr (mode == AddressingModes::IMMEDIATE) {
 		buff8 = Imm();
 		return buff8;
 	}
 		// ADC $3420,X -> A + contents of memory $3420 + X
-	else if (mode == AddressingModes::ABSOLUTE_INDEXED_X)
+	else if  constexpr (mode == AddressingModes::ABSOLUTE_INDEXED_X)
 		return Read(AbsX());
 		// ADC $3420,Y	-> A + contents of memory $3420 + Y
-	else if (mode == AddressingModes::ABSOLUTE_INDEXED_Y)
+	else if  constexpr (mode == AddressingModes::ABSOLUTE_INDEXED_Y)
 		return Read(AbsY());
 		// ADC $F6 -> A + contents of memory $F6
-	else if (mode == AddressingModes::ZERO_PAGE)
+	else if  constexpr (mode == AddressingModes::ZERO_PAGE)
 		return Read(Imm() & 0xFF);
-	else if (mode == AddressingModes::ZERO_PAGE_X)
+	else if constexpr  (mode == AddressingModes::ZERO_PAGE_X)
 		return Read((Imm() + x) & 0xFF);
-	else if (mode == AddressingModes::ZERO_PAGE_Y)
+	else if  constexpr (mode == AddressingModes::ZERO_PAGE_Y)
 		return Read((Imm() + y) & 0xFF);
 		// https://www.csh.rit.edu/~moffitt/6502.html#ADDR-IIND
-	else if (mode == AddressingModes::INDEXED_INDIRECT_X) {
+	else if constexpr  (mode == AddressingModes::INDEXED_INDIRECT_X) {
 		u8 addr8 = Imm() + x;
 		u16 zp16 = Zp16(addr8);
 		return Read(zp16);
-	} else if (mode == AddressingModes::INDIRECT_INDEXED) {
+	} else if constexpr  (mode == AddressingModes::INDIRECT_INDEXED) {
 		u16 zp16 = Zp16(Imm());
 		CrossesPage(zp16, y);
 		return Read(zp16 + y);
-	} else if (mode == AddressingModes::ACCUMULATOR)
+	} else if constexpr  (mode == AddressingModes::ACCUMULATOR) {
 		return a;
+	}
 		// ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
 		//case AddressingModes::INDIRECT_INDEXED:
 		//return Zp(Imm()) + y;
-	else
-		throw "Wrong addressing mode implemented! " + std::to_string(mode);
 }
 #pragma endregion
 
@@ -557,10 +551,19 @@ void CPU::ADC() {
 
 	u8 lhs = a;
 	u8 rhs = getOperand8<mode>();
-	s16 res = lhs + rhs + C();
-	a = static_cast<u8>(res & 0xff);
+	if (D()) {
+		lhs = toBCD(lhs);
+		rhs = toBCD(rhs);
+	}
+	u16 res = lhs + rhs + C();
+
+	if (D()) {
+		res = toBinary(res);
+	}
 	UpdCV(lhs, rhs, res);
-	UpdNZ((u8) (res & 0xff));
+
+	a = res & 0xffu;
+	UpdNZ(a);
 }
 
 //....	and (with accumulator)
@@ -616,8 +619,8 @@ void CPU::BIT() {
 	u8 op = (u8) getPureOperand<mode>();
 	u8 res = a & op;
 	Z(!res);
-	N(op & (1 << 7));
-	V(op & (1 << 6));
+	N(op & (1u << 7u));
+	V(op & (1u << 6u));
 }
 
 template<AddressingModes mode>
@@ -818,7 +821,7 @@ void CPU::PHA() {
 template<AddressingModes mode>
 void CPU::PHP() {
 	tick();
-	Push8(p | (1 << 4));
+	Push8(p | (1u << 4u));
 }
 
 template<AddressingModes mode>
@@ -893,10 +896,30 @@ void CPU::SBC() {
 	tick(CalcBaseTicks<mode>());
 	calcCrossed = true;
 	u8 lhs = a;
-	u8 rhs = getOperand8<mode>() ^ 0xff;
-	s16 res = lhs + rhs + C();
-	UpdCV(a, rhs, res);
-	a = static_cast<u8>(res);
+	u8 rhs = getOperand8<mode>();
+
+	u16 res{};
+	if (D()) {
+		lhs = toBCD(lhs);
+		rhs = toBCD(rhs);
+		u16 sres = lhs - rhs - !C();
+		if (sres > 0x1ff) {
+			sres = 99 - (0xffff - sres) + 100;
+		}
+		res = sres;
+		res = toBinary(res);
+	} else {
+		rhs ^= 0xffu;
+		res = lhs + rhs + C();
+	}
+
+	if (D()) {
+		C(res < 0x100u);
+	} else {
+		UpdC(a, rhs, res);
+	}
+	UpdV(a, rhs, res);
+	a = res & 0xffu;
 	UpdNZ(a);
 }
 

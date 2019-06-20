@@ -46,7 +46,7 @@ public:
 	}
 };
 
-int main() {
+int _main() {
 	std::ios oldState(nullptr);
 	oldState.copyfmt(std::cout);
 	std::chrono::high_resolution_clock::time_point start(
@@ -109,7 +109,7 @@ int main() {
 	return 0;
 }
 
-int _main(int argc, char *args[]) {
+int main(int argc, char *args[]) {
 
 	auto fs = cmrc::resources::get_filesystem();
 	std::ios_base::sync_with_stdio(false);
@@ -157,15 +157,15 @@ int _main(int argc, char *args[]) {
 		}
 	});
 
+	const char chars[] =
+			{'!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5',
+			 '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+			 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 	unsigned buff{};
 	try {
 		while (true) {
 //			textRenderer.drawAndUpdate("asdasd");
 			cpu.execute();
-			char chars[] =
-					{'!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5',
-					 '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-					 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 			++buff;
 			if (buff == 10000) {
 				buff = 0;
@@ -173,8 +173,12 @@ int _main(int argc, char *args[]) {
 					for (size_t j = 0; j < 40; j++) {
 						unsigned char c = mmu.read(0x400 + i * 25 + j);
 
-						std::cout << (char) chars[(int) c - 0x21] << ' ';
-//						std::cout << std::hex << std::uppercase << (int) c << ' ';
+						std::cout << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) c << ' ';
+//						if (c < 0x21 || c > (107 + 0x21)) {
+//							std::cout << "_ ";
+//						} else {
+//							std::cout << (char) chars[c - 0x21] << ' ';
+//						}
 					}
 					std::cout << '\n';
 				}

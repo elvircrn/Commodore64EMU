@@ -19,16 +19,5 @@ void Clock::startTicking() {
 }
 #pragma clang diagnostic pop
 
-void Clock::waitTick(uint32_t ticks) {
-	if (enabled) {
-		if (t != std::chrono::nanoseconds::zero()) {
-			while (ticks--) {
-				while (stamps[std::this_thread::get_id()] == stamp) {
-				}
-				stamps[std::this_thread::get_id()].store(stamp);
-			}
-		}
-	}
-}
 
-Clock::Clock(std::chrono::nanoseconds t) : stamp{}, enabled(true), t(t) { }
+Clock::Clock(std::chrono::nanoseconds t) : stamp{}, t(t), enabled(true) { }

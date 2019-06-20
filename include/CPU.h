@@ -58,7 +58,6 @@ class CPU {
 	MMU &mmu;
 
 	// Instructions
-	std::vector<bool> isOfficial;
 	bool zeroPageCrossed;
 	bool calcCrossed;
 
@@ -201,7 +200,6 @@ public:
 	std::vector<u8> bitStack;
 	std::vector<std::pair<std::string, u16>> vectors;
 	std::vector<std::tuple<u16, std::string, std::array<u8, 4>>> instrHist;
-	inline bool IsOfficial() { return isOfficial[Read(pc)]; }
 	void debugDump();
 #pragma endregion
 

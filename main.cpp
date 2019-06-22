@@ -46,71 +46,7 @@ public:
 	}
 };
 
-int _main() {
-	std::ios oldState(nullptr);
-	oldState.copyfmt(std::cout);
-	std::chrono::high_resolution_clock::time_point start(
-			std::chrono::high_resolution_clock::now() );
-
-	std::vector<u8> vicIO(0xffff);
-	Clock clk{}; //	Clock clk(std::chrono::milliseconds(1));
-	ROM rom{};
-	auto fs = cmrc::resources::get_filesystem();
-	MMU mmu{rom};
-
-	MMULoader mmuLoader{fs, mmu};
-	mmuLoader.dumpToRAM("res/6502_functional_test.bin", 0x400);
-
-	CPU cpu(clk, mmu, 0x400);
-
-	cpu.write(1, 0);
-
-	bool passed{};
-
-	u16 pcPrev{};
-
-	while (true) {
-		cpu.execute();
-
-		if (cpu.PC() == 0x3463) {
-			passed = true;
-			std::cout << std::hex << cpu.PC() << '\n';
-			break;
-		} else if (cpu.PC() == pcPrev) {
-			std::cout << "loop\n";
-			std::cout << std::hex << pcPrev << '\n';
-			break;
-		}
-
-		pcPrev = cpu.PC();
-	}
-
-	std::cout << std::endl;
-	for (size_t i = cpu.instrHist.size() - 50; i < cpu.instrHist.size(); i++) {
-		auto v = std::get<2>(cpu.instrHist[i]);
-		std::cout << std::hex << std::setw(2) << std::setfill('0') << std::get<0>(cpu.instrHist[i]) << ' '
-							<< std::get<1>(cpu.instrHist[i]) << ' ';
-		for (const auto &data : v) {
-			std::cout << ' ' << std::hex << std::setw(2) << std::setfill('0') << (int) data;
-		}
-		std::cout << '\n';
-	}
-
-	std::cout.copyfmt(oldState);
-
-	if (passed) {
-		std::cout << "Passed!\n";
-	} else {
-		std::cout << "Failed!\n";
-	}
-
-	auto microseconds = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-	std::cout << microseconds.count() << "ms\n";
-	return 0;
-}
-
 int main(int argc, char *args[]) {
-
 	auto fs = cmrc::resources::get_filesystem();
 	std::ios_base::sync_with_stdio(false);
 	sdl2::TTFContext ttfContext{};
@@ -157,10 +93,14 @@ int main(int argc, char *args[]) {
 		}
 	});
 
+//	const char chars[] =
+//			{'!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5',
+//			 '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+//			 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 	const char chars[] =
-			{'!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5',
-			 '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-			 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
+			 {'@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+		 '[', ' ', ']' , ' ', ' ', ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5',
+			 '6', '7', '8', '9', ':', ';', '<', '=', '>', '?'};
 	unsigned buff{};
 	try {
 		while (true) {
@@ -171,14 +111,14 @@ int main(int argc, char *args[]) {
 				buff = 0;
 				for (size_t i = 0; i < 25; i++) {
 					for (size_t j = 0; j < 40; j++) {
-						unsigned char c = mmu.read(0x400 + i * 25 + j);
+						unsigned char c = mmu.read(0x400 + i * 25 + j + i * 15);
 
-						std::cout << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) c << ' ';
-//						if (c < 0x21 || c > (107 + 0x21)) {
-//							std::cout << "_ ";
-//						} else {
-//							std::cout << (char) chars[c - 0x21] << ' ';
-//						}
+//						std::cout << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) c << ' ';
+						if (c < 64 && chars[c] != ' ') {
+							std::cout << (char) chars[c];
+						} else {
+							std::cout << '_';
+						}
 					}
 					std::cout << '\n';
 				}

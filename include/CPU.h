@@ -80,8 +80,6 @@ class CPU {
 		return (x << 1);
 	}
 
-
-
 /**
  * Get @nib-th nibble of @val.
  * @param val Value that contains the nibble

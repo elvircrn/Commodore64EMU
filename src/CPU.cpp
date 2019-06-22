@@ -63,7 +63,6 @@ void CPU::execute() {
 	if (GetNMI()) {
 		INT<Interrupts::NMI>();
 	} else {
-
 		switch (op) {
 		case 0x69: ADC<AddressingModes::IMMEDIATE>();
 			break;
@@ -815,10 +814,10 @@ void CPU::ROL() {
 	tick(CalcShiftTicks<mode>());
 	u8 mem = getOperand8<mode>();
 	u8 t = mem;
-	mem <<= 1;
+	mem <<= 1u;
 	mem |= static_cast<u8>(C());
 	writeOperandVal<mode>(mem);
-	C(t & 0x80);
+	C(t & 0x80u);
 	UpdNZ(mem);
 }
 
@@ -828,10 +827,10 @@ void CPU::ROR() {
 	tick(CalcShiftTicks<mode>());
 	u8 mem = getOperand8<mode>();
 	u8 t = mem;
-	mem >>= 1;
-	mem |= (C() << 7);
+	mem >>= 1u;
+	mem |= (C() << 7u);
 	writeOperandVal<mode>(mem);
-	C(t & 1);
+	C(t & 1u);
 	UpdNZ(mem);
 }
 
@@ -860,6 +859,7 @@ void CPU::RTS() {
 	pc = Pop16() + 1;
 }
 
+// TODO: Speed-up
 template<AddressingModes mode>
 void CPU::SBC() {
 	tick(CalcBaseTicks<mode>());

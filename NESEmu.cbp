@@ -747,6 +747,11 @@
 			<Option target="NESEmu"/>
 			<Option target="NESTest"/>
 		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/SDL_FontCache.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
 		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/StreamUtil.h">
 			<Option target="NESEmuLib"/>
 			<Option target="NESEmu"/>
@@ -843,6 +848,11 @@
 			<Option target="NESTest"/>
 		</Unit>
 		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/ROM.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/SDL_FontCache.cpp">
 			<Option target="NESEmuLib"/>
 			<Option target="NESEmu"/>
 			<Option target="NESTest"/>

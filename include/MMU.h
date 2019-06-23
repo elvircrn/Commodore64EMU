@@ -27,9 +27,14 @@ public:
 		u8 bankMask = ram[1];
 
 
-		if (std::abs(addr - 0xDC00) < 3) {
-			std::cout << "Called";
+		if ((addr >> 8u) == 0xdcu) {
+			std::cout << "CIA1";
 		}
+
+		if ((addr >> 8u) == 0xddu) {
+			std::cout << "CIA2";
+		}
+
 
 		if (addr < 0xa000) {
 			return ram[addr];

@@ -752,7 +752,7 @@
 			<Option target="NESEmu"/>
 			<Option target="NESTest"/>
 		</Unit>
-		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/bitfield.h">
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/TimingConstants.h">
 			<Option target="NESEmuLib"/>
 			<Option target="NESEmu"/>
 			<Option target="NESTest"/>

@@ -59,7 +59,6 @@ void CPU::execute() {
 			bitStack.push_back(Read(pc - 1 + i));
 	}
 
-
 	if (GetNMI()) {
 		INT<Interrupts::NMI>();
 	} else {
@@ -369,6 +368,27 @@ void CPU::execute() {
 		case 0xEA: NOP<AddressingModes::IMPLIED>();
 			break;
 
+			// Unofficial opcodes
+//		case 0x47: LSE<AddressingModes::ZERO_PAGE>(); // NOTE: Alias, SRE
+//			break;
+//		case 0x4F: LSE<AddressingModes::ABSOLUTE>();
+//			break;
+//
+//		case 0x2F: RLA<AddressingModes::ABSOLUTE>();
+//			break;
+//		case 0x3F: RLA<AddressingModes::ABSOLUTE_INDEXED_X>();
+//			break;
+//		case 0x3B: RLA<AddressingModes::ABSOLUTE_INDEXED_Y>();
+//			break;
+//		case 0x27: RLA<AddressingModes::ZERO_PAGE>();
+//			break;
+//		case 0x37: RLA<AddressingModes::ZERO_PAGE_X>();
+//			break;
+//		case 0x23: RLA<AddressingModes::INDEXED_INDIRECT_X>();
+//			break;
+//		case 0x33: RLA<AddressingModes::INDIRECT_INDEXED>();
+//			break;
+
 		default: std::stringstream ss;
 			if constexpr (DEBUG && !ignoreUnknownInstr) {
 				for (int i = pcHist.back(); i < pcHist.back() + 10; i++)
@@ -381,7 +401,6 @@ void CPU::execute() {
 
 	tick(zeroPageCrossed & calcCrossed);
 	cycleCount += 4;
-
 }
 
 #pragma region Debug and Logging
@@ -469,35 +488,33 @@ u8 CPU::getOperand8() {
 	if constexpr (mode == AddressingModes::ABSOLUTE) {
 		u16 abs = Abs();
 		return Read(abs);
-	}
 		// ADC #2 -> A + 2
-	else if constexpr (mode == AddressingModes::IMMEDIATE) {
+	} else if constexpr (mode == AddressingModes::IMMEDIATE) {
 		buff8 = Imm();
 		return buff8;
-	}
 		// ADC $3420,X -> A + contents of memory $3420 + X
-	else if constexpr (mode == AddressingModes::ABSOLUTE_INDEXED_X)
+	} else if constexpr (mode == AddressingModes::ABSOLUTE_INDEXED_X) {
 		return Read(AbsX());
 		// ADC $3420,Y	-> A + contents of memory $3420 + Y
-	else if constexpr (mode == AddressingModes::ABSOLUTE_INDEXED_Y)
+	} else if constexpr (mode == AddressingModes::ABSOLUTE_INDEXED_Y) {
 		return Read(AbsY());
 		// ADC $F6 -> A + contents of memory $F6
-	else if constexpr (mode == AddressingModes::ZERO_PAGE)
+	} else if constexpr (mode == AddressingModes::ZERO_PAGE) {
 		return Read(Imm() & 0xFF);
-	else if constexpr  (mode == AddressingModes::ZERO_PAGE_X)
+	} else if constexpr  (mode == AddressingModes::ZERO_PAGE_X) {
 		return Read((Imm() + x) & 0xFF);
-	else if constexpr (mode == AddressingModes::ZERO_PAGE_Y)
+	} else if constexpr (mode == AddressingModes::ZERO_PAGE_Y) {
 		return Read((Imm() + y) & 0xFF);
 		// https://www.csh.rit.edu/~moffitt/6502.html#ADDR-IIND
-	else if constexpr  (mode == AddressingModes::INDEXED_INDIRECT_X) {
+	} else if constexpr  (mode == AddressingModes::INDEXED_INDIRECT_X) {
 		u8 addr8 = Imm() + x;
 		u16 zp16 = Zp16(addr8);
 		return Read(zp16);
-	} else if constexpr  (mode == AddressingModes::INDIRECT_INDEXED) {
+	} else if constexpr (mode == AddressingModes::INDIRECT_INDEXED) {
 		u16 zp16 = Zp16(Imm());
 		CrossesPage(zp16, y);
 		return Read(zp16 + y);
-	} else if constexpr  (mode == AddressingModes::ACCUMULATOR) {
+	} else if constexpr (mode == AddressingModes::ACCUMULATOR) {
 		return a;
 	}
 	// ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
@@ -765,8 +782,8 @@ void CPU::LDY() {
 template<AddressingModes mode>
 void CPU::LSR() {
 	u8 op = getOperand8<mode>();
-	C(static_cast<bool>(op & 1));
-	op >>= 1;
+	C(static_cast<bool>(op & 1u));
+	op >>= 1u;
 	writeOperandVal<mode>(op);
 	UpdNZ(op);
 }
@@ -899,7 +916,9 @@ template<AddressingModes mode>
 void CPU::SED() { D(true); }
 
 template<AddressingModes mode>
-void CPU::SEI() { I(true); }
+void CPU::SEI() {
+	I(true);
+}
 
 template<AddressingModes mode>
 void CPU::STA() {
@@ -965,7 +984,7 @@ void CPU::LAX() {
 template<Interrupts inter>
 void CPU::INT() {
 	if constexpr (DEBUG) {
-//		std::cout << "Interrupted, type: " << inter << '\n'; // TODO: Find a better way to log
+		std::cout << "Interrupted, type: " << inter << '\n'; // TODO: Find a better way to log
 	}
 	// Note that BRK, although it is a one - byte instruction, needs an extra
 	// byte of padding after it.This is because the return address it puts on
@@ -985,7 +1004,7 @@ void CPU::INT() {
 	// or recovery code.
 	if constexpr (inter != Interrupts::RST) {
 		Push16(pc);
-		Push8(p | ((Interrupts::BRK == inter) << 4));
+		Push8(p | ((Interrupts::BRK == inter) << 0x4u));
 	} else {
 		// s -= 3;
 		tick(3);
@@ -1001,8 +1020,34 @@ void CPU::INT() {
 
 	pc = Read16(vect[inter]);
 
-	if (inter == NMI)
+	if constexpr (inter == NMI) {
 		nmi = false;
+	}
+}
 
+template<AddressingModes mode>
+void CPU::LSE() {
+	u8 op = getOperand8<mode>();
+	C(static_cast<bool>(op & 0x1u));
+	op >>= 0x1u;
+	a ^= op;
+	UpdNZ(a);
+}
+
+template<AddressingModes mode>
+void CPU::RLA() {
+	tick(CalcBaseTicks<mode>());
+	tick(CalcShiftTicks<mode>());
+	u8 mem = getOperand8<mode>();
+	u8 t = mem;
+	mem <<= 1u;
+	mem |= static_cast<u8>(C());
+	a &= mem;
+	C(t & 0x80u);
+	UpdNZ(mem);
+}
+
+void CPU::interruptRequest() {
+	INT<Interrupts::IRQ>();
 }
 

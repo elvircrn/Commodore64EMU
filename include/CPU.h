@@ -1,5 +1,6 @@
 
-#pragma once
+#ifndef NESEMU_CPU_H
+#define NESEMU_CPU_H
 
 #include <cstdint>
 #include <vector>
@@ -329,6 +330,8 @@ public:
 	void execute();
 
 #pragma region Instructions
+	void interruptRequest();
+
 	template<AddressingModes mode>
 	void ADC();  //....	add with carry
 	template<AddressingModes mode>
@@ -457,6 +460,10 @@ public:
 	void ARR();
 	template<AddressingModes mode>
 	void AXS();
+	template<AddressingModes mode>
+	void LSE();
+	template<AddressingModes mode>
+	void RLA();
 #pragma endregion
 
 #pragma region Operand calculator
@@ -513,3 +520,4 @@ inline void CPU::UpdNZ(u8 x) {
 	UpdZ(x);
 }
 
+#endif

@@ -14,7 +14,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O3")
+set(CMAKE_CXX_FLAGS_DEBUG "-g ")
 
 
 file(GLOB source_files
@@ -22,12 +22,12 @@ file(GLOB source_files
         "src/*.cpp")
 
 #set library
-add_library(NESEmuLib STATIC ${source_files})
+add_library(NESEmuLib STATIC ${source_files} include/TimingConstants.h)
 
 
 include_directories(include)
 
-add_executable(NESEmu ${source_files} main.cpp "rom/basic.rom" "rom/kernal.rom" "rom/chargen.rom" "res/font.ttf" src/vic.cpp)
+add_executable(NESEmu ${source_files} main.cpp "rom/basic.rom" "rom/kernal.rom" "rom/chargen.rom" "res/font.ttf" src/vic.cpp include/TimingConstants.h)
 
 cmrc_add_resource_library(resources res/6502_functional_test.bin rom/kernal.rom rom/basic.rom rom/chargen.rom "res/font.ttf" ALIAS resources::rc)
 target_link_libraries(NESEmu PRIVATE resources::rc ${CONAN_LIBS})

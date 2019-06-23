@@ -6,6 +6,7 @@
 #include "core.h"
 #include "ROM.h"
 
+#include <iostream>
 class MMU {
 	constexpr static int RAM_SIZE = 65536;
 
@@ -24,6 +25,11 @@ public:
 
 	inline u8 read(const u16 &addr) const {
 		u8 bankMask = ram[1];
+
+
+		if (std::abs(addr - 0xDC00) < 3) {
+			std::cout << "Called";
+		}
 
 		if (addr < 0xa000) {
 			return ram[addr];

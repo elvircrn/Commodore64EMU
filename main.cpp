@@ -12,15 +12,16 @@
 #include <SDL_ttf.h>
 #include "cmrc/cmrc.hpp"
 #include "boost/filesystem.hpp"
-#include "bitfield.h"
+
+#include "sdl2.h"
 
 #include "MMULoader.h"
+#include "TimingConstants.h"
 #include "CPU.h"
 #include "StreamUtil.h"
 #include "GUI.h"
 #include "MMU.h"
 #include "Clock.h"
-#include "sdl2.h"
 
 CMRC_DECLARE(resources);
 
@@ -79,17 +80,23 @@ int main(int argc, char *args[]) {
 
 	SDL_Event event;
 
-	Clock clk{}; //	Clock clk(std::chrono::milliseconds(1));
+	Clock clk{};
+//	Clock clk(std::chrono::microseconds(1));
 	ROM rom(kernal, basic, chargen, vicIO);
 	MMU mmu(rom);
 	CPU cpu(clk, mmu);
 
+
+//	auto clockThread = std::thread([&clk]() {
+//		clk.startTicking();
+//	});
+//
 	auto t = std::thread([&cpu]() {
 		std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // Wait until CPU is initialized.
 		while (true) {
-			cpu.setNMI(true);
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(50));
+//			cpu.setNMI(true);
+//
+//			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		}
 	});
 
@@ -98,21 +105,41 @@ int main(int argc, char *args[]) {
 //			 '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
 //			 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'};
 	const char chars[] =
-			 {'@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-		 '[', ' ', ']' , ' ', ' ', ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5',
+			{'@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+			 'V', 'W', 'X', 'Y', 'Z',
+			 '[', ' ', ']', ' ', ' ', ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0',
+			 '1', '2', '3', '4', '5',
 			 '6', '7', '8', '9', ':', ';', '<', '=', '>', '?'};
-	unsigned buff{};
+
+	std::chrono::high_resolution_clock::time_point start(
+			std::chrono::high_resolution_clock::now());
+	u64 buff{};
+	bool initial = true;
 	try {
 		while (true) {
-//			textRenderer.drawAndUpdate("asdasd");
-			cpu.execute();
-			++buff;
-			if (buff == 10000) {
-				buff = 0;
+			buff++;
+			auto milliseconds =
+					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+
+			if (initial && milliseconds >= std::chrono::seconds(1)) {
+				initial = false;
+			}
+
+			if (!initial &&
+			milliseconds >= std::chrono::milliseconds(200)) {
+				cpu.setNMI(true);
+				start = std::chrono::high_resolution_clock::now();
+			}
+
+
+			if (buff % TimingConstants::PAL_CPU_RATIO == 0) {
+				cpu.execute();
+			}
+
+			if (buff % TimingConstants::CONSOLE_RATIO == 0) {
 				for (size_t i = 0; i < 25; i++) {
 					for (size_t j = 0; j < 40; j++) {
 						unsigned char c = mmu.read(0x400 + i * 25 + j + i * 15);
-
 //						std::cout << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) c << ' ';
 						if (c < 64 && chars[c] != ' ') {
 							std::cout << (char) chars[c];
@@ -126,13 +153,20 @@ int main(int argc, char *args[]) {
 				std::cout << '\n';
 				std::cout << '\n';
 			}
+
+			if (buff % TimingConstants::PAL_KEYBOARD_CYCLES == 0) {
+				cpu.interruptRequest();
+				cpu.setNMI(false);
+				cpu.execute();
+			}
 //			SDL_Delay(3000);
+//			std::this_thread::sleep_for(std::chrono::nanoseconds(TimingConstants::PAL_MASTER_NANOS));
 		}
 	} catch (const std::string &error) {
 		std::cout << error << '\n';
 	}
 
-	t.join();
+//	t.join();
 	SDL_Quit();
 
 	return 0;

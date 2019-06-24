@@ -702,6 +702,16 @@
 		<Unit filename="/Users/elvir/CLionProjects/NESEmu/__cmrc_resources/lib.cpp.rule">
 			<Option target="resources"/>
 		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/CIA1.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/CIA2.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
 		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/CPU.h">
 			<Option target="NESEmuLib"/>
 			<Option target="NESEmu"/>
@@ -811,6 +821,11 @@
 		</Unit>
 		<Unit filename="/Users/elvir/CLionProjects/NESEmu/rom/kernal.rom">
 			<Option target="NESEmu"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/CIA1.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
 		</Unit>
 		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/CPU.cpp">
 			<Option target="NESEmuLib"/>

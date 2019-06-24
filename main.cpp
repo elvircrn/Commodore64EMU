@@ -8,6 +8,7 @@
 #include <chrono>
 #include <iomanip>
 
+#include <SDL_FontCache.h>
 #include <SDL2/SDL.h>
 #include <SDL_ttf.h>
 #include "cmrc/cmrc.hpp"
@@ -15,6 +16,8 @@
 
 #include "sdl2.h"
 
+#include "CIA1.h"
+#include "CIA2.h"
 #include "MMULoader.h"
 #include "TimingConstants.h"
 #include "CPU.h"
@@ -55,9 +58,6 @@ public:
 //		SDL_RenderPresent(renderer);
 	}
 };
-
-#include <chrono>
-#include <SDL_FontCache.h>
 
 using namespace std::chrono_literals;
 
@@ -122,9 +122,11 @@ int main(int argc, char *args[]) {
 	std::vector<u8> vicIO(0xffff);
 
 	Clock clk{};
+	CIA1 cia1{};
+	CIA2 cia2{};
 //	Clock clk(std::chrono::microseconds(1));
 	ROM rom(kernal, basic, chargen, vicIO);
-	MMU mmu(rom);
+	MMU mmu(rom, cia1, cia2);
 	CPU cpu(clk, mmu);
 
 	const char chars[] =
@@ -148,6 +150,8 @@ int main(int argc, char *args[]) {
 	FC_LoadFont(font, renderer.get(), "res/font.ttf", 20, FC_MakeColor(0, 0, 0, 255), TTF_STYLE_NORMAL);
 	std::chrono::high_resolution_clock::time_point start(
 			std::chrono::high_resolution_clock::now());
+	std::chrono::high_resolution_clock::time_point startInt(
+			std::chrono::high_resolution_clock::now());
 	u64 buff{};
 	bool initial = true;
 	while (!quit_game) {
@@ -156,11 +160,19 @@ int main(int argc, char *args[]) {
 		if (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT) {
 				break;
+			} else if (event.type == SDL_KEYDOWN) {
+				if (event.key.keysym.sym == SDLK_i) {
+					std::cout << "I pressed\n";
+					cpu.interruptRequest();
+				}
 			}
 		}
 
 		for (size_t amp = 0; amp < 10000; amp++) {
 			buff++;
+			auto millisecondsInt =
+					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - startInt);
+
 			auto milliseconds =
 					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 
@@ -168,29 +180,33 @@ int main(int argc, char *args[]) {
 				initial = false;
 			}
 
-			if (!initial && milliseconds >= std::chrono::milliseconds(200)) {
-				cpu.setNMI(true);
+			if (!initial && millisecondsInt >= std::chrono::milliseconds(350)) {
+//				cpu.interruptRequest();
+				startInt = std::chrono::high_resolution_clock::now();
+			}
+
+			if (!initial && milliseconds >= std::chrono::milliseconds(400)) {
+				cpu.INT<Interrupts::NMI>();
+
 				start = std::chrono::high_resolution_clock::now();
 			}
 
 			cpu.execute();
-
-			if (buff % TimingConstants::CONSOLE_RATIO == 0) {
-				for (size_t i = 0; i < 25; i++) {
-					std::string lineBuff(40, ' ');
-					for (size_t j = 0; j < 40; j++) {
-						unsigned char c = mmu.read(0x400 + i * 25 + j + i * 15);
-						if (c < 64 && chars[c] != ' ') {
-							lineBuff[j] = chars[c];
-						}
-					}
-					textRenderer.drawAndUpdate(lineBuff, i);
-				}
-			}
 		}
 
-		std::cout << '\n';
-		std::cout << '\n';
+		if (buff % TimingConstants::CONSOLE_RATIO == 0) {
+			for (size_t i = 0; i < 25; i++) {
+				std::string lineBuff(40, ' ');
+				for (size_t j = 0; j < 40; j++) {
+					unsigned char c = mmu.read(0x400 + i * 25 + j + i * 15);
+					if (c < 64 && chars[c] != ' ') {
+						lineBuff[j] = chars[c];
+					}
+				}
+				textRenderer.drawAndUpdate(lineBuff, i);
+			}
+
+		}
 
 		auto delta_time = clock::now() - time_start;
 		time_start = clock::now();
@@ -225,124 +241,3 @@ int main(int argc, char *args[]) {
 
 	return 0;
 }
-/*
-int _main(int argc, char *args[]) {
-	auto fs = cmrc::resources::get_filesystem();
-	std::ios_base::sync_with_stdio(false);
-	sdl2::TTFContext ttfContext{};
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
-	}
-
-	constexpr u16 WINDOW_WIDTH = 320, WINDOW_HEIGHT = 200;
-	auto window = sdl2::make_window("c64 Emulator", 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
-	auto renderer = sdl2::make_renderer(window.get(), -1, 0);
-	auto texture =
-			sdl2::make_bmp(renderer.get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-	std::string basicFileName = "rom/basic.rom";
-	std::string kernalFileName = "rom/kernal.rom";
-	std::string chargenFileName = "rom/chargen.rom";
-
-	auto basicStream = fs.open(basicFileName);
-	auto kernalStream = fs.open(kernalFileName);
-	auto chargenStream = fs.open(chargenFileName);
-
-	auto sans = sdl2::make_ttffont("res/font.ttf", 12);
-
-	TextRenderer textRenderer{std::move(renderer), std::move(sans)};
-
-	std::vector<u8> kernal{kernalStream.begin(), kernalStream.end()};
-	std::vector<u8> basic{basicStream.begin(), basicStream.end()};
-	std::vector<u8> chargen{chargenStream.begin(), chargenStream.end()};
-	std::vector<u8> vicIO(0xffff);
-
-	SDL_Event event;
-
-	Clock clk{};
-//	Clock clk(std::chrono::microseconds(1));
-	ROM rom(kernal, basic, chargen, vicIO);
-	MMU mmu(rom);
-	CPU cpu(clk, mmu);
-
-
-//	auto clockThread = std::thread([&clk]() {
-//		clk.startTicking();
-//	});
-//
-	auto t = std::thread([&cpu]() {
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // Wait until CPU is initialized.
-		while (true) {
-//			cpu.setNMI(true);
-//
-//			std::this_thread::sleep_for(std::chrono::milliseconds(50));
-		}
-	});
-
-	const char chars[] =
-			{'@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-			 'V', 'W', 'X', 'Y', 'Z',
-			 '[', ' ', ']', ' ', ' ', ' ', '!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '-', '.', '/', '0',
-			 '1', '2', '3', '4', '5',
-			 '6', '7', '8', '9', ':', ';', '<', '=', '>', '?'};
-
-	std::chrono::high_resolution_clock::time_point start(
-			std::chrono::high_resolution_clock::now());
-	u64 buff{};
-	bool initial = true;
-	try {
-		while (true) {
-			buff++;
-			auto milliseconds =
-					std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
-
-			if (initial && milliseconds >= std::chrono::seconds(1)) {
-				initial = false;
-			}
-
-			if (!initial && milliseconds >= std::chrono::milliseconds(200)) {
-				cpu.setNMI(true);
-				start = std::chrono::high_resolution_clock::now();
-			}
-
-			if (buff % TimingConstants::PAL_CPU_RATIO == 0) {
-				cpu.execute();
-			}
-
-			if (buff % TimingConstants::CONSOLE_RATIO == 0) {
-				for (size_t i = 0; i < 25; i++) {
-					for (size_t j = 0; j < 40; j++) {
-						unsigned char c = mmu.read(0x400 + i * 25 + j + i * 15);
-//						std::cout << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) c << ' ';
-						if (c < 64 && chars[c] != ' ') {
-							std::cout << (char) chars[c];
-						} else {
-							std::cout << '_';
-						}
-					}
-					std::cout << '\n';
-				}
-
-				std::cout << '\n';
-				std::cout << '\n';
-			}
-
-			if (buff % TimingConstants::PAL_KEYBOARD_CYCLES == 0) {
-				cpu.interruptRequest();
-				cpu.setNMI(false);
-				cpu.execute();
-			}
-//			SDL_Delay(3000);
-//			std::this_thread::sleep_for(std::chrono::nanoseconds(TimingConstants::PAL_MASTER_NANOS));
-		}
-	} catch (const std::string &error) {
-		std::cout << error << '\n';
-	}
-
-//	t.join();
-	SDL_Quit();
-
-	return 0;
-}
-
- */

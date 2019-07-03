@@ -3,8 +3,11 @@ const buff = fs.readFileSync('buff.txt').toString();
 
 
 const instrs = [
-    'sed',
-    'ldx'
+    'dey',
+    '*',
+    'dey',
+    'dey',
+    'dey'
 ];
 const instrs1 = [
     'sta',

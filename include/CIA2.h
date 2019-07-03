@@ -16,15 +16,15 @@ class CIA2 {
 	 * @return Value from internal memory @mem
 	 */
 	inline u8 &get(u16 addr) {
-		return mem[addr - 0xDCFF];
+		return mem[addr - 0xDD00];
 	}
 
 	bool isTimerAEnabled() {
-		return get(0xDC0D) & 1u;
+		return get(0xDD0D) & 1u;
 	}
 
 	bool isTimerBEnabled() {
-		return ((u8) (get(0xDC0Du) >> 0x1u) & 0x1u) != 0;
+		return ((u8) (get(0xDD0Du) >> 0x1u) & 0x1u) != 0;
 	}
 public:
 
@@ -33,17 +33,18 @@ public:
 		std::cout << "CIA2 write " << std::hex << std::setw(2) << std::setfill('0') << "CIA2 addr: " << (u32) addr
 							<< " val: " << (u32) val << ' ' << std::bitset<8>{val} << '\n';
 		get(addr) = val;
-		if (addr == 0xDC0D) {
+		if (addr == 0xDD0D) {
 
 		}
 	}
 
 	inline u8 read(u16 addr) {
-		std::cout << "CIA1 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << '\n';
+		std::cout << "CIA2 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << '\n';
 		// Timer control
-		if (addr == 0xDC0E) {
-
+		if (addr == 0xDD0D) {
+			return 1u << 7u;
 		}
+		return get(addr);
 	}
 
 	void tick() {

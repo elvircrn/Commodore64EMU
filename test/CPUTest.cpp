@@ -22,9 +22,11 @@ TEST_CASE("CPU Test") {
 
 	std::vector<u8> vicIO(0xffff);
 	Clock clk{};
+	CIA1 cia1{};
+	CIA2 cia2{};
 	ROM rom{};
 	auto fs = cmrc::test_resources::get_filesystem();
-	MMU mmu{rom};
+	MMU mmu{rom, cia1, cia2};
 
 	MMULoader mmuLoader{fs, mmu};
 	mmuLoader.dumpToRAM("res/6502_functional_test.bin", 0x400);
@@ -32,6 +34,9 @@ TEST_CASE("CPU Test") {
 	CPU cpu(clk, mmu, 0x400);
 
 	cpu.write(1, 0);
+
+
+	cpu.setDebug(false);
 
 	bool passed{};
 	u16 pcPrev{};
@@ -66,5 +71,6 @@ TEST_CASE("CPU Test") {
 	auto microseconds =
 			std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 	std::cout << "Duration: " << microseconds.count() << "ms\n";
+
 	REQUIRE(passed);
 }

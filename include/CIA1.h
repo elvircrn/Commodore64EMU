@@ -11,7 +11,7 @@ class CIA1 {
 	static const u16 ADDRESS_COUNTER_A = 0xDC04;
 	static const u16 TIMER_CONTROL_REGISTER_A = 0xDC0E;
 
-	std::array<u8, 0xffu> mem;
+	std::array<u8, 0xffu> mem{};
 
 	/**
 	 * Map external addresses into internal buffer
@@ -19,7 +19,7 @@ class CIA1 {
 	 * @return Value from internal memory @mem
 	 */
 	inline u8 &get(u16 addr) {
-		return mem[addr - 0xDCFF];
+		return mem[addr - 0xDC00];
 	}
 
 	inline u16 get16(u16 addr) {
@@ -27,6 +27,7 @@ class CIA1 {
 	}
 
 	inline void set16(u16 addr, u16 val) {
+		// TODO: Check if this the right order of operations
 		get(addr) = LO(val);
 		get(addr + 1) = HI(val);
 	}
@@ -57,25 +58,15 @@ public:
 
 	inline u8 write(u16 addr, u8 val) {
 		// Timer control
-		std::cout << "CIA1 write " << std::hex << std::setw(2) << std::setfill('0') << "CIA1 addr: " << (u32) addr
-							<< " val: " << (u32) val << ' ' << std::bitset<8>{val} << '\n';
+//		std::cout << "CIA1 write " << std::hex << std::setw(2) << std::setfill('0') << "CIA1 addr: " << (u32) addr
+//							<< " val: " << (u32) val << ' ' << std::bitset<8>{val} << '\n';
 		get(addr) = val;
-
-		if (addr == 0xDC0D) {
-
-		}
 	}
 
 	inline u8 read(u16 addr) {
-		std::cout << "CIA1 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << '\n';
-		// Timer control
-		if (addr == 0xDC00u) {
-			return 32u;
-		}
-		if (addr == 0xDC01u) {
-			return 32u;
-		}
-		return 0u;
+//		std::cout << "CIA1 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << '\n';
+		return (0xffu - 7);
+		return get(addr);
 	}
 
 	void tick() {
@@ -83,8 +74,6 @@ public:
 		// Start timer
 		if (BIT(controlA, 0)) {
 			u8 counterA = a();
-
-
 			decrementA();
 		}
 	}

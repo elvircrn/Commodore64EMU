@@ -17,6 +17,9 @@ class MMU {
 	CIA1 &cia1;
 	CIA2 &cia2;
 
+	std::function<u8(const u16&)> vicReadCallback;
+	std::function<bool(const u16&, const u8&)>  vicWriteCallback;
+
 public:
 	explicit MMU(ROM &_rom, CIA1 &cia1, CIA2 &cia2) : ram(RAM_SIZE), rom(_rom), cia1(cia1), cia2(cia2) {
 		// The default is mode 31 (no cartridge) as all latch bits are logically high (set to 1).
@@ -41,13 +44,14 @@ public:
 			if (isCharGen(bankMask)) {
 				return rom.chargen[addr - 0xd000];
 			} else if (isIO(bankMask)) {
-				if (HI(addr) == 0xdcu) {
+				if (addr < 0xd400 && vicReadCallback) {
+					return vicReadCallback(0xd000u + (addr & 0xffu));
+				} else if (HI(addr) == 0xdcu) {
 					return cia1.read(addr);
 				} else if (HI(addr) == 0xddu) {
 					return cia2.read(addr);
-				} else {
-					return rom.io[addr - 0xd000];
 				}
+				return rom.io[addr - 0xd000];
 			}
 		} else if (addr <= 0xffff) {
 			if (isKernal(bankMask)) {
@@ -61,6 +65,10 @@ public:
 
 	inline bool write(u16 addr, u8 val) {
 		u8 bankMask = ram[1];
+
+		if (addr >= 0x400 && addr - 0x400 < 512) {
+			std::cout << "Writing to screen space addr " << std::hex << std::setw(2) << std::setfill('0') << (int) addr << " prev: " << (int) ram[addr] << " " << (int) val << '\n';
+		}
 
 		if (addr < 0xa000) {
 			return ram[addr] = val;
@@ -76,13 +84,14 @@ public:
 			if (isCharGen(bankMask)) {
 				return rom.chargen[addr - 0xd000] = val;
 			} else if (isIO(bankMask)) {
-				if (HI(addr) == 0xdcu) {
+				if (addr < 0xd400 && vicWriteCallback) {
+					return vicWriteCallback(0xd000u + (addr & 0xffu), val);
+				} else if (HI(addr) == 0xdcu) {
 					return cia1.write(addr, val);
 				} else if (HI(addr) == 0xddu) {
 					return cia2.write(addr, val);
-				} else {
-					return rom.io[addr - 0xd000] = val;
 				}
+				return rom.io[addr - 0xd000] = val;
 			}
 		} else if (addr <= 0xffff) {
 			if (isKernal(bankMask)) {
@@ -112,6 +121,14 @@ public:
 
 	inline bool isKernal(const u8 &val) const {
 		return BIT(val, 1);
+	}
+
+	inline void setVICReadListener(std::function<u8(const u16&)> _vicReadCallback) {
+		this->vicReadCallback = _vicReadCallback;
+	}
+
+	inline void setVICWriteListener(std::function<bool(const u16&, const u8&)> _vicWriteCallback) {
+		this->vicWriteCallback = _vicWriteCallback;
 	}
 };
 

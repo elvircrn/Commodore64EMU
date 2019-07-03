@@ -11,6 +11,7 @@
 #include <SDL_FontCache.h>
 #include <SDL2/SDL.h>
 #include <SDL_ttf.h>
+#include <vic.h>
 #include "cmrc/cmrc.hpp"
 #include "boost/filesystem.hpp"
 
@@ -90,6 +91,7 @@ game_state interpolate(game_state const &current, game_state const &previous, fl
 	return interpolated_state;
 }
 
+
 int main(int argc, char *args[]) {
 	auto fs = cmrc::resources::get_filesystem();
 	std::ios_base::sync_with_stdio(false);
@@ -128,6 +130,15 @@ int main(int argc, char *args[]) {
 	ROM rom(kernal, basic, chargen, vicIO);
 	MMU mmu(rom, cia1, cia2);
 	CPU cpu(clk, mmu);
+	VIC vic(clk, mmu);
+
+	mmu.setVICWriteListener([&vic](const u16 &addr, const u8 &val) {
+		return vic.set(addr, val);
+	});
+
+	mmu.setVICReadListener([&vic](const u16 &addr) -> u8 {
+		return vic.get(addr);
+	});
 
 	const char chars[] =
 			{'@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
@@ -154,6 +165,9 @@ int main(int argc, char *args[]) {
 			std::chrono::high_resolution_clock::now());
 	u64 buff{};
 	bool initial = true;
+	bool iEnabled = false;
+	bool nEnabled = false;
+	bool dEnabled = false;
 	while (!quit_game) {
 		// NOTE: This must be called!
 		SDL_Event event;
@@ -162,8 +176,30 @@ int main(int argc, char *args[]) {
 				break;
 			} else if (event.type == SDL_KEYDOWN) {
 				if (event.key.keysym.sym == SDLK_i) {
-					std::cout << "I pressed\n";
-					cpu.interruptRequest();
+					iEnabled ^= true;
+//					cpu.setDebug(iEnabled);
+					if (iEnabled) {
+						std::cout << "IRQ enabled\n";
+					} else {
+						std::cout << "IRQ disabled\n";
+					}
+				}
+				if (event.key.keysym.sym == SDLK_n) {
+					nEnabled ^= true;
+//					cpu.setDebug(nEnabled);
+					if (nEnabled) {
+						std::cout << "NMI enabled\n";
+					} else {
+						std::cout << "NMI disabled\n";
+					}
+				}
+				if (event.key.keysym.sym == SDLK_d) {
+					cpu.setDebug(dEnabled ^= true);
+					if (dEnabled) {
+						std::cout << "Debug enabled\n";
+					} else {
+						std::cout << "Debug disabled\n";
+					}
 				}
 			}
 		}
@@ -180,26 +216,38 @@ int main(int argc, char *args[]) {
 				initial = false;
 			}
 
-			if (!initial && millisecondsInt >= std::chrono::milliseconds(350)) {
-//				cpu.interruptRequest();
+			if (!initial && millisecondsInt >= std::chrono::milliseconds(133)) {
+				if (iEnabled) {
+					cpu.interruptRequest();
+				}
 				startInt = std::chrono::high_resolution_clock::now();
 			}
 
 			if (!initial && milliseconds >= std::chrono::milliseconds(400)) {
-				cpu.INT<Interrupts::NMI>();
+				if (nEnabled) {
+					cpu.INT<Interrupts::NMI>();
+				}
 
 				start = std::chrono::high_resolution_clock::now();
 			}
 
+			if (amp % 100 == 0) {
+				vic.tick();
+//				cpu.interruptRequest();
+			}
 			cpu.execute();
 		}
-
+		auto cursorX = mmu.read(0x00C9), cursorY = mmu.read(0x00CA);
+		bool cursorEnabled = mmu.read(0x00CC) == 0;
 		if (buff % TimingConstants::CONSOLE_RATIO == 0) {
 			for (size_t i = 0; i < 25; i++) {
 				std::string lineBuff(40, ' ');
 				for (size_t j = 0; j < 40; j++) {
-					unsigned char c = mmu.read(0x400 + i * 25 + j + i * 15);
-					if (c < 64 && chars[c] != ' ') {
+					auto tX = i, tY = j + i * 15;
+					unsigned char c = mmu.read(0x400 + i * 25 + tY);
+					if (cursorEnabled && tX == cursorX && tY == cursorY) {
+						lineBuff[j] = 161u;
+					} else if (c < 64 && chars[c] != ' ') {
 						lineBuff[j] = chars[c];
 					}
 				}

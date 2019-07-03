@@ -1,0 +1,14 @@
+      <Expression success="false" type="REQUIRE" filename="/Users/elvir/CLionProjects/NESEmu/test/CPUTest.cpp" line="76">
+        <Original>
+          passed
+        </Original>
+        <Expanded>
+          false
+        </Expanded>
+      </Expression>
+      <OverallResult success="false" durationInSeconds="0.126369"/>
+    </TestCase>
+    <OverallResults successes="0" failures="1" expectedFailures="0"/>
+  </Group>
+  <OverallResults successes="0" failures="1" expectedFailures="0"/>
+</Catch>

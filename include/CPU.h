@@ -4,7 +4,7 @@
 
 #include <cstdint>
 #include <vector>
-#include "variant.h"
+#include <deque>
 #include <tuple>
 #include "MMU.h"
 #include "optional.h"
@@ -193,12 +193,15 @@ public:
 	inline u8 P(u8 _p) { return p = _p; }
 
 #pragma region Debug
-	static constexpr bool DEBUG = false;
-	std::vector<u16> pcHist;
-	std::vector<u8> opHist;
-	std::vector<u8> bitStack;
-	std::vector<std::pair<std::string, u16>> vectors;
-	std::vector<std::tuple<u16, std::string, std::array<u8, 4>>> instrHist;
+	static constexpr bool DEBUG = true;
+	bool debug = false;
+	bool isDebug() const;
+	void setDebug(bool debug);
+	std::deque<u16> pcHist;
+	std::deque<u8> opHist;
+	std::deque<u8> bitStack;
+	std::deque<std::pair<std::string, u16>> vectors;
+	std::deque<std::tuple<u16, std::string, std::array<u8, 4>>> instrHist;
 	void debugDump();
 #pragma endregion
 
@@ -237,8 +240,8 @@ public:
 	inline u16 Ind(u16 addr) {
 		tick(3);
 		u8 lo = Read(addr);
-		u8 hi = Read((addr & 0xff00) + LO(addr + 1));
-		return lo + (hi << 8);
+		u8 hi = Read((addr & 0xff00u) + LO(addr + 1));
+		return lo + (hi << 8u);
 	}
 #pragma endregion
 
@@ -518,6 +521,14 @@ inline void CPU::UpdZ(u8 x) {
 inline void CPU::UpdNZ(u8 x) {
 	UpdN(x);
 	UpdZ(x);
+}
+
+inline bool CPU::isDebug() const {
+	return debug;
+}
+
+inline void CPU::setDebug(bool debug) {
+	CPU::debug = debug;
 }
 
 #endif

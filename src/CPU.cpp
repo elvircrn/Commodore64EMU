@@ -48,13 +48,23 @@ void CPU::execute() {
 	tick(2);
 
 	u8 op = Read(pc++);
-	if constexpr (DEBUG) {
-		opHist.push_back(op);
-		pcHist.push_back(pc - 1);
+	if (debug && DEBUG) {
+		opHist.push_front(op);
+		if (opHist.size() == 100) {
+			opHist.pop_back();
+		}
+		if (pcHist.size() == 100) {
+			opHist.pop_back();
+		}
+		if (instrHist.size() == 100) {
+			opHist.pop_front();
+		}
+		pcHist.push_front(pc - 1);
 		bitStack.clear();
 		instrHist.emplace_back(pc,
 													 Instructions::Name(Read(pc - 1)),
 													 std::array<u8, 4>({Read(pc - 1), Read(pc), Read(pc + 1), Read(pc + 2)}));
+		std::cout << Instructions::Name(Read(pc - 1)) <<  ' ' << std::hex << ' ' << (int) Read(pc - 1) << ' ' << (int) Read(pc) << ' ' << (int) Read(pc + 1) << '\n';
 		for (int i = 0; i < 5; i++)
 			bitStack.push_back(Read(pc - 1 + i));
 	}
@@ -642,7 +652,7 @@ void CPU::BPL() {
 // NOTE: Mostly used for debugging.
 template<AddressingModes mode>
 void CPU::BRK() {
-	INT<Interrupts::BRK>();
+//	INT<Interrupts::BRK>();
 }
 
 template<AddressingModes mode>
@@ -672,7 +682,9 @@ template<AddressingModes mode>
 void CPU::CLD() { D(0); }
 
 template<AddressingModes mode>
-void CPU::CLI() { I(0); }
+void CPU::CLI() {
+	I(false);
+}
 
 template<AddressingModes mode>
 void CPU::CLV() { V(0); }
@@ -861,9 +873,6 @@ combination of interrupt plus RTI allows truly reentrant coding.
 */
 template<AddressingModes mode>
 void CPU::RTI() {
-	if constexpr (DEBUG) {
-		std::cout << "RTI called\n"; // TODO: Remove
-	}
 	// NOTE: Changes the p register
 	PLP<mode>(); // pop8
 	tick(2);
@@ -983,9 +992,6 @@ void CPU::LAX() {
 // INT is not a 6502 instruction. It is simply an interrupt handler.
 template<Interrupts inter>
 void CPU::INT() {
-	if constexpr (DEBUG) {
-		std::cout << "Interrupted, type: " << inter << '\n'; // TODO: Find a better way to log
-	}
 	// Note that BRK, although it is a one - byte instruction, needs an extra
 	// byte of padding after it.This is because the return address it puts on
 	// the stack will cause the RTI to put the program counter back not to the
@@ -1048,6 +1054,8 @@ void CPU::RLA() {
 }
 
 void CPU::interruptRequest() {
-	INT<Interrupts::IRQ>();
+	if (!I()) {
+		INT<Interrupts::IRQ>();
+	}
 }
 

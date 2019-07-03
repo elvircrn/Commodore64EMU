@@ -61,3 +61,8 @@ The (extended) memory map as seen by the VIC looks like this:
 320×200 or 160×200 pixels in the bitmap modes.
 
 
+
+# Refresh Counter
+
+DRAM refresh - not really important
+

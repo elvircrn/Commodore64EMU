@@ -652,7 +652,7 @@ void CPU::BPL() {
 // NOTE: Mostly used for debugging.
 template<AddressingModes mode>
 void CPU::BRK() {
-//	INT<Interrupts::BRK>();
+	INT<Interrupts::BRK>();
 }
 
 template<AddressingModes mode>
@@ -1010,7 +1010,7 @@ void CPU::INT() {
 	// or recovery code.
 	if constexpr (inter != Interrupts::RST) {
 		Push16(pc);
-		Push8(p | ((Interrupts::BRK == inter) << 0x4u));
+		Push8(p & 0xefu);
 	} else {
 		// s -= 3;
 		tick(3);
@@ -1054,6 +1054,7 @@ void CPU::RLA() {
 }
 
 void CPU::interruptRequest() {
+	std::cout << "Interrupt request\n";
 	if (!I()) {
 		INT<Interrupts::IRQ>();
 	}

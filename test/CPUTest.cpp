@@ -35,7 +35,6 @@ TEST_CASE("CPU Test") {
 
 	cpu.write(1, 0);
 
-
 	cpu.setDebug(false);
 
 	bool passed{};

@@ -124,7 +124,8 @@ int main(int argc, char *args[]) {
 	std::vector<u8> vicIO(0xffff);
 
 	Clock clk{};
-	CIA1 cia1{};
+	SDL_Event event;
+	CIA1 cia1{event};
 	CIA2 cia2{};
 //	Clock clk(std::chrono::microseconds(1));
 	ROM rom(kernal, basic, chargen, vicIO);
@@ -170,7 +171,6 @@ int main(int argc, char *args[]) {
 	bool dEnabled = false;
 	while (!quit_game) {
 		// NOTE: This must be called!
-		SDL_Event event;
 		if (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT) {
 				break;
@@ -216,7 +216,7 @@ int main(int argc, char *args[]) {
 				initial = false;
 			}
 
-			if (!initial && millisecondsInt >= std::chrono::milliseconds(133)) {
+			if (!initial && millisecondsInt >= std::chrono::milliseconds(533)) {
 				if (iEnabled) {
 					cpu.interruptRequest();
 				}
@@ -235,6 +235,7 @@ int main(int argc, char *args[]) {
 				vic.tick();
 //				cpu.interruptRequest();
 			}
+			cia1.tick();
 			cpu.execute();
 		}
 		auto cursorX = mmu.read(0x00C9), cursorY = mmu.read(0x00CA);

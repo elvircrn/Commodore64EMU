@@ -15,7 +15,7 @@
 #include "ROM.h"
 
 // Interrupt types along with their respective vectors
-enum Interrupts { BRK, IRQ, NMI, RST };
+enum Interrupts { BRK = 0, IRQ, NMI, RST };
 constexpr u16 vect[] = {0xFFFE, 0xFFFE, 0xFFFA, 0xFFFC};
 
 // CPU Flags, _ -> empty

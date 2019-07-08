@@ -20,9 +20,11 @@ TEST_CASE("CPU Test") {
 	std::chrono::high_resolution_clock::time_point start(
 			std::chrono::high_resolution_clock::now());
 
+	SDL_Event evt;
+
 	std::vector<u8> vicIO(0xffff);
 	Clock clk{};
-	CIA1 cia1{};
+	CIA1 cia1{evt};
 	CIA2 cia2{};
 	ROM rom{};
 	auto fs = cmrc::test_resources::get_filesystem();

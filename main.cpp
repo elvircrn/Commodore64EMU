@@ -133,6 +133,11 @@ int main(int argc, char *args[]) {
 	CPU cpu(clk, mmu);
 	VIC vic(clk, mmu);
 
+
+	cia1.setGenerateInterrupt([&cpu]() {
+		cpu.interruptRequest();
+	});
+
 	mmu.setVICWriteListener([&vic](const u16 &addr, const u8 &val) {
 		return vic.set(addr, val);
 	});
@@ -168,7 +173,8 @@ int main(int argc, char *args[]) {
 	bool initial = true;
 	bool iEnabled = false;
 	bool nEnabled = false;
-	bool dEnabled = false;
+	bool dEnabled = true;
+	cpu.setDebug(dEnabled);
 	while (!quit_game) {
 		// NOTE: This must be called!
 		if (SDL_PollEvent(&event)) {
@@ -218,7 +224,7 @@ int main(int argc, char *args[]) {
 
 			if (!initial && millisecondsInt >= std::chrono::milliseconds(533)) {
 				if (iEnabled) {
-					cpu.interruptRequest();
+//					cpu.interruptRequest();
 				}
 				startInt = std::chrono::high_resolution_clock::now();
 			}
@@ -235,7 +241,10 @@ int main(int argc, char *args[]) {
 				vic.tick();
 //				cpu.interruptRequest();
 			}
-			cia1.tick();
+			if (amp % 20 == 0) {
+				SDL_PollEvent(&event);
+				cia1.tick();
+			}
 			cpu.execute();
 		}
 		auto cursorX = mmu.read(0x00C9), cursorY = mmu.read(0x00CA);

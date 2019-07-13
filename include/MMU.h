@@ -37,43 +37,54 @@ public:
 			return ram[addr];
 		}
 
+		u8 retVal{};
 		if (addr < 0xa000) {
-			return ram[addr];
+			retVal = ram[addr];
 		} else if (addr < 0xc000) {
 			if (isBASIC(bankMask)) {
-				return rom.basic[addr - 0xa000];
+				retVal = rom.basic[addr - 0xa000];
 			} else {
-				return ram[addr];
+				retVal = ram[addr];
 			}
 		} else if (addr < 0xd000) {
-			return ram[addr];
+			retVal = ram[addr];
 		} else if (addr < 0xe000) {
 			if (isCharGen(bankMask)) {
-				return rom.chargen[addr - 0xd000];
+				retVal = rom.chargen[addr - 0xd000];
 			} else if (isIO(bankMask)) {
 				if (addr < 0xd400 && vicReadCallback) {
-					return vicReadCallback(0xd000u + (addr & 0xffu));
+					retVal = vicReadCallback(0xd000u + (addr & 0xffu));
 				} else if (HI(addr) == 0xdcu) {
-					return cia1.read(addr);
+					retVal = cia1.read(addr);
 				} else if (HI(addr) == 0xddu) {
-					return cia2.read(addr);
+					retVal = cia2.read(addr);
+				} else {
+					retVal = rom.io[addr - 0xd000];
 				}
-				return rom.io[addr - 0xd000];
 			}
 		} else if (addr <= 0xffff) {
 			if (isKernal(bankMask)) {
-				return rom.kernal[addr - 0xe000];
+				retVal = rom.kernal[addr - 0xe000];
 			} else {
-				return ram[addr];
+				retVal = ram[addr];
 			}
+		} else {
+			retVal = ram[addr];
 		}
-		return ram[addr];
+
+		// TODO: Remove
+//		std::cout << "Reading " << std::hex << std::setfill('0') << std::uppercase << addr << ' ' << (u32) retVal << '\n';
+
+		return retVal;
 	}
 
 	inline bool write(u16 addr, u8 val) {
 		u8 bankMask = ram[1];
 
 		if (addr == 0xc6u) {
+			if (val) {
+				std::cout << "I WAS PRESSED WR\n";
+			}
 			return ram[addr] = val;
 		}
 

@@ -131,6 +131,7 @@ int main(int argc, char *args[]) {
 	ROM rom(kernal, basic, chargen, vicIO);
 	MMU mmu(rom, cia1, cia2);
 	CPU cpu(clk, mmu);
+	mmu.write(1, 0x07u);
 	VIC vic(clk, mmu);
 
 
@@ -241,8 +242,10 @@ int main(int argc, char *args[]) {
 				vic.tick();
 //				cpu.interruptRequest();
 			}
-			if (amp % 20 == 0) {
+			if (amp % 70 == 0) {
 				SDL_PollEvent(&event);
+			}
+			if (amp % 5 == 0) {
 				cia1.tick();
 			}
 			cpu.execute();

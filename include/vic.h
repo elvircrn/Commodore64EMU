@@ -59,6 +59,7 @@ public:
  	 * @return Value from internal memory @mem
  	 */
 	inline u8 get(u16 addr) {
+		addr = (addr & 0xffu) + VIC_REGISTER_ADDRESS_BASE;
 		return mem[addr - VIC_REGISTER_ADDRESS_BASE];
 	}
 
@@ -67,6 +68,7 @@ public:
 	 * VIC-specific addresses.
 	 */
 	inline bool set(u16 addr, u8 val) {
+		addr = (addr & 0xffu) + VIC_REGISTER_ADDRESS_BASE;
 		if (addr == CONTROL_REGISTER_1) {
 			// Check if DEN is set during raster 0x30.
 			bool den = BIT(val, 5);

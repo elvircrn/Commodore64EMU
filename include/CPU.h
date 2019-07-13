@@ -337,6 +337,19 @@ public:
 #pragma region Instructions
 	void interruptRequest();
 
+	std::string GetNESTestLine() {
+		std::stringstream ss;
+
+		ss << "PC:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) PC()
+				<< " A:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) A()
+				<< " X:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) X()
+				<< " Y:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) Y()
+				<< " P:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) P()
+				<< " SP:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) SP();
+
+		return ss.str();
+	}
+
 	template<AddressingModes mode>
 	void ADC();  //....	add with carry
 	template<AddressingModes mode>

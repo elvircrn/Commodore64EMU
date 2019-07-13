@@ -40,7 +40,6 @@ void CPU::init(u16 _pc) {
 
 #include <iostream>
 #include <CPU.h>
-#include <Debugger.h>
 
 void CPU::execute() {
 	clock.waitTick();
@@ -64,7 +63,7 @@ void CPU::execute() {
 		instrHist.emplace_back(pc,
 													 Instructions::Name(Read(pc - 1)),
 													 std::array<u8, 4>({Read(pc - 1), Read(pc), Read(pc + 1), Read(pc + 2)}));
-		std::cout << Instructions::Name(Read(pc - 1)) <<  ' ' << std::hex << ' ' << (int) Read(pc - 1) << ' ' << (int) Read(pc) << ' ' << (int) Read(pc + 1) << '\n';
+		std::cout << Instructions::Name(Read(pc - 1)) <<  ' ' << std::hex << ' ' << (int) Read(pc - 1) << ' ' << (int) Read(pc) << ' ' << (int) Read(pc + 1) << ' ' << GetNESTestLine() << '\n';
 		for (int i = 0; i < 5; i++)
 			bitStack.push_back(Read(pc - 1 + i));
 	}
@@ -752,7 +751,9 @@ void CPU::INC() {
 }
 
 template<AddressingModes mode>
-void CPU::INX() { UpdNZ(++x); }
+void CPU::INX() {
+	UpdNZ(++x);
+}
 
 template<AddressingModes mode>
 void CPU::INY() { UpdNZ(++y); }

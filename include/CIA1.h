@@ -1,3 +1,5 @@
+#include <utility>
+
 #ifndef NESEMU_CIA1_H
 #define NESEMU_CIA1_H
 
@@ -55,7 +57,7 @@ class CIA1 {
 	/**
 	 * CIA1 Register values
 	 */
-	std::array<u8, 0xffu> mem{};
+	std::array<u8, 0x10u> mem{};
 
 	std::function<void()> generateInterrupt;
 
@@ -69,7 +71,7 @@ class CIA1 {
 	 * @return Value from internal memory @mem
 	 */
 	inline u8 &get(u16 addr) {
-		return mem[addr - 0xDC00];
+		return mem[(addr - 0xDC00u) & 0xfu];
 	}
 
 	inline u16 get16(u16 addr) {
@@ -183,6 +185,7 @@ public:
 	}
 
 	inline u8 write(u16 addr, u8 val) {
+		addr = (addr & 0xfu) + 0xdc00u;
 // Timer control
 		std::cout << "CIA1 write " << std::hex << std::setw(2) << std::setfill('0') << "CIA1 addr: " << (u32) addr
 							<< " val: " << (u32) val << ' ' << std::bitset<8>{val} << '\n';
@@ -190,6 +193,12 @@ public:
 		if (addr == 0xdc00) {
 			if (val == 0xff) { // invalid state
 				return get(addr) = val;
+			}
+		} else if (addr == 0xdc0du) {
+			if (BIT(val, 7)) {
+				get(addr) = val;
+			} else {
+				get(addr) = 0;
 			}
 		} else if (addr == 0xdc0e) {
 			// Bit 4: 1 = Load latch into the timer once.
@@ -205,18 +214,19 @@ public:
 	}
 
 	inline u8 read(u16 addr) {
-		std::cout << "CIA1 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << '\n';
+		addr = (addr & 0xfu) + 0xdc00u;
+		std::cout << "CIA1 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << ' ';
 
 		// Port B, keyboard matrix rows and joystick
 		if (addr == 0xdc01) {
-			SDL_PollEvent(&event);
 			u8 pos{}, val = get(0xdc00);
-			if (val == 0xff) {
-				return 0;
-			}
-			while (val & 0x1u) {
-				pos++;
-				val >>= 0x1u;
+			if (val != 0xffu) {
+				while (val & 0x1u) {
+					pos++;
+					val >>= 0x1u;
+				}
+			} else {
+				pos = 0;
 			}
 
 			auto keystate = SDL_GetKeyboardState(nullptr);
@@ -225,26 +235,29 @@ public:
 			for (u8 i = 0; i < 0x8u; i++) {
 				if (keystate[keymap[pos][i]]) {
 					mask |= (keymap[pos][i] ? 0x1u : 0x0u) << i;
-					if (mask > 0) {
-						std::cout << "woo a keypress\n";
-					}
 				}
-
 			}
 
+			if (mask > 0) {
+				std::cout << "woo a keypress " << std::hex << (u32) mask << '\n';
+			} else {
+				std::cout << (u32) mask << '\n';
+			}
 			return mask;
 		} else if (addr == 0xdc0c) {
 			// TODO: Figure out how CNT input pin works. Check if this is actually used.
-		} else if (addr == 0xdc0e) {
+		} else if (addr == 0xdc0d) {
 
+		} else if (addr == 0xdc0e) {
 		}
 
+		u8 _val = get(addr);
+		std::cout << std::hex << (u32) _val << '\n';
 		return get(addr);
 	}
 
 	void tick() {
 		u8 controlA = get(TIMER_CONTROL_REGISTER_A);
-		u8 controlB = get(TIMER_CONTROL_REGISTER_B);
 
 		setInterruptGenerated(false);
 		setTimerAUnderflow(false);
@@ -256,43 +269,20 @@ public:
 			timerA--;
 
 			// Timer A underflow occurred.
-			if (timerA >= timerAPrev) {
-				setTimerAUnderflow(true);
-				if (isTimerAReset()) {
-					timerA = timerALatch();
-				} else {
-					// TODO: Should this be zero'd?
-				}
+			if (timerAPrev && !timerA) {
 				if (isInterruptAEnabled()) {
+					SDL_PollEvent(&event);
+					setTimerAUnderflow(true);
 					setInterruptGenerated(true);
 					generateInterrupt();
 				}
-			}
-		}
-
-		// Start timer
-		if (BIT(controlB, 0)) {
-			u16 timerBPrev = timerB;
-			timerB--;
-
-			// Timer B underflow occurred.
-			if (timerB >= timerBPrev) {
-				setTimerBUnderflow(true);
-				if (isTimerBReset()) {
-					timerB = timerBLatch();
-				} else {
-					// TODO: Should this be zero'd?
-				}
-				if (isInterruptBEnabled()) {
-					setInterruptGenerated(true);
-					generateInterrupt();
-				}
+				timerA = timerALatch();
 			}
 		}
 	}
 
-	void setGenerateInterrupt(std::function<void()> generateInterrupt) {
-		this->generateInterrupt = generateInterrupt;
+	inline void setGenerateInterrupt(std::function<void()> _generateInterrupt) {
+		this->generateInterrupt = std::move(_generateInterrupt);
 	}
 };
 

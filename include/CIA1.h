@@ -220,13 +220,13 @@ public:
 		// Port B, keyboard matrix rows and joystick
 		if (addr == 0xdc01) {
 			u8 pos{}, val = get(0xdc00);
-			if (val != 0xffu) {
+			if (!val) {
+				return 0x0u;
+			} else if (val != 0xffu) {
 				while (val & 0x1u) {
 					pos++;
 					val >>= 0x1u;
 				}
-			} else {
-				pos = 0;
 			}
 
 			auto keystate = SDL_GetKeyboardState(nullptr);
@@ -239,8 +239,10 @@ public:
 			}
 
 			if (mask > 0) {
+				mask = ~mask;
 				std::cout << "woo a keypress " << std::hex << (u32) mask << '\n';
 			} else {
+				mask = 0xffu;
 				std::cout << (u32) mask << '\n';
 			}
 			return mask;

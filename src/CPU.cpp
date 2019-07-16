@@ -1025,7 +1025,7 @@ void CPU::INT() {
 #ifdef TEST_MODE
 		Push8(p | (u8) ((Interrupts::BRK == inter) << 0x4u));
 #else
-		Push8(p);
+		Push8(p & (u8) (0xffu ^ (u8) ((Interrupts::BRK == inter) << 0x4u)));
 #endif
 	} else {
 		// s -= 3;

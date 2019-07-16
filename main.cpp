@@ -174,7 +174,7 @@ int main(int argc, char *args[]) {
 	bool initial = true;
 	bool iEnabled = false;
 	bool nEnabled = false;
-	bool dEnabled = true;
+	bool dEnabled = false;
 	cpu.setDebug(dEnabled);
 	while (!quit_game) {
 		// NOTE: This must be called!

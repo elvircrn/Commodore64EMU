@@ -30,8 +30,8 @@ public:
 
 	inline u8 write(u16 addr, u8 val) {
 		// Timer control
-		std::cout << "CIA2 write " << std::hex << std::setw(2) << std::setfill('0') << "CIA2 addr: " << (u32) addr
-							<< " val: " << (u32) val << ' ' << std::bitset<8>{val} << '\n';
+		L_INFO(std::cout << "CIA2 write " << std::hex << std::setw(2) << std::setfill('0') << "CIA2 addr: " << (u32) addr
+							<< " val: " << (u32) val << ' ' << std::bitset<8>{val} << '\n');
 		get(addr) = val;
 		if (addr == 0xDD0D) {
 
@@ -39,7 +39,7 @@ public:
 	}
 
 	inline u8 read(u16 addr) {
-		std::cout << "CIA2 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << '\n';
+		L_INFO(std::cout << "CIA2 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << '\n');
 		// Timer control
 		if (addr == 0xDD0D) {
 			return 1u << 7u;

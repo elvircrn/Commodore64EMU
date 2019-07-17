@@ -1,4 +1,5 @@
 #include <utility>
+#include "LogUtil.h"
 
 #ifndef NESEMU_CIA1_H
 #define NESEMU_CIA1_H
@@ -186,9 +187,9 @@ public:
 
 	inline u8 write(u16 addr, u8 val) {
 		addr = (addr & 0xfu) + 0xdc00u;
-// Timer control
-		std::cout << "CIA1 write " << std::hex << std::setw(2) << std::setfill('0') << "CIA1 addr: " << (u32) addr
-							<< " val: " << (u32) val << ' ' << std::bitset<8>{val} << '\n';
+		// Timer control
+		L_INFO(std::cout << "CIA1 write " << std::hex << std::setw(2) << std::setfill('0') << "CIA1 addr: " << (u32) addr
+							<< " val: " << (u32) val << ' ' << std::bitset<8>{val} << '\n');
 
 		if (addr == 0xdc00) {
 			if (val == 0xff) { // invalid state
@@ -215,7 +216,7 @@ public:
 
 	inline u8 read(u16 addr) {
 		addr = (addr & 0xfu) + 0xdc00u;
-		std::cout << "CIA1 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << ' ';
+		L_INFO(std::cout << "CIA1 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << ' ');
 
 		// Port B, keyboard matrix rows and joystick
 		if (addr == 0xdc01) {
@@ -240,10 +241,8 @@ public:
 
 			if (mask > 0) {
 				mask = ~mask;
-				std::cout << "woo a keypress " << std::hex << (u32) mask << '\n';
 			} else {
 				mask = 0xffu;
-				std::cout << (u32) mask << '\n';
 			}
 			return mask;
 		} else if (addr == 0xdc0c) {
@@ -253,8 +252,6 @@ public:
 		} else if (addr == 0xdc0e) {
 		}
 
-		u8 _val = get(addr);
-		std::cout << std::hex << (u32) _val << '\n';
 		return get(addr);
 	}
 

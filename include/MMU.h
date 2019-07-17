@@ -30,13 +30,6 @@ public:
 	inline u8 read(const u16 &addr) const {
 		u8 bankMask = ram[1];
 
-		if (addr == 0xc6u) {
-			if (ram[addr]) {
-				std::cout << "I WAS PRESSED\n";
-			}
-			return ram[addr];
-		}
-
 		u8 retVal{};
 		if (addr < 0xa000) {
 			retVal = ram[addr];
@@ -72,24 +65,14 @@ public:
 			retVal = ram[addr];
 		}
 
-		// TODO: Remove
-//		std::cout << "Reading " << std::hex << std::setfill('0') << std::uppercase << addr << ' ' << (u32) retVal << '\n';
-
 		return retVal;
 	}
 
 	inline bool write(u16 addr, u8 val) {
 		u8 bankMask = ram[1];
 
-		if (addr == 0xc6u) {
-			if (val) {
-				std::cout << "I WAS PRESSED WR\n";
-			}
-			return ram[addr] = val;
-		}
-
 		if (addr >= 0x400 && addr - 0x400 < 512) {
-			std::cout << "Writing to screen space addr " << std::hex << std::setw(2) << std::setfill('0') << (int) addr << " prev: " << (int) ram[addr] << " " << (int) val << '\n';
+			L_INFO(std::cout << "Writing to screen space addr " << std::hex << std::setw(2) << std::setfill('0') << (int) addr << " prev: " << (int) ram[addr] << " " << (int) val << '\n');
 		}
 
 		if (addr < 0xa000) {

@@ -737,6 +737,11 @@
 			<Option target="NESEmu"/>
 			<Option target="NESTest"/>
 		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/LogUtil.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
 		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/MMU.h">
 			<Option target="NESEmuLib"/>
 			<Option target="NESEmu"/>

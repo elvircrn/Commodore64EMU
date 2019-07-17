@@ -1070,7 +1070,6 @@ void CPU::RLA() {
 }
 
 void CPU::interruptRequest() {
-	std::cout << "Interrupt request\n";
 	if (!I()) {
 		INT<Interrupts::IRQ>();
 	}

@@ -25,7 +25,7 @@ class VIC {
 	 true, if den was set during raster line(0xd012) 0x30
 	 false, if den was set during raster line(0xd012)
 	 */
-	bool wasDENSetOn30;
+	bool wasDENSetOn30{};
 
 	Clock &clock;
 	MMU &mmu;
@@ -37,7 +37,6 @@ public:
 	void tick();
 	u64 getCharData(u16 characterId);
 
-	void drawChars();
 	bool getCharData(u16 characterId, u8 bit);
 	bool isBadLine(u8 rasterCounter, u8 yscroll, bool wasDENSet);
 
@@ -69,6 +68,10 @@ public:
 	 */
 	inline bool set(u16 addr, u8 val) {
 		addr = (addr & 0xffu) + VIC_REGISTER_ADDRESS_BASE;
+		L_DEBUG(
+		if (addr != 0xd012) {
+			std::cout << std::hex << (u32) addr << ' ' << (u32) val << '\n';
+		});
 		if (addr == CONTROL_REGISTER_1) {
 			// Check if DEN is set during raster 0x30.
 			bool den = BIT(val, 5);

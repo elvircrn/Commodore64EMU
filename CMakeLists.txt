@@ -16,18 +16,15 @@ endif()
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
-
 file(GLOB source_files
         "include/*.h"
         "src/*.cpp")
 
 #set library
-add_library(NESEmuLib STATIC ${source_files} include/TimingConstants.h include/SDL_FontCache.h src/SDL_FontCache.cpp include/CIA1.h include/CIA2.h src/CIA1.cpp)
-
-
+add_library(NESEmuLib STATIC ${source_files})
 include_directories(include)
 
-add_executable(NESEmu ${source_files} main.cpp "rom/basic.rom" "rom/kernal.rom" "rom/chargen.rom" "res/font.ttf" src/vic.cpp include/TimingConstants.h include/SDL_FontCache.h src/SDL_FontCache.cpp include/CIA1.h include/CIA2.h src/CIA1.cpp)
+add_executable(NESEmu ${source_files} main.cpp)
 
 cmrc_add_resource_library(resources res/6502_functional_test.bin rom/kernal.rom rom/basic.rom rom/chargen.rom "res/font.ttf" ALIAS resources::rc)
 target_link_libraries(NESEmu PRIVATE resources::rc ${CONAN_LIBS})

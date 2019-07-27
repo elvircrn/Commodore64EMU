@@ -1,6 +1,6 @@
 #set includes
 set(CMAKE_CXX_STANDARD 17)
-include(${CMAKE_BINARY_DIR}/cmake-build-debug/conanbuildinfo.cmake)
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 include(CMakeRC.cmake)
 target_link_libraries(NESEmuLib)

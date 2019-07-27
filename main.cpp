@@ -3,9 +3,7 @@
 #include <thread>
 #include <chrono>
 
-#include <SDL_FontCache.h>
 #include <SDL2/SDL.h>
-#include <SDL_ttf.h>
 #include <vic.h>
 #include <Loop.h>
 #include "cmrc/cmrc.hpp"
@@ -45,8 +43,6 @@ int main() {
 	auto kernalStream = fs.open(kernalFileName);
 	auto chargenStream = fs.open(chargenFileName);
 
-	auto sans = sdl2::make_ttffont("res/font.ttf", 12);
-
 	std::vector<u8> kernal{kernalStream.begin(), kernalStream.end()};
 	std::vector<u8> basic{basicStream.begin(), basicStream.end()};
 	std::vector<u8> chargen{chargenStream.begin(), chargenStream.end()};
@@ -77,10 +73,6 @@ int main() {
 		return vic.get(addr);
 	});
 	using clock = std::chrono::high_resolution_clock;
-
-	std::chrono::nanoseconds lag(0ns);
-	auto time_start = clock::now();
-	bool quit_game = false;
 
 	u64 buff{};
 	bool dEnabled = false;

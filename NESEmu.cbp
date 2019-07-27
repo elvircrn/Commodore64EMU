@@ -672,12 +672,6 @@
 		<Unit filename="/Users/elvir/CLionProjects/NESEmu/__cmrc_resources/intermediate/res/6502_functional_test.bin.cpp.rule">
 			<Option target="resources"/>
 		</Unit>
-		<Unit filename="/Users/elvir/CLionProjects/NESEmu/__cmrc_resources/intermediate/res/font.ttf.cpp">
-			<Option target="resources"/>
-		</Unit>
-		<Unit filename="/Users/elvir/CLionProjects/NESEmu/__cmrc_resources/intermediate/res/font.ttf.cpp.rule">
-			<Option target="resources"/>
-		</Unit>
 		<Unit filename="/Users/elvir/CLionProjects/NESEmu/__cmrc_resources/intermediate/rom/basic.rom.cpp">
 			<Option target="resources"/>
 		</Unit>

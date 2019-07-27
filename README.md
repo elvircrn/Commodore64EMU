@@ -35,7 +35,7 @@ conan install . -if=C:/Users/elvircrn/CMakeBuilds/0730974a-797b-6738-a0b9-9daee0
 # Mac OS X
 
 ```
-conan install . --install-folder=cmake-build-debug  --build=missing -s compiler=apple-clang -s compiler.version=9.1 -s compiler.libcxx=libc++ -s build_type=Debug
+conan install . --install-folder=cmake-build-debug  --build=missing -s compiler=apple-clang -s compiler.version=10.0 -s compiler.libcxx=libc++ -s build_type=Debug
 ```
 
 # TODOs

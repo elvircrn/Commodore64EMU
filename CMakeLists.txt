@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(NESEmu)
 
 include(CMakeRC.cmake)
-include(${CMAKE_BINARY_DIR}/cmake-build-debug/conanbuildinfo.cmake)
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 set(CMAKE_CXX_STANDARD 17)
@@ -26,7 +26,7 @@ include_directories(include)
 
 add_executable(NESEmu ${source_files} main.cpp)
 
-cmrc_add_resource_library(resources res/6502_functional_test.bin rom/kernal.rom rom/basic.rom rom/chargen.rom "res/font.ttf" ALIAS resources::rc)
+cmrc_add_resource_library(resources res/6502_functional_test.bin rom/kernal.rom rom/basic.rom rom/chargen.rom ALIAS resources::rc)
 target_link_libraries(NESEmu PRIVATE resources::rc ${CONAN_LIBS})
 
 add_subdirectory(test)

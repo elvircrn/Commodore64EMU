@@ -3,7 +3,6 @@
 #include <SDL2/SDL.h>
 #include <string>
 #include <memory>
-#include <SDL2/SDL_ttf.h>
 
 namespace sdl2 {
 
@@ -43,8 +42,6 @@ using renderer_ptr_t = std::unique_ptr<SDL_Renderer, decltype(&SDL_DestroyRender
 using renderer_sh_ptr_t = std::shared_ptr<SDL_Renderer>;
 using surf_ptr_t = std::unique_ptr<SDL_Surface, decltype(&SDL_FreeSurface)>;
 using texture_ptr_t = std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)>;
-using ttffont_ptr_t = std::unique_ptr<TTF_Font, decltype(&TTF_CloseFont)>;
-using ttffont_sh_ptr_t = std::shared_ptr<TTF_Font>;
 
 // Initialize SDL (the returned int* contains the return value from SDL_Init)
 inline sdlsystem_ptr_t make_sdlsystem(Uint32 flags) {
@@ -67,13 +64,6 @@ inline surf_ptr_t make_bmp(SDL_RWops *sdlfile) {
 	return make_resource(SDL_LoadBMP_RW, SDL_FreeSurface, sdlfile, 1);
 }
 
-// Create a surface from a font and text, containing both the surface and the destructor
-inline surf_ptr_t make_font(TTF_Font *font, const std::string &text, const SDL_Color &color = {255, 255, 255}) {
-	// May throw an exception if sdlfile is nullptr
-	return make_resource(TTF_RenderText_Solid, SDL_FreeSurface, font,
-											 text.c_str(), color);
-}
-
 // Create an in-memory bmp
 inline texture_ptr_t make_bmp(SDL_Renderer *renderer, Uint32 format, int access, int w, int h) {
 	// May throw an exception if sdlfile is nullptr
@@ -84,20 +74,4 @@ inline texture_ptr_t make_bmp(SDL_Renderer *renderer, Uint32 format, int access,
 inline texture_ptr_t make_texture(SDL_Renderer *ren, SDL_Surface *surf) {
 	return make_resource(SDL_CreateTextureFromSurface, SDL_DestroyTexture, ren, surf);
 }
-
-inline ttffont_ptr_t make_ttffont(const std::string &path, size_t size) {
-	return make_resource(TTF_OpenFont, TTF_CloseFont, path.c_str(), size);
-}
-
-class TTFContext {
-public:
-	TTFContext() {
-		TTF_Init();
-	}
-
-	~TTFContext() {
-		TTF_Quit();
-	}
-};
-
 } // namespace sdl2

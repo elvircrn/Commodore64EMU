@@ -1,6 +1,5 @@
 [requires]
 sdl2/2.0.9@bincrafters/stable
-boost_filesystem/1.67.0@bincrafters/stable
 
 
 [generators]

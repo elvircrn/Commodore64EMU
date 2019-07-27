@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <string>
 #include <sstream>
-#include "optional.h"
 
 typedef signed char s8;
 typedef short s16;
@@ -12,9 +11,6 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 typedef unsigned long long u64;
-
-template<class T>
-using optional = std::experimental::optional<T>;
 
 inline u8 LO(const u16 &addr) { return static_cast<u8>(addr & 0xffu); }
 inline u8 HI(const u16 &addr) { return static_cast<u8>((u8) (addr >> 0x8u) & 0xffu); }

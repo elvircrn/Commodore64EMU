@@ -1,12 +1,6 @@
 #include "StreamUtil.h"
-#include "optional.h"
 
-#include <iostream>
-#include <sstream>
 #include <iterator>
-#include <numeric>
-#include <algorithm>
-#include <fstream>
 
 using std::tuple;
 using std::vector;

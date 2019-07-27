@@ -7,7 +7,6 @@
 
 #include "ROM.h"
 #include "core.h"
-#include "optional.h"
 
 using std::vector;
 using std::tuple;

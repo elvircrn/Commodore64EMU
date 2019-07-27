@@ -9,7 +9,6 @@
 #include <deque>
 #include <tuple>
 #include "MMU.h"
-#include "optional.h"
 #include "Clock.h"
 #include <functional>
 
@@ -71,7 +70,7 @@ class CPU {
 	// Absolute along with its variants, and immediate reads mutate the program counter, therefore
 	// the value obtained via these two methods should only be calculated once during the instruction
 	// cycle.
-	std::experimental::optional<u16> instructionDataLatch;
+	std::optional<u16> instructionDataLatch;
 
 	// Instruction helpers
 	inline u8 _ASL(const u8 &x) {

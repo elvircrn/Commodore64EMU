@@ -24,39 +24,9 @@ CMRC_DECLARE(resources);
 
 using namespace std::chrono_literals;
 
-// we use a fixed timestep of 1 / (60 fps) = 16 milliseconds
-constexpr std::chrono::nanoseconds timestep(16ms);
-
-struct game_state {
-	// this contains the state of your game, such as positions and velocities
-};
-
-bool handle_events() {
-	// poll for events
-
-	return false; // true if the user wants to quit the game
-}
-
-void update(game_state *) {
-	// update game logic here
-}
-
-void render(game_state const &) {
-	// render stuff here
-}
-
-game_state interpolate(game_state const &current, game_state const &previous, float alpha) {
-	game_state interpolated_state;
-
-	// interpolate between previous and current by alpha here
-
-	return interpolated_state;
-}
-
-int main(int argc, char *args[]) {
+int main() {
 	auto fs = cmrc::resources::get_filesystem();
 	std::ios_base::sync_with_stdio(false);
-	sdl2::TTFContext ttfContext{};
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
 	}
@@ -112,11 +82,6 @@ int main(int argc, char *args[]) {
 	auto time_start = clock::now();
 	bool quit_game = false;
 
-	game_state current_state;
-	game_state previous_state;
-
-	FC_Font *font = FC_CreateFont();
-	FC_LoadFont(font, renderer.get(), "res/font.ttf", 20, FC_MakeColor(0, 0, 0, 255), TTF_STYLE_NORMAL);
 	u64 buff{};
 	bool dEnabled = false;
 	cpu.setDebug(dEnabled);
@@ -141,8 +106,6 @@ int main(int argc, char *args[]) {
 
 		loop.draw();
 	}
-
-	FC_FreeFont(font);
 
 	SDL_Quit();
 

@@ -211,7 +211,7 @@ public:
 				timerB = timerBLatch();
 			}
 		}
-		get(addr) = val;
+		return get(addr) = val;
 	}
 
 	inline u8 read(u16 addr) {

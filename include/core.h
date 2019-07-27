@@ -20,6 +20,9 @@ inline u8 LO(const u16 &addr) { return static_cast<u8>(addr & 0xffu); }
 inline u8 HI(const u16 &addr) { return static_cast<u8>((u8) (addr >> 0x8u) & 0xffu); }
 inline bool BIT(const u8 &bits, const u8 &n) { return (bits & (1u << n)) > 0; }
 inline u8 SET(const u8 &bits, const u8 &n) { return (bits | (1u << n)); }
+inline u8 SET(const u8 &bits, const u8 &n, bool bit) {
+	return (bits | (u32) (bit << n)) & (0xffu - ((!bit) << n));
+}
 inline std::string BIT_STR(u8 bits) {
 	if (!bits) {
 		return "0";

@@ -6,7 +6,7 @@ include(CMakeRC.cmake)
 target_link_libraries(NESEmuLib)
 
 include_directories(${THIRD_PARTY_INCLUDE_PATH})
-add_executable(NESTest ${source_files} catch.hpp CPUTest.cpp ../include/TimingConstants.h ../include/SDL_FontCache.h ../src/SDL_FontCache.cpp ../include/CIA1.h ../include/CIA2.h ../src/CIA1.cpp)
+add_executable(NESTest ${source_files} catch.hpp CPUTest.cpp)
 
 
 set(TEST_ASSET_COPY_DIR $<TARGET_FILE_DIR:NESTest>/res)

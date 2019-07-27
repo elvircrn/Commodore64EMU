@@ -27,7 +27,7 @@ public:
 		ram[1] = (1u << 8u) - 1u;
 	}
 
-	inline u8 read(const u16 &addr) const {
+	inline u8 read(const u16 &addr, bool vic = false) const {
 		u8 bankMask = ram[1];
 
 		u8 retVal{};
@@ -42,11 +42,11 @@ public:
 		} else if (addr < 0xd000) {
 			retVal = ram[addr];
 		} else if (addr < 0xe000) {
-			if (isCharGen(bankMask)) {
-				retVal = rom.chargen[addr - 0xd000];
+			if (vic || isCharGen(bankMask)) {
+				retVal = rom.chargen[addr - 0xd000u];
 			} else if (isIO(bankMask)) {
 				if (addr < 0xd400 && vicReadCallback) {
-					retVal = vicReadCallback(0xd000u + (addr & 0xffu));
+					retVal = vicReadCallback(addr);
 				} else if (HI(addr) == 0xdcu) {
 					retVal = cia1.read(addr);
 				} else if (HI(addr) == 0xddu) {
@@ -90,7 +90,7 @@ public:
 				return rom.chargen[addr - 0xd000] = val;
 			} else if (isIO(bankMask)) {
 				if (addr < 0xd400 && vicWriteCallback) {
-					return vicWriteCallback(0xd000u + (addr & 0xffu), val);
+					return vicWriteCallback(addr, val);
 				} else if (HI(addr) == 0xdcu) {
 					return cia1.write(addr, val);
 				} else if (HI(addr) == 0xddu) {
@@ -111,20 +111,20 @@ public:
 	inline void writeRAM(u16 addr, u8 val) {
 		ram[addr] = val;
 	}
-	inline bool isIO(const u8 &val) const {
+	[[nodiscard]] inline bool isIO(const u8 &val) const {
 		// bit_3(val) = 1 && val != 100
 		return val >= 0x5u;
 	}
 
-	inline bool isCharGen(const u8 &val) const {
+	[[nodiscard]] inline bool isCharGen(const u8 &val) const {
 		return (~BIT(val, 2u)) & (BIT(val, 0) | BIT(val, 1));
 	}
 
-	inline bool isBASIC(const u8 &val) const {
+	[[nodiscard]] inline bool isBASIC(const u8 &val) const {
 		return BIT(val, 0) & BIT(val, 1);
 	}
 
-	inline bool isKernal(const u8 &val) const {
+	[[nodiscard]] inline bool isKernal(const u8 &val) const {
 		return BIT(val, 1);
 	}
 

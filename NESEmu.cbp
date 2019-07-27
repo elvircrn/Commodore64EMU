@@ -742,6 +742,11 @@
 			<Option target="NESEmu"/>
 			<Option target="NESTest"/>
 		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/Loop.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
 		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/MMU.h">
 			<Option target="NESEmuLib"/>
 			<Option target="NESEmu"/>
@@ -762,7 +767,17 @@
 			<Option target="NESEmu"/>
 			<Option target="NESTest"/>
 		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/RegisterHolder.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
 		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/SDL_FontCache.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/Screen.h">
 			<Option target="NESEmuLib"/>
 			<Option target="NESEmu"/>
 			<Option target="NESTest"/>
@@ -815,18 +830,6 @@
 		<Unit filename="/Users/elvir/CLionProjects/NESEmu/main.cpp">
 			<Option target="NESEmu"/>
 		</Unit>
-		<Unit filename="/Users/elvir/CLionProjects/NESEmu/res/font.ttf">
-			<Option target="NESEmu"/>
-		</Unit>
-		<Unit filename="/Users/elvir/CLionProjects/NESEmu/rom/basic.rom">
-			<Option target="NESEmu"/>
-		</Unit>
-		<Unit filename="/Users/elvir/CLionProjects/NESEmu/rom/chargen.rom">
-			<Option target="NESEmu"/>
-		</Unit>
-		<Unit filename="/Users/elvir/CLionProjects/NESEmu/rom/kernal.rom">
-			<Option target="NESEmu"/>
-		</Unit>
 		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/CIA1.cpp">
 			<Option target="NESEmuLib"/>
 			<Option target="NESEmu"/>
@@ -853,6 +856,11 @@
 			<Option target="NESTest"/>
 		</Unit>
 		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/Instructions.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/Loop.cpp">
 			<Option target="NESEmuLib"/>
 			<Option target="NESEmu"/>
 			<Option target="NESTest"/>

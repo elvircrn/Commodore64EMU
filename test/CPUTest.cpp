@@ -9,9 +9,9 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include "cmrc/cmrc.hpp"
 #include "MMULoader.h"
 #include "MMU.h"
-
 CMRC_DECLARE(test_resources);
 
 TEST_CASE("CPU Test") {
@@ -30,8 +30,8 @@ TEST_CASE("CPU Test") {
 	auto fs = cmrc::test_resources::get_filesystem();
 	MMU mmu{rom, cia1, cia2};
 
-	MMULoader mmuLoader{fs, mmu};
-	mmuLoader.dumpToRAM("res/6502_functional_test.bin", 0x400);
+//	MMULoader mmuLoader{fs, mmu};
+//	mmuLoader.dumpToRAM("res/6502_functional_test.bin", 0x400);
 
 	CPU cpu(clk, mmu, 0x400);
 

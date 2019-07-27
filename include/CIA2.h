@@ -36,6 +36,7 @@ public:
 		if (addr == 0xDD0D) {
 
 		}
+		return val;
 	}
 
 	inline u8 read(u16 addr) {

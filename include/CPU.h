@@ -112,7 +112,7 @@ class CPU {
 	// Addressing helpers
 	inline u8 Imm() {
 		if (!instructionDataLatch) {
-			instructionDataLatch = Read(pc++);
+			instructionDataLatch.emplace(Read(pc++));
 		}
 		return static_cast<u8>(instructionDataLatch.value());
 	}

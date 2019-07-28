@@ -44,7 +44,7 @@ void VIC::tick() {
 	u8 borderColor = get(BORDER_COLOR);
 	if (!isVBlank(rasterCounter)) {
 		if (isHorizontalBorder(rasterCounter)) {
-			for (size_t i = 0; i < 403; i++) {
+			for (size_t i = 0; i < GraphicsConstants::WINDOW_WIDTH; i++) {
 				screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, 0, borderColor);
 			}
 			blockRowId = 0;
@@ -55,7 +55,7 @@ void VIC::tick() {
 				} else {
 					u32 pixelId = i - GraphicsConstants::FIRST_VISIBLE_VERTICAL_LINE;
 
-					u8 blockColumn = pixelId / 8; // TODO: Extract 25 as constant
+					u8 blockColumn = pixelId / 8;
 					u8 blockRow =
 							(rasterCounter - GraphicsConstants::FIRST_VISIBLE_LINE - GraphicsConstants::FIRST_BORDER_LINE) / 8;
 

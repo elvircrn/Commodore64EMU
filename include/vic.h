@@ -47,16 +47,15 @@ public:
 	bool getCharData(u16 characterId, u8 bit);
 	bool isBadLine(u8 rasterCounter, u8 yscroll, bool wasDENSet);
 
-
-	static inline bool isVBlank(u16 rasterCounter) {
+	inline bool isVBlank(u16 rasterCounter) {
 		return rasterCounter < GraphicsConstants::FIRST_BORDER_LINE || GraphicsConstants::FIRST_BORDER_LINE + GraphicsConstants::LAST_BORDER_LINE <= rasterCounter;
 	}
 
-	static inline bool isHorizontalBorder(u16 rasterCounter) {
+	inline bool isHorizontalBorder(u16 rasterCounter) {
 		return rasterCounter <= GraphicsConstants::BORDER_DIMENSIONS + GraphicsConstants::FIRST_BORDER_LINE || 257 <= rasterCounter;
 	}
 
-	static inline bool isVerticalBorder(u16 x) {
+	inline bool isVerticalBorder(u16 x) {
 		return x < GraphicsConstants::BORDER_DIMENSIONS || x >= GraphicsConstants::BORDER_DIMENSIONS + GraphicsConstants::TEXT_AREA_WIDTH;
 	}
 

@@ -28,10 +28,10 @@ int main() {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
 	}
 
-	auto window{sdl2::make_window("c64 Emulator", 0, 0, 403, 284, SDL_WINDOW_OPENGL)};
+	auto window{sdl2::make_window("c64 Emulator", 0, 0, GraphicsConstants::WINDOW_WIDTH, GraphicsConstants::WINDOW_HEIGHT, SDL_WINDOW_OPENGL)};
 	auto renderer{sdl2::make_renderer(window.get(), -1, SDL_RENDERER_ACCELERATED)};
 	auto texture
-			{sdl2::make_bmp(renderer.get(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, 403, 284)};
+			{sdl2::make_bmp(renderer.get(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, GraphicsConstants::WINDOW_WIDTH, GraphicsConstants::WINDOW_HEIGHT)};
 	Screen screen{texture.get(), renderer.get()};
 
 	std::string basicFileName = "rom/basic.rom";
@@ -54,7 +54,6 @@ int main() {
 
 	ROM rom(kernal, basic, chargen, vicIO);
 	MMU mmu(rom, cia1, cia2);
-	mmu.write(1, 0x07u);
 	CPU cpu(clk, mmu);
 	VIC vic{clk, mmu, screen};
 	Loop loop{screen, event};

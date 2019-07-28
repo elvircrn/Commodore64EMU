@@ -34,7 +34,6 @@ enum AddressingModes {
 	ZERO_PAGE,
 	ABSOLUTE_INDEXED_X,
 	ABSOLUTE_INDEXED_Y,
-	ZERO_PAGE_INDEXED,
 	ZERO_PAGE_X,
 	ZERO_PAGE_Y,
 	INDEXED_INDIRECT_X
@@ -113,7 +112,7 @@ class CPU {
 	inline u16 Abs() {
 		if (!instructionDataLatch) {
 			pc += 2;
-			instructionDataLatch = read16(static_cast<u16>(pc - 2));
+			instructionDataLatch.emplace(read16(static_cast<u16>(pc - 2)));
 		}
 		return instructionDataLatch.value();
 	}

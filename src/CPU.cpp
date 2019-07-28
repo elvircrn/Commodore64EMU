@@ -55,8 +55,9 @@ void CPU::execute() {
 		instrHist.emplace_back(pc,
 													 Instructions::Name(read(pc - 1)),
 													 std::array<u8, 4>({read(pc - 1), read(pc), read(pc + 1), read(pc + 2)}));
-		L_DEBUG(std::cout << Instructions::Name(read(pc - 1)) << ' ' << std::hex << ' ' << (int) read(pc - 1) << ' ' << (int) read(
-				pc) << ' ' << (int) read(
+		L_DEBUG(std::cout << Instructions::Name(read(pc - 1)) << ' ' << std::hex << ' ' << (int) read(pc - 1) << ' '
+											<< (int) read(
+													pc) << ' ' << (int) read(
 				pc + 1) << ' ' << getNESTestLine() << '\n');
 		for (int i = 0; i < 5; i++)
 			bitStack.push_back(read(pc - 1 + i));
@@ -438,11 +439,11 @@ bool CPU::writeOperandVal(const u8 &val) {
 		// ADC $F6 -> A + contents of memory $F6
 		// Zero page only considers the low bytes. TODO: Refactor
 	else if (mode == AddressingModes::ZERO_PAGE) {
-		return write(Imm() & 0xFF, val);
+		return write(Imm() & 0xFFu, val);
 	} else if (mode == AddressingModes::ZERO_PAGE_X) {
-		return write((Imm() + x) & 0xFF, val);
+		return write((Imm() + x) & 0xFFu, val);
 	} else if (mode == AddressingModes::ZERO_PAGE_Y) {
-		return write((Imm() + y) & 0xFF, val);
+		return write((Imm() + y) & 0xFFu, val);
 	}
 		// https://www.csh.rit.edu/~moffitt/6502.html#ADDR-IIND
 	else if (mode == AddressingModes::INDEXED_INDIRECT_X) {
@@ -480,11 +481,11 @@ u8 CPU::getOperand8() {
 		return read(AbsY());
 		// ADC $F6 -> A + contents of memory $F6
 	} else if constexpr (mode == AddressingModes::ZERO_PAGE) {
-		return read(Imm() & 0xFF);
+		return read(Imm() & 0xffu);
 	} else if constexpr  (mode == AddressingModes::ZERO_PAGE_X) {
-		return read((Imm() + x) & 0xFF);
+		return read((Imm() + x) & 0xffu);
 	} else if constexpr (mode == AddressingModes::ZERO_PAGE_Y) {
-		return read((Imm() + y) & 0xFF);
+		return read((Imm() + y) & 0xffu);
 		// https://www.csh.rit.edu/~moffitt/6502.html#ADDR-IIND
 	} else if constexpr  (mode == AddressingModes::INDEXED_INDIRECT_X) {
 		u8 addr8 = Imm() + x;
@@ -497,13 +498,9 @@ u8 CPU::getOperand8() {
 	} else if constexpr (mode == AddressingModes::ACCUMULATOR) {
 		return a;
 	}
-	// ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
-	//case AddressingModes::INDIRECT_INDEXED:
-	//return Zp(Imm()) + y;
 }
 #pragma endregion
 
-//.... add with carry
 template<AddressingModes mode>
 void CPU::ADC() {
 	tick(CalcBaseTicks<mode>());
@@ -531,14 +528,12 @@ void CPU::ADC() {
 	UpdNZ(a);
 }
 
-//....	and (with accumulator)
 template<AddressingModes mode>
 void CPU::AND() {
 	calcCrossed = true;
 	UpdNZ(a &= getPureOperand<mode>());
 }
 
-//....	arithmetic shift left
 template<AddressingModes mode>
 void CPU::ASL() {
 	tick(CalcBaseTicks<mode>());

@@ -644,10 +644,10 @@ void CPU::BVS() {
 }
 
 template<AddressingModes mode>
-void CPU::CLC() { C(0); }
+void CPU::CLC() { C(false); }
 
 template<AddressingModes mode>
-void CPU::CLD() { D(0); }
+void CPU::CLD() { D(false); }
 
 template<AddressingModes mode>
 void CPU::CLI() {
@@ -655,7 +655,7 @@ void CPU::CLI() {
 }
 
 template<AddressingModes mode>
-void CPU::CLV() { V(0); }
+void CPU::CLV() { V(false); }
 
 template<AddressingModes mode>
 void CPU::CMP() {
@@ -889,7 +889,7 @@ void CPU::SBC() {
 }
 
 template<AddressingModes mode>
-void CPU::SEC() { C(1); }
+void CPU::SEC() { C(true); }
 
 template<AddressingModes mode>
 void CPU::SED() { D(true); }

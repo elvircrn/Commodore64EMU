@@ -1,17 +1,19 @@
-#include <utility>
-#include "LogUtil.h"
-
 #ifndef NESEMU_CIA1_H
 #define NESEMU_CIA1_H
 
 #include <iomanip>
 #include <array>
+#include <utility>
+
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_events.h>
 
 #include "core.h"
+#include "Keyboard.h"
+#include "LogUtil.h"
+#include "RegisterHolder.h"
 
-class CIA1 {
+class CIA1 : public RegisterHolder<0xDC00> {
 	/**
 	 * Addresses
 	 */
@@ -65,6 +67,8 @@ class CIA1 {
 
 	SDL_Event &event;
 
+	Keyboard keyboard{};
+
 	/**
 	 * Map external addresses into internal buffer
 	 * @param addr External address
@@ -116,85 +120,19 @@ class CIA1 {
 		return BIT(get(TIMER_CONTROL_REGISTER_B), 3);
 	}
 
-	SDL_Scancode keymap[8][8];
-
 public:
 
-	CIA1(SDL_Event &event) : event(event) {
-		for (u8 i = 0; i < 8; i++) {
-			for (u8 j = 0; j < 8; j++) {
-				keymap[i][j] = SDL_SCANCODE_UNKNOWN;
-			}
-		}
-		keymap[1][2] = SDL_SCANCODE_A;
-		keymap[3][4] = SDL_SCANCODE_B;
-		keymap[2][4] = SDL_SCANCODE_C;
-		keymap[2][2] = SDL_SCANCODE_D;
-		keymap[1][6] = SDL_SCANCODE_E;
-		keymap[2][5] = SDL_SCANCODE_F;
-		keymap[3][2] = SDL_SCANCODE_G;
-		keymap[3][5] = SDL_SCANCODE_H;
-		keymap[4][1] = SDL_SCANCODE_I;
-		keymap[4][2] = SDL_SCANCODE_J;
-		keymap[4][5] = SDL_SCANCODE_K;
-		keymap[5][2] = SDL_SCANCODE_L;
-		keymap[4][4] = SDL_SCANCODE_M;
-		keymap[4][7] = SDL_SCANCODE_N;
-		keymap[4][6] = SDL_SCANCODE_O;
-		keymap[5][1] = SDL_SCANCODE_P;
-		keymap[7][6] = SDL_SCANCODE_Q;
-		keymap[2][1] = SDL_SCANCODE_R;
-		keymap[1][5] = SDL_SCANCODE_S;
-		keymap[2][6] = SDL_SCANCODE_T;
-		keymap[3][6] = SDL_SCANCODE_U;
-		keymap[3][7] = SDL_SCANCODE_V;
-		keymap[1][1] = SDL_SCANCODE_W;
-		keymap[2][7] = SDL_SCANCODE_X;
-		keymap[3][1] = SDL_SCANCODE_Y;
-		keymap[1][4] = SDL_SCANCODE_Z;
-		keymap[7][0] = SDL_SCANCODE_1;
-		keymap[7][3] = SDL_SCANCODE_2;
-		keymap[1][0] = SDL_SCANCODE_3;
-		keymap[1][3] = SDL_SCANCODE_4;
-		keymap[2][0] = SDL_SCANCODE_5;
-		keymap[2][3] = SDL_SCANCODE_6;
-		keymap[3][0] = SDL_SCANCODE_7;
-		keymap[3][3] = SDL_SCANCODE_8;
-		keymap[4][0] = SDL_SCANCODE_9;
-		keymap[4][3] = SDL_SCANCODE_0;
-		keymap[0][4] = SDL_SCANCODE_F1;
-		keymap[0][4] = SDL_SCANCODE_F3;
-		keymap[0][4] = SDL_SCANCODE_F5;
-		keymap[0][4] = SDL_SCANCODE_F7;
-		keymap[0][1] = SDL_SCANCODE_RETURN;
-		keymap[7][4] = SDL_SCANCODE_SPACE;
-		keymap[1][7] = SDL_SCANCODE_LSHIFT;
-		keymap[6][4] = SDL_SCANCODE_RSHIFT;
-		keymap[5][7] = SDL_SCANCODE_COMMA;
-		keymap[5][4] = SDL_SCANCODE_PERIOD;
-		keymap[6][7] = SDL_SCANCODE_SLASH;
-		keymap[6][2] = SDL_SCANCODE_SEMICOLON;
-		keymap[6][5] = SDL_SCANCODE_EQUALS;
-		keymap[0][0] = SDL_SCANCODE_BACKSPACE;
-		keymap[5][3] = SDL_SCANCODE_MINUS;
-		keymap[5][5] = SDL_SCANCODE_BACKSLASH; // :
-		keymap[5][0] = SDL_SCANCODE_LEFTBRACKET; // +
-		keymap[6][1] = SDL_SCANCODE_RIGHTBRACKET; // *
-		keymap[5][6] = SDL_SCANCODE_APOSTROPHE; // @
-		keymap[7][5] = SDL_SCANCODE_LGUI; // commodore key
+	explicit CIA1(SDL_Event &event) : event(event) {
 	}
 
 	inline u8 write(u16 addr, u8 val) {
-		addr = (addr & 0xfu) + 0xdc00u;
+		addr = normalize(addr);
+
 		// Timer control
 		L_INFO(std::cout << "CIA1 write " << std::hex << std::setw(2) << std::setfill('0') << "CIA1 addr: " << (u32) addr
-							<< " val: " << (u32) val << ' ' << std::bitset<8>{val} << '\n');
+										 << " val: " << (u32) val << ' ' << std::bitset<8>{val} << '\n');
 
-		if (addr == 0xdc00) {
-			if (val == 0xff) { // invalid state
-				return get(addr) = val;
-			}
-		} else if (addr == 0xdc0du) {
+		if (addr == 0xdc0du) {
 			if (BIT(val, 7)) {
 				get(addr) = val;
 			} else {
@@ -215,7 +153,8 @@ public:
 
 	inline u8 read(u16 addr) {
 		addr = (addr & 0xfu) + 0xdc00u;
-		L_INFO(std::cout << "CIA1 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << ' ');
+		L_INFO(
+				std::cout << "CIA1 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << ' ');
 
 		// Port B, keyboard matrix rows and joystick
 		if (addr == 0xdc01) {
@@ -229,12 +168,10 @@ public:
 				}
 			}
 
-			auto keystate = SDL_GetKeyboardState(nullptr);
-
 			u8 mask{};
 			for (u8 i = 0; i < 0x8u; i++) {
-				if (keystate[keymap[pos][i]]) {
-					mask |= (keymap[pos][i] ? 0x1u : 0x0u) << i;
+				if (keyboard.isKeyPressed(pos, i)) {
+					mask |= 1u << i;
 				}
 			}
 

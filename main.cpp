@@ -54,8 +54,8 @@ int main() {
 
 	ROM rom(kernal, basic, chargen, vicIO);
 	MMU mmu(rom, cia1, cia2);
-	CPU cpu(clk, mmu);
 	mmu.write(1, 0x07u);
+	CPU cpu(clk, mmu);
 	VIC vic{clk, mmu, screen};
 	Loop loop{screen, event};
 

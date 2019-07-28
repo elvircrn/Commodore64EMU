@@ -30,6 +30,10 @@ public:
 		mem[regAddr + 1] = HI(val);
 		return val;
 	}
+
+	inline u16 normalize(u16 addr) const {
+		return addressBase + (addr & size);
+	}
 };
 
 #endif //NESEMU_REGISTERHOLDER_H

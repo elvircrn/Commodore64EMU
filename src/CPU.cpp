@@ -19,7 +19,6 @@ CPU::CPU(Clock &_clock, MMU &_mmu, u16 _pc)
 CPU::~CPU() = default;
 
 void CPU::init() {
-	// TODO: Check if IRQ should be disabled
 	p = 0x24; // IRQ disabled
 	a = 0;
 	x = 0;
@@ -29,12 +28,7 @@ void CPU::init() {
 }
 
 void CPU::init(u16 _pc) {
-	// TODO: Check if IRQ should be disabled
-	p = 0x24; // IRQ disabled
-	a = 0;
-	x = 0;
-	y = 0;
-	sp = 0xfd;
+	init();
 	pc = _pc;
 }
 
@@ -555,7 +549,6 @@ void CPU::ASL() {
 	UpdNZ(val);
 }
 
-// TODO: Consider refactoring into a non-templated function
 template<AddressingModes mode>
 void CPU::BCC() {
 	u16 loc = getPureOperand<mode>();
@@ -893,7 +886,7 @@ void CPU::SBC() {
 	if (D()) {
 		C(res < 0x100u);
 	} else {
-		UpdC(a, rhs, res);
+		UpdC(res);
 	}
 	UpdV(a, rhs, res);
 	a = res & 0xffu;

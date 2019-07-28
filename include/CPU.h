@@ -40,7 +40,6 @@ enum AddressingModes {
 	INDEXED_INDIRECT_X
 };
 
-// TODO: Check if every instructions increases the PC by at least 1.
 class CPU {
 	static constexpr bool ignoreUnknownInstr = true;
 	Clock &clock;
@@ -64,7 +63,6 @@ class CPU {
 	bool calcCrossed;
 
 	// Buffers
-	u16 buff16;
 	u8 buff8;
 
 	// Absolute along with its variants, and immediate reads mutate the program counter, therefore
@@ -207,7 +205,6 @@ public:
 #pragma endregion
 
 #pragma region Setup
-	// TODO: Consider refactoring into an external class?
 	void init();
 	void init(u16 pc);
 	// Called before instruction execution
@@ -250,7 +247,7 @@ public:
 	inline void SetFlag(Flags, bool);
 	inline bool GetFlag(Flags) const;
 
-	inline void UpdC(u8, u8, u16);
+	inline void UpdC(u16 r);
 	inline void UpdV(u8, u8, u16);
 	inline void UpdCV(u8, u8, u16);
 
@@ -497,13 +494,13 @@ inline void CPU::UpdV(u8 x, u8 y, u16 r) {
 	V(static_cast<bool>(~(x ^ y) & (r ^ x) & 0x80u));
 }
 
-inline void CPU::UpdC(u8 x, u8 y, u16 r) {
+inline void CPU::UpdC(u16 r) {
 	C(0xff < r);
 }
 
 inline void CPU::UpdCV(u8 pX, u8 pY, u16 r) {
 	UpdV(pX, pY, r);
-	UpdC(pX, pY, r);
+	UpdC(r);
 }
 
 inline void CPU::UpdN(u8 x) {

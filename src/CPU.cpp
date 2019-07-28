@@ -965,12 +965,6 @@ void CPU::TYA() {
 	UpdNZ(a);
 }
 
-template<AddressingModes mode>
-void CPU::LAX() {
-	LDA<mode>();
-	TAX<mode>();
-}
-
 // INT is not a 6502 instruction. It is simply an interrupt handler.
 template<Interrupts inter>
 void CPU::INT() {
@@ -1021,28 +1015,6 @@ void CPU::INT() {
 	if constexpr (inter == NMI) {
 		nmi = false;
 	}
-}
-
-template<AddressingModes mode>
-void CPU::LSE() {
-	u8 op = getOperand8<mode>();
-	C(static_cast<bool>(op & 0x1u));
-	op >>= 0x1u;
-	a ^= op;
-	UpdNZ(a);
-}
-
-template<AddressingModes mode>
-void CPU::RLA() {
-	tick(CalcBaseTicks<mode>());
-	tick(CalcShiftTicks<mode>());
-	u8 mem = getOperand8<mode>();
-	u8 t = mem;
-	mem <<= 1u;
-	mem |= static_cast<u8>(C());
-	a &= mem;
-	C(t & 0x80u);
-	UpdNZ(mem);
 }
 
 void CPU::interruptRequest() {

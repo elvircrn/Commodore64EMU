@@ -463,24 +463,6 @@ public:
 	void TYA();  //....	transfer Y to accumulator
 	template<Interrupts inter>
 	void INT();
-
-	// Unofficial opcodes
-	template<AddressingModes mode>
-	void LAX();
-	template<AddressingModes mode>
-	void SAX();
-	template<AddressingModes mode>
-	void ALR();
-	template<AddressingModes mode>
-	void ANC();
-	template<AddressingModes mode>
-	void ARR();
-	template<AddressingModes mode>
-	void AXS();
-	template<AddressingModes mode>
-	void LSE();
-	template<AddressingModes mode>
-	void RLA();
 #pragma endregion
 
 #pragma region Operand calculator

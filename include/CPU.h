@@ -2,8 +2,6 @@
 #ifndef NESEMU_CPU_H
 #define NESEMU_CPU_H
 
-//#define TEST_MODE
-
 #include <cstdint>
 #include <vector>
 #include <deque>

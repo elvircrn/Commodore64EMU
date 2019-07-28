@@ -11,29 +11,23 @@ private:
 
 public:
 	inline virtual u8 get(const u16 &addr) const {
-		const u8 regAddr = ((addr - addressBase) & 0xffu);
-		return mem[regAddr];
+		return mem[toMem(addr)];
 	}
 
 	inline u16 get16(const u16 &addr) const {
-		const u8 regAddr = ((addr - addressBase) & 0xffu);
-		return mem[regAddr] + (mem[regAddr + 1] << 0x8u);
+		return mem[toMem(addr)] + (mem[toMem(addr + 1)] << 0x8u);
 	}
 
 	inline virtual u8 set(const u16 &addr, const u8 &val) {
-		const u8 regAddr = ((addr - addressBase));
-		return mem[regAddr] = val;
-	}
-
-	inline u16 set16(const u16 &addr, const u8 &val) {
-		const u8 regAddr = ((addr - addressBase));
-		mem[regAddr] = LO(val);
-		mem[regAddr + 1] = HI(val);
-		return val;
+		return mem[toMem(addr)] = val;
 	}
 
 	inline u16 normalize(u16 addr) const {
 		return addressBase + (addr & bits);
+	}
+
+	inline u16 toMem(u16 addr) const {
+		return normalize(addr) - addressBase;
 	}
 };
 

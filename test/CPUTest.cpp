@@ -4,7 +4,6 @@
 #include "StreamUtil.h"
 #include "cmrc/cmrc.hpp"
 
-#include <fstream>
 #include <iomanip>
 #include "MMU.h"
 CMRC_DECLARE(test_resources);
@@ -25,8 +24,11 @@ TEST_CASE("CPU Test") {
 	auto fs = cmrc::test_resources::get_filesystem();
 	MMU mmu{rom, cia1, cia2};
 
-//	MMULoader mmuLoader{fs, mmu};
-//	mmuLoader.dumpToRAM("res/6502_functional_test.bin", 0x400);
+	auto content = fs.open("res/6502_functional_test.bin");
+	u32 addr = 0x400;
+	for (const auto& it : content) {
+		mmu.writeRAM(addr++, it);
+	}
 
 	CPU cpu(clk, mmu, 0x400);
 

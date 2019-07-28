@@ -73,9 +73,6 @@ public:
 		keymap[7][5] = SDL_SCANCODE_LGUI; // commodore key
 	}
 
-	void updateKeystate() {
-	}
-
 	inline bool isKeyPressed(u8 kX, u8 kY) {
 		return isKeyPressed(keymap[kX][kY]);
 	}

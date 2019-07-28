@@ -26,7 +26,11 @@ void CPU::init() {
 }
 
 void CPU::init(u16 _pc) {
-	init();
+	p = 0x24; // IRQ disabled
+	a = 0;
+	x = 0;
+	y = 0;
+	sp = 0xfd;
 	pc = _pc;
 }
 
@@ -616,11 +620,9 @@ void CPU::BPL() {
 // NOTE: Mostly used for debugging.
 template<AddressingModes mode>
 void CPU::BRK() {
-#ifdef TEST_MODE
 	if (!I()) {
 		INT<Interrupts::BRK>();
 	}
-#endif
 }
 
 template<AddressingModes mode>
@@ -962,13 +964,9 @@ void CPU::INT() {
 	// very next byte after the BRK, but to the second byte after it. This
 	// padding byte can be used for a signature byte to tell the BReaK interrupt
 	// routine which BRK caused the particular software interrupt.
-//#ifdef TEST_MODE
-//	if constexpr (inter != Interrupts::RST) {
 	if constexpr (inter != Interrupts::IRQ && inter != Interrupts::NMI) {
 		pc++;
 	}
-//	}
-//#endif
 
 	tick();
 
@@ -980,11 +978,7 @@ void CPU::INT() {
 	// or recovery code.
 	if constexpr (inter != Interrupts::RST) {
 		Push16(pc);
-#ifdef TEST_MODE
 		Push8(p | (u8) ((Interrupts::BRK == inter) << 0x4u));
-#else
-		Push8(p & (u8) (0xffu ^ (u8) ((Interrupts::BRK == inter) << 0x4u)));
-#endif
 	} else {
 		// s -= 3;
 		tick(3);

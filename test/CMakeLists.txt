@@ -6,7 +6,7 @@ include(CMakeRC.cmake)
 target_link_libraries(NESEmuLib)
 
 include_directories(${THIRD_PARTY_INCLUDE_PATH})
-add_executable(NESTest ${source_files} catch.hpp CPUTest.cpp)
+add_executable(NESTest ${source_files} catch.hpp CPUTest.cpp BitTest.cpp)
 
 
 set(TEST_ASSET_COPY_DIR $<TARGET_FILE_DIR:NESTest>/res)

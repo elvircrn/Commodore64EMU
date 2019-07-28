@@ -14,9 +14,6 @@
 #include "RegisterHolder.h"
 
 class CIA1 : public RegisterHolder<0xDC00, 0x10> {
-	/**
-	 * Addresses
-	 */
 	static constexpr u16 ADDRESS_COUNTER_A = 0xDC04u;
 	static constexpr u16 ADDRESS_COUNTER_B = 0xDC06u;
 	static constexpr u16 TIMER_CONTROL_REGISTER_A = 0xDC0Eu;
@@ -26,34 +23,16 @@ class CIA1 : public RegisterHolder<0xDC00, 0x10> {
 	/**
 	 * DC0D Control values, read values
 	 */
-	// Bit #0
-	void setTimerAUnderflow(bool val) {
-		set(INTERRUPT_CONTROL_STATUS, get(INTERRUPT_CONTROL_STATUS) | (0xffu & (u8(val << 0x0u))));
+	inline void setTimerAUnderflow(bool val) {
+		set(INTERRUPT_CONTROL_STATUS, SET(get(INTERRUPT_CONTROL_STATUS), 0, val));
 	}
 
-	// Bit #1
-	void setTimerBUnderflow(bool val) {
-		set(INTERRUPT_CONTROL_STATUS, get(INTERRUPT_CONTROL_STATUS) | (0xffu & (u8(val << 0x1u))));
+	inline void setTimerBUnderflow(bool val) {
+		set(INTERRUPT_CONTROL_STATUS, SET(get(INTERRUPT_CONTROL_STATUS), 1, val));
 	}
 
-	// Bit #2
-	void setTimerTODEqual(bool val) {
-		set(INTERRUPT_CONTROL_STATUS, get(INTERRUPT_CONTROL_STATUS) | (0xffu & (u8(val << 0x2u))));
-	}
-
-	// Bit #3
-	void setShiftRegisterOverflow(bool val) {
-		set(INTERRUPT_CONTROL_STATUS, get(INTERRUPT_CONTROL_STATUS) | (0xffu & (u8(val << 0x3u))));
-	}
-
-	// Bit #4
-	void setSignalLevelOnFLAGPin(bool val) {
-		set(INTERRUPT_CONTROL_STATUS, get(INTERRUPT_CONTROL_STATUS) | (0xffu & (u8(val << 0x4u))));
-	}
-
-	// Bit #7
-	void setInterruptGenerated(bool val) {
-		set(INTERRUPT_CONTROL_STATUS, get(INTERRUPT_CONTROL_STATUS) | (0xffu & (u8(val << 0x7u))));
+	inline void setInterruptGenerated(bool val) {
+		set(INTERRUPT_CONTROL_STATUS, SET(get(INTERRUPT_CONTROL_STATUS), 7, val));
 	}
 
 	/**
@@ -64,17 +43,18 @@ class CIA1 : public RegisterHolder<0xDC00, 0x10> {
 	std::function<void()> generateInterrupt;
 
 	u16 timerA{}, timerB{};
+	bool interruptAEnabled{}, interruptBEnabled{};
 
 	SDL_Event &event;
 
 	Keyboard keyboard{};
 
 	inline bool isInterruptAEnabled() {
-		return BIT(get(INTERRUPT_CONTROL_STATUS), 0);
+		return interruptAEnabled;
 	}
 
 	inline bool isInterruptBEnabled() {
-		return BIT(get(INTERRUPT_CONTROL_STATUS), 1);
+		return interruptBEnabled;
 	}
 
 	inline bool isTimerAEnabled() {
@@ -113,27 +93,33 @@ public:
 		L_INFO(std::cout << "CIA1 write " << std::hex << std::setw(2) << std::setfill('0') << "CIA1 addr: " << (u32) addr
 										 << " val: " << (u32) val << ' ' << std::bitset<8>{val} << '\n');
 
-		if (addr == 0xdc0du) {
-			if (BIT(val, 7)) {
-				set(addr, val);
-			} else {
-				set(addr, 0);
+		if (addr == INTERRUPT_CONTROL_STATUS) {
+			// Any bits set to 1 other than the 7-th bit, get
+			// their values from the bit #7.
+			bool setBit = BIT(val, 7);
+			if (BIT(val, 0)) {
+				interruptAEnabled = setBit;
 			}
-		} else if (addr == 0xdc0e) {
+			if (BIT(val, 1)) {
+				interruptBEnabled = setBit;
+			}
+
+			return (interruptAEnabled | (interruptBEnabled << 0x1u));
+		} else if (addr == TIMER_CONTROL_REGISTER_A) {
 			// Bit 4: 1 = Load latch into the timer once.
 			if (BIT(val, 4)) {
 				timerA = timerALatch();
 			}
-		} else if (addr == 0xdc0f) {
+		} else if (addr == TIMER_CONTROL_REGISTER_B) {
 			if (BIT(val, 4)) {
-				timerB = timerBLatch();
+				return timerB = timerBLatch();
 			}
 		}
 		return set(addr, val);
 	}
 
 	inline u8 read(u16 addr) {
-		addr = (addr & 0xfu) + 0xdc00u;
+		addr = normalize(addr);
 		L_INFO(
 				std::cout << "CIA1 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << ' ');
 

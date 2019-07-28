@@ -6,30 +6,17 @@
 #include <array>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_render.h>
+
+#include "GraphicsConstants.h"
 #include "core.h"
 
 class Screen {
-	int NUM_COLS = 40;
-	int NUM_ROWS = 25;
-
-	u8 BLOCK_SIZE = 0x8u;
-
-	u8 PIXEL_MULTIPLIER = 1;
-
-	/**
-	 * Alternatively, one could go about implementing these
-	 * constants in the following manner:
-	 *
-	 * u16 WINDOW_WIDTH = NUM_COLS * PIXEL_MULTIPLIER * BLOCK_SIZE;
-	 * u16 WINDOW_HEIGHT = NUM_ROWS * PIXEL_MULTIPLIER * BLOCK_SIZE;
-	 */
-	static constexpr u16 WINDOW_WIDTH = 403;
-	static constexpr u16 WINDOW_HEIGHT = 284;
+	const SDL_Rect screenRectrangle{0, 0, GraphicsConstants::WINDOW_WIDTH, GraphicsConstants::WINDOW_HEIGHT};
 
 	SDL_Texture *texture;
 	SDL_Renderer *renderer;
-	std::array<u32, WINDOW_WIDTH * WINDOW_HEIGHT> screen{};
-	std::array<u32, 16> colors;
+	std::array<u32, GraphicsConstants::WINDOW_WIDTH * GraphicsConstants::WINDOW_HEIGHT> screen{};
+	std::array<u32, 16> colors{};
 
 public:
 	Screen(SDL_Texture *_texture, SDL_Renderer *_renderer) : texture(_texture), renderer(_renderer) {
@@ -54,27 +41,17 @@ public:
 
 	void drawPixel(u32 x, u32 y, u8 data, u32 color) {
 		if (data) {
-			screen[y * WINDOW_WIDTH + x] = colors[1];
+			screen[y * GraphicsConstants::WINDOW_WIDTH + x] = colors[1];
 		} else {
-			screen[y * WINDOW_WIDTH + x] = colors[color];
+			screen[y * GraphicsConstants::WINDOW_WIDTH + x] = colors[color];
 		}
 	}
 
-	void drawPixels(u32 x, u32 y, const std::vector<u8> &data) {
-		u32 id = NUM_COLS * x + y;
-		std::copy(data.begin(), data.end(), screen.begin() + id);
-	}
-
 	void flushTexture() {
-		SDL_UpdateTexture(texture, nullptr, screen.data(), WINDOW_WIDTH * sizeof(u32));
-		SDL_Rect texture_rect;
-		texture_rect.x = 0;  //the x coordinate
-		texture_rect.y = 0; // the y coordinate
-		texture_rect.w = 403; //the width of the texture
-		texture_rect.h = 284; //the height of the texture
+		SDL_UpdateTexture(texture, nullptr, screen.data(), GraphicsConstants::WINDOW_WIDTH * sizeof(u32));
 
 		SDL_RenderClear(renderer);
-		SDL_RenderCopy(renderer, texture, nullptr, &texture_rect);
+		SDL_RenderCopy(renderer, texture, nullptr, &screenRectrangle);
 
 	}
 

@@ -52,8 +52,12 @@ public:
 		return rasterCounter < GraphicsConstants::FIRST_BORDER_LINE || GraphicsConstants::FIRST_BORDER_LINE + GraphicsConstants::LAST_BORDER_LINE <= rasterCounter;
 	}
 
-	static inline bool isBorderLine(u16 rasterCounter) {
+	static inline bool isHorizontalBorder(u16 rasterCounter) {
 		return rasterCounter <= GraphicsConstants::BORDER_DIMENSIONS + GraphicsConstants::FIRST_BORDER_LINE || 257 <= rasterCounter;
+	}
+
+	static inline bool isVerticalBorder(u16 x) {
+		return x < GraphicsConstants::BORDER_DIMENSIONS || x >= GraphicsConstants::BORDER_DIMENSIONS + GraphicsConstants::TEXT_AREA_WIDTH;
 	}
 
 	inline u8 getControlRegister1() {

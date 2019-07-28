@@ -5,8 +5,8 @@
 
 class GraphicsConstants {
 public:
-
-
+	static constexpr u16 WINDOW_WIDTH = 403;
+	static constexpr u16 WINDOW_HEIGHT = 284;
 
 	static constexpr u16 TEXT_AREA_HEIGHT = 200;
 	static constexpr u16 TEXT_AREA_WIDTH = 320;

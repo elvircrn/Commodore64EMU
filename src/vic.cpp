@@ -43,30 +43,27 @@ void VIC::tick() {
 
 	u8 borderColor = get(BORDER_COLOR);
 	if (!isVBlank(rasterCounter)) {
-		if (isBorderLine(rasterCounter)) {
+		if (isHorizontalBorder(rasterCounter)) {
 			for (size_t i = 0; i < 403; i++) {
 				screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, 0, borderColor);
 			}
 			blockRowId = 0;
 		} else {
-			for (u32 i = 0; i < GraphicsConstants::FIRST_VISIBLE_VERTICAL_LINE; i++) {
-				screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, 0, borderColor);
-			}
+			for (u32 i = 0; i < GraphicsConstants::WINDOW_WIDTH; i++) {
+				if (isVerticalBorder(i)) {
+					screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, 0, borderColor);
+				} else {
+					u32 pixelId = i - GraphicsConstants::FIRST_VISIBLE_VERTICAL_LINE;
 
-			for (u32 i = GraphicsConstants::FIRST_VISIBLE_VERTICAL_LINE; i < GraphicsConstants::LAST_VISIBLE_VERTICAL_LINE; i++) {
-				u32 pixelId = i - GraphicsConstants::FIRST_VISIBLE_VERTICAL_LINE;
+					u8 blockColumn = pixelId / 8; // TODO: Extract 25 as constant
+					u8 blockRow =
+							(rasterCounter - GraphicsConstants::FIRST_VISIBLE_LINE - GraphicsConstants::FIRST_BORDER_LINE) / 8;
 
-				u8 blockColumn = pixelId / 8; // TODO: Extract 25 as constant
-				u8 blockRow = (rasterCounter - GraphicsConstants::FIRST_VISIBLE_LINE - GraphicsConstants::FIRST_BORDER_LINE) / 8;
-
-				u8 characterId = mmu.read(screenMemBase + blockRow * 40 + blockColumn);
-				u8 charPixelId = (blockRowId * 8) + pixelId % 8;
-				bool charData = getCharData(characterId, charPixelId, 0xd000);
-				screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, charData, get(BACKGROUND_COLOR_0));
-			}
-
-			for (u32 i = GraphicsConstants::LAST_VISIBLE_VERTICAL_LINE; i < 403; i++) {
-				screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, 0, borderColor);
+					u8 characterId = mmu.read(screenMemBase + blockRow * 40 + blockColumn);
+					u8 charPixelId = (blockRowId * 8) + pixelId % 8;
+					bool charData = getCharData(characterId, charPixelId, 0xd000);
+					screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, charData, get(BACKGROUND_COLOR_0));
+				}
 			}
 			blockRowId = (blockRowId + 1) % 8;
 		}

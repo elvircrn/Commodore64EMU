@@ -210,7 +210,7 @@ std::string Debugger::GetStatusLine() const
 
 void Debugger::AppendStatHist(const std::string &stat)
 {
-	statHist.push_back(instructionName[cpu->Read(cpu->PC())] + " " + stat);
+	statHist.push_back(instructionName[cpu->read(cpu->PC())] + " " + stat);
 }
 
 std::string Debugger::GetOpHistForLogging() const

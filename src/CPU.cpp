@@ -2,9 +2,7 @@
 #include "Instructions.h"
 
 #include <array>
-#include <tuple>
 #include <sstream>
-#include <string>
 
 CPU::CPU(Clock &_clock, MMU &_mmu)
 		: clock(_clock), mmu(_mmu), cycleCount{} {
@@ -24,7 +22,7 @@ void CPU::init() {
 	x = 0;
 	y = 0;
 	sp = 0xfd;
-	pc = Read16(vect[Interrupts::RST]);
+	pc = read16(vect[Interrupts::RST]);
 }
 
 void CPU::init(u16 _pc) {
@@ -40,7 +38,7 @@ void CPU::execute() {
 	clear();
 	tick(2);
 
-	u8 op = Read(pc++);
+	u8 op = read(pc++);
 	if (debug && DEBUG) {
 		opHist.push_front(op);
 		if (opHist.size() == 100) {
@@ -55,14 +53,16 @@ void CPU::execute() {
 		pcHist.push_front(pc - 1);
 		bitStack.clear();
 		instrHist.emplace_back(pc,
-													 Instructions::Name(Read(pc - 1)),
-													 std::array<u8, 4>({Read(pc - 1), Read(pc), Read(pc + 1), Read(pc + 2)}));
-		L_DEBUG(std::cout << Instructions::Name(Read(pc - 1)) <<  ' ' << std::hex << ' ' << (int) Read(pc - 1) << ' ' << (int) Read(pc) << ' ' << (int) Read(pc + 1) << ' ' << GetNESTestLine() << '\n');
+													 Instructions::Name(read(pc - 1)),
+													 std::array<u8, 4>({read(pc - 1), read(pc), read(pc + 1), read(pc + 2)}));
+		L_DEBUG(std::cout << Instructions::Name(read(pc - 1)) << ' ' << std::hex << ' ' << (int) read(pc - 1) << ' ' << (int) read(
+				pc) << ' ' << (int) read(
+				pc + 1) << ' ' << GetNESTestLine() << '\n');
 		for (int i = 0; i < 5; i++)
-			bitStack.push_back(Read(pc - 1 + i));
+			bitStack.push_back(read(pc - 1 + i));
 	}
 
-	if (GetNMI()) {
+	if (getNMI()) {
 		pc--;
 		INT<Interrupts::NMI>();
 	} else {
@@ -372,7 +372,7 @@ void CPU::execute() {
 		default: std::stringstream ss;
 			if constexpr (DEBUG && !ignoreUnknownInstr) {
 				for (int i = pcHist.back(); i < pcHist.back() + 10; i++)
-					ss << std::hex << (int) Read(i) << ' ';
+					ss << std::hex << (int) read(i) << ' ';
 				debugDump();
 				L_ERROR(std::cout << "Instruction not found at pc: " + std::to_string(pc) + "\nDump: " + ss.str() << '\n');
 			}
@@ -386,7 +386,7 @@ void CPU::execute() {
 #pragma region Debug and Logging
 void CPU::debugDump() {
 	for (int i = 0xfff0; i < 0x10000; i++)
-		vectors.emplace_back(HexString(i), Read(static_cast<u16>(i)));
+		vectors.emplace_back(HexString(i), read(static_cast<u16>(i)));
 }
 #pragma endregion
 
@@ -413,7 +413,7 @@ u16 CPU::getOperand16() {
 	}
 		// TODO: Check if -2 is needed
 	else if (mode == AddressingModes::INDIRECT)
-		return Ind(Abs());
+		return ind(Abs());
 }
 
 template<AddressingModes mode>
@@ -467,33 +467,33 @@ u8 CPU::getOperand8() {
 	// ADC $3420 -> A + contents of memory $3420
 	if constexpr (mode == AddressingModes::ABSOLUTE) {
 		u16 abs = Abs();
-		return Read(abs);
+		return read(abs);
 		// ADC #2 -> A + 2
 	} else if constexpr (mode == AddressingModes::IMMEDIATE) {
 		buff8 = Imm();
 		return buff8;
 		// ADC $3420,X -> A + contents of memory $3420 + X
 	} else if constexpr (mode == AddressingModes::ABSOLUTE_INDEXED_X) {
-		return Read(AbsX());
+		return read(AbsX());
 		// ADC $3420,Y	-> A + contents of memory $3420 + Y
 	} else if constexpr (mode == AddressingModes::ABSOLUTE_INDEXED_Y) {
-		return Read(AbsY());
+		return read(AbsY());
 		// ADC $F6 -> A + contents of memory $F6
 	} else if constexpr (mode == AddressingModes::ZERO_PAGE) {
-		return Read(Imm() & 0xFF);
+		return read(Imm() & 0xFF);
 	} else if constexpr  (mode == AddressingModes::ZERO_PAGE_X) {
-		return Read((Imm() + x) & 0xFF);
+		return read((Imm() + x) & 0xFF);
 	} else if constexpr (mode == AddressingModes::ZERO_PAGE_Y) {
-		return Read((Imm() + y) & 0xFF);
+		return read((Imm() + y) & 0xFF);
 		// https://www.csh.rit.edu/~moffitt/6502.html#ADDR-IIND
 	} else if constexpr  (mode == AddressingModes::INDEXED_INDIRECT_X) {
 		u8 addr8 = Imm() + x;
 		u16 zp16 = Zp16(addr8);
-		return Read(zp16);
+		return read(zp16);
 	} else if constexpr (mode == AddressingModes::INDIRECT_INDEXED) {
 		u16 zp16 = Zp16(Imm());
 		CrossesPage(zp16, y);
-		return Read(zp16 + y);
+		return read(zp16 + y);
 	} else if constexpr (mode == AddressingModes::ACCUMULATOR) {
 		return a;
 	}
@@ -734,7 +734,7 @@ void CPU::JMP() {
 		tick();
 		pc = Abs();
 	} else if (mode == AddressingModes::INDIRECT)
-		pc = Ind(Abs()); // Ind calls tick
+		pc = ind(Abs()); // Ind calls tick
 }
 
 // TODO: Check if pc - 1 or pc + 1
@@ -1003,7 +1003,7 @@ void CPU::INT() {
 
 	I(true);
 
-	pc = Read16(vect[inter]);
+	pc = read16(vect[inter]);
 
 	if constexpr (inter == NMI) {
 		nmi = false;

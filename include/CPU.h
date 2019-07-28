@@ -17,7 +17,7 @@
 
 // Interrupt types along with their respective vectors
 enum Interrupts { BRK = 0, IRQ, NMI, RST };
-constexpr u16 vect[] = {0xFFFE, 0xFFFE, 0xFFFA, 0xFFFC};
+constexpr std::array<u16, 4> vect = {0xFFFE, 0xFFFE, 0xFFFA, 0xFFFC};
 
 // CPU Flags, _ -> empty
 enum Flags { C, Z, I, D, B, _, V, N };
@@ -59,11 +59,11 @@ class CPU {
 	MMU &mmu;
 
 	// Instructions
-	bool zeroPageCrossed;
-	bool calcCrossed;
+	bool zeroPageCrossed{};
+	bool calcCrossed{};
 
 	// Buffers
-	u8 buff8;
+	u8 buff8{};
 
 	// Absolute along with its variants, and immediate reads mutate the program counter, therefore
 	// the value obtained via these two methods should only be calculated once during the instruction
@@ -71,13 +71,9 @@ class CPU {
 	std::optional<u16> instructionDataLatch;
 
 	// Instruction helpers
-	inline u8 _ASL(const u8 &x) {
-		C(x & 0x80);
-		return (x << 1);
-	}
-	inline u16 _ASL(u16 &x) {
-		C(x & 0x8000);
-		return (x << 1);
+	inline u8 _ASL(const u8 &_x) {
+		C(_x & 0x80u);
+		return (_x << 0x1u);
 	}
 
 /**
@@ -87,11 +83,11 @@ class CPU {
  * @return
  */
 	inline u8 getNibble(u16 val, u8 nibIdx) {
-		return (val >> (4u * nibIdx)) & 0xfu;
+		return (u32) (val >> (4u * nibIdx)) & 0xfu;
 	}
 
 	inline u16 toBinary(u16 in) {
-		return (((in / 1000u) % 10) << 16u) + (((in / 100u) % 10) << 8u) +  (((in / 10u) % 10) << 4u) + (in % 10u);
+		return (((in / 1000u) % 10) << 16u) + (((in / 100u) % 10) << 8u) + (((in / 10u) % 10) << 4u) + (in % 10u);
 	}
 
 	inline u8 toBCD(u8 in) {
@@ -109,7 +105,7 @@ class CPU {
 	// Addressing helpers
 	inline u8 Imm() {
 		if (!instructionDataLatch) {
-			instructionDataLatch.emplace(Read(pc++));
+			instructionDataLatch.emplace(read(pc++));
 		}
 		return static_cast<u8>(instructionDataLatch.value());
 	}
@@ -117,7 +113,7 @@ class CPU {
 	inline u16 Abs() {
 		if (!instructionDataLatch) {
 			pc += 2;
-			instructionDataLatch = Read16(static_cast<u16>(pc - 2));
+			instructionDataLatch = read16(static_cast<u16>(pc - 2));
 		}
 		return instructionDataLatch.value();
 	}
@@ -134,18 +130,18 @@ class CPU {
 		return abs + y;
 	}
 	inline u16 Zp16(u8 addr) {
-		return (mmu.read(static_cast<u16>((addr + 1) & 0xff)) << 8) + mmu.read(addr);
+		return (mmu.read(static_cast<u16>((u16) (addr + 0x1u) & 0xffu)) << 0x8u) + mmu.read(addr);
 	}
 	inline void CrossesPage(u16 addr, u8 offset) {
-		zeroPageCrossed |= ((addr & 0xff00) != ((addr + offset) & 0xff00));
+		zeroPageCrossed |= ((addr & 0xff00u) != ((u16) (addr + offset) & 0xff00u));
 	}
-	// 		return static_cast<u8 &>(mmu(static_cast<u16>(0x0100 + static_cast<u32>(addr))));
+
 	inline void Push8(u8 val) {
 		mmu.write(static_cast<u16>(0x0100 + static_cast<u32>(sp--)), val);
 	}
 	inline void Push16(u16 val) {
-		Push8(static_cast<u8>(val >> 8));
-		Push8(static_cast<u8>(val & 0xFF));
+		Push8(static_cast<u8>(val >> 0x8u));
+		Push8(static_cast<u8>(val & 0xffu));
 	}
 	inline u8 Pop8() {
 		sp++;
@@ -153,7 +149,7 @@ class CPU {
 	}
 	inline u16 Pop16() {
 		u8 lo = Pop8();
-		u16 hi = Pop8() << 8;
+		u16 hi = Pop8() << 0x8u;
 		return hi + lo;
 	}
 
@@ -161,20 +157,19 @@ class CPU {
 	inline bool N() { return GetFlag(Flags::N); }
 	inline bool V() { return GetFlag(Flags::V); }
 	inline bool U() { return GetFlag(Flags::_); }
-	inline bool B() { return GetFlag(Flags::B); }
 	inline bool D() { return GetFlag(Flags::D); }
 	inline bool I() { return GetFlag(Flags::I); }
 	inline bool Z() { return GetFlag(Flags::Z); }
 	inline bool C() { return GetFlag(Flags::C); }
 
-	inline void N(bool x) { SetFlag(Flags::N, x); }
-	inline void V(bool x) { SetFlag(Flags::V, x); }
-	inline void U(bool x) { SetFlag(Flags::_, x); }
-	inline void B(bool x) { SetFlag(Flags::B, x); }
-	inline void D(bool x) { SetFlag(Flags::D, x); }
-	inline void I(bool x) { SetFlag(Flags::I, x); }
-	inline void Z(bool x) { SetFlag(Flags::Z, x); }
-	inline void C(bool x) { SetFlag(Flags::C, x); }
+	inline void N(bool _x) { SetFlag(Flags::N, _x); }
+	inline void V(bool _x) { SetFlag(Flags::V, _x); }
+	inline void U(bool _x) { SetFlag(Flags::_, _x); }
+	inline void B(bool _x) { SetFlag(Flags::B, _x); }
+	inline void D(bool _x) { SetFlag(Flags::D, _x); }
+	inline void I(bool _x) { SetFlag(Flags::I, _x); }
+	inline void Z(bool _x) { SetFlag(Flags::Z, _x); }
+	inline void C(bool _x) { SetFlag(Flags::C, _x); }
 
 public:
 	inline u8 A() { return a; }
@@ -184,17 +179,9 @@ public:
 	inline u8 SP() { return sp; }
 	inline u8 P() { return p; }
 
-	inline u8 A(u8 _a) { return a = _a; }
-	inline u8 X(u8 _x) { return x = _x; }
-	inline u8 Y(u8 _y) { return y = _y; }
-	inline u16 PC(u16 _pc) { return pc = _pc; }
-	inline u8 SP(u8 _sp) { return sp = _sp; }
-	inline u8 P(u8 _p) { return p = _p; }
-
 #pragma region Debug
 	static constexpr bool DEBUG = true;
 	bool debug = false;
-	bool isDebug() const;
 	void setDebug(bool debug);
 	std::deque<u16> pcHist;
 	std::deque<u8> opHist;
@@ -217,28 +204,22 @@ public:
 #pragma endregion
 
 #pragma region Memory
-	bool inline isOAMDMA(u16 addr) {
-		return addr == 0x4014;
-	}
 
 	// Default memory layout, no reference to PPU
-	inline u8 Read(u16 addr) const {
+	inline u8 read(u16 addr) const {
 		return mmu.read(addr);
 	}
 
 	inline bool write(const u16 &addr, const u8 &value) {
-		if (!oamDmaIdx && isOAMDMA(addr)) {
-			oamDmaIdx = 256;
-		}
 		mmu.write(addr, value);
 		return true;
 	}
 
-	inline u16 Read16(u16 addr) { return Read(addr) + (Read(addr + 1) << 8); }
-	inline u16 Ind(u16 addr) {
+	inline u16 read16(u16 addr) { return read(addr) + (read(addr + 1) << 8u); }
+	inline u16 ind(u16 addr) {
 		tick(3);
-		u8 lo = Read(addr);
-		u8 hi = Read((addr & 0xff00u) + LO(addr + 1));
+		u8 lo = read(addr);
+		u8 hi = read((addr & 0xff00u) + LO(addr + 1));
 		return lo + (hi << 8u);
 	}
 #pragma endregion
@@ -255,8 +236,7 @@ public:
 	inline void UpdZ(u8);
 	inline void UpdNZ(u8);
 
-	inline void setNMI(bool _nmi) { nmi = _nmi; }
-	inline bool GetNMI() { return nmi; }
+	inline bool getNMI() { return nmi; }
 #pragma endregion
 
 #pragma region Constructors
@@ -267,13 +247,11 @@ public:
 
 #pragma region Timing
 	int cycleCount;
-	int delta;
+	int delta{};
 	inline void tick(int cycles = 1) {
 		cycleCount += cycles;
 		delta += cycles;
 	}
-
-	inline int Delta() { return delta; }
 
 	// NOTE Do not use with jumps or returns!
 #pragma region Tick calculation
@@ -337,11 +315,11 @@ public:
 		std::stringstream ss;
 
 		ss << "PC:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) PC()
-				<< " A:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) A()
-				<< " X:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) X()
-				<< " Y:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) Y()
-				<< " P:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) P()
-				<< " SP:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) SP();
+			 << " A:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) A()
+			 << " X:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) X()
+			 << " Y:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) Y()
+			 << " P:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) P()
+			 << " SP:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) SP();
 
 		return ss.str();
 	}
@@ -471,9 +449,6 @@ public:
 	bool writeOperandVal(const u8 &val);
 	template<AddressingModes m>
 	u16 getPureOperand();
-
-	template<AddressingModes m>
-	constexpr inline bool Is8Bit() { return !(0 <= m && m < 2); }
 #pragma endregion
 	u16 oamDmaIdx = 0;
 };
@@ -483,15 +458,15 @@ public:
 
 // Flags
 inline void CPU::SetFlag(Flags f, bool bit) {
-	p ^= (-(static_cast<int>(bit)) ^ p) & (1u << f);
+	p ^= (-(static_cast<u32>(bit)) ^ p) & (1u << f);
 }
 
 inline bool CPU::GetFlag(Flags f) const {
-	return (p & (1 << f)) > 0;
+	return (p & (0x1u << f)) > 0;
 }
 
-inline void CPU::UpdV(u8 x, u8 y, u16 r) {
-	V(static_cast<bool>(~(x ^ y) & (r ^ x) & 0x80u));
+inline void CPU::UpdV(u8 _x, u8 _y, u16 r) {
+	V(static_cast<bool>(~(_x ^ _y) & (r ^ x) & 0x80u));
 }
 
 inline void CPU::UpdC(u16 r) {
@@ -503,25 +478,21 @@ inline void CPU::UpdCV(u8 pX, u8 pY, u16 r) {
 	UpdC(r);
 }
 
-inline void CPU::UpdN(u8 x) {
-	SetFlag(Flags::N, static_cast<bool>(x & 0x80));
+inline void CPU::UpdN(u8 _x) {
+	SetFlag(Flags::N, static_cast<bool>(_x & 0x80));
 }
 
-inline void CPU::UpdZ(u8 x) {
-	SetFlag(Flags::Z, !x);
+inline void CPU::UpdZ(u8 _x) {
+	SetFlag(Flags::Z, !_x);
 }
 
-inline void CPU::UpdNZ(u8 x) {
-	UpdN(x);
-	UpdZ(x);
+inline void CPU::UpdNZ(u8 _x) {
+	UpdN(_x);
+	UpdZ(_x);
 }
 
-inline bool CPU::isDebug() const {
-	return debug;
-}
-
-inline void CPU::setDebug(bool debug) {
-	CPU::debug = debug;
+inline void CPU::setDebug(bool _debug) {
+	CPU::debug = _debug;
 }
 
 #endif

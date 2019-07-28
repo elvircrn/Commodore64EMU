@@ -89,8 +89,7 @@ public:
 										 << " val: " << (u32) val << ' ' << std::bitset<8>{val} << '\n');
 
 		if (addr == INTERRUPT_CONTROL_STATUS) {
-			// Any bits set to 1 other than the 7-th bit, get
-			// their values from the bit #7.
+			// Any bits set to 1 other than the 7-th bit, get their values from the bit #7.
 			bool setBit = BIT(val, 7);
 			if (BIT(val, 0)) {
 				interruptAEnabled = setBit;
@@ -98,7 +97,6 @@ public:
 			if (BIT(val, 1)) {
 				interruptBEnabled = setBit;
 			}
-
 			return (interruptAEnabled | (interruptBEnabled << 0x1u));
 		} else if (addr == TIMER_CONTROL_REGISTER_A) {
 			// Bit 4: 1 = Load latch into the timer once.
@@ -143,11 +141,6 @@ public:
 				mask = 0xffu;
 			}
 			return mask;
-		} else if (addr == 0xdc0c) {
-			// TODO: Figure out how CNT input pin works. Check if this is actually used.
-		} else if (addr == 0xdc0d) {
-
-		} else if (addr == 0xdc0e) {
 		}
 
 		return get(addr);

@@ -35,11 +35,6 @@ class CIA1 : public RegisterHolder<0xDC00, 0x10> {
 		set(INTERRUPT_CONTROL_STATUS, SET(get(INTERRUPT_CONTROL_STATUS), 7, val));
 	}
 
-	/**
-	 * CIA1 Register values
-	 */
-	std::array<u8, 0x10u> mem{};
-
 	std::function<void()> generateInterrupt;
 
 	u16 timerA{}, timerB{};

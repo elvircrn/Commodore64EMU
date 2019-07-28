@@ -57,7 +57,7 @@ void CPU::execute() {
 													 std::array<u8, 4>({read(pc - 1), read(pc), read(pc + 1), read(pc + 2)}));
 		L_DEBUG(std::cout << Instructions::Name(read(pc - 1)) << ' ' << std::hex << ' ' << (int) read(pc - 1) << ' ' << (int) read(
 				pc) << ' ' << (int) read(
-				pc + 1) << ' ' << GetNESTestLine() << '\n');
+				pc + 1) << ' ' << getNESTestLine() << '\n');
 		for (int i = 0; i < 5; i++)
 			bitStack.push_back(read(pc - 1 + i));
 	}
@@ -886,7 +886,7 @@ void CPU::SBC() {
 	if (D()) {
 		C(res < 0x100u);
 	} else {
-		UpdC(res);
+		updC(res);
 	}
 	UpdV(a, rhs, res);
 	a = res & 0xffu;

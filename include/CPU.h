@@ -154,22 +154,22 @@ class CPU {
 	}
 
 	// Flag helpers
-	inline bool N() { return GetFlag(Flags::N); }
-	inline bool V() { return GetFlag(Flags::V); }
-	inline bool U() { return GetFlag(Flags::_); }
-	inline bool D() { return GetFlag(Flags::D); }
-	inline bool I() { return GetFlag(Flags::I); }
-	inline bool Z() { return GetFlag(Flags::Z); }
-	inline bool C() { return GetFlag(Flags::C); }
+	inline bool N() { return getFlag(Flags::N); }
+	inline bool V() { return getFlag(Flags::V); }
+	inline bool U() { return getFlag(Flags::_); }
+	inline bool D() { return getFlag(Flags::D); }
+	inline bool I() { return getFlag(Flags::I); }
+	inline bool Z() { return getFlag(Flags::Z); }
+	inline bool C() { return getFlag(Flags::C); }
 
-	inline void N(bool _x) { SetFlag(Flags::N, _x); }
-	inline void V(bool _x) { SetFlag(Flags::V, _x); }
-	inline void U(bool _x) { SetFlag(Flags::_, _x); }
-	inline void B(bool _x) { SetFlag(Flags::B, _x); }
-	inline void D(bool _x) { SetFlag(Flags::D, _x); }
-	inline void I(bool _x) { SetFlag(Flags::I, _x); }
-	inline void Z(bool _x) { SetFlag(Flags::Z, _x); }
-	inline void C(bool _x) { SetFlag(Flags::C, _x); }
+	inline void N(bool _x) { setFlag(Flags::N, _x); }
+	inline void V(bool _x) { setFlag(Flags::V, _x); }
+	inline void U(bool _x) { setFlag(Flags::_, _x); }
+	inline void B(bool _x) { setFlag(Flags::B, _x); }
+	inline void D(bool _x) { setFlag(Flags::D, _x); }
+	inline void I(bool _x) { setFlag(Flags::I, _x); }
+	inline void Z(bool _x) { setFlag(Flags::Z, _x); }
+	inline void C(bool _x) { setFlag(Flags::C, _x); }
 
 public:
 	inline u8 A() { return a; }
@@ -225,10 +225,10 @@ public:
 #pragma endregion
 
 #pragma region Flags
-	inline void SetFlag(Flags, bool);
-	inline bool GetFlag(Flags) const;
+	inline void setFlag(Flags, bool);
+	inline bool getFlag(Flags) const;
 
-	inline void UpdC(u16 r);
+	inline void updC(u16 r);
 	inline void UpdV(u8, u8, u16);
 	inline void UpdCV(u8, u8, u16);
 
@@ -311,7 +311,7 @@ public:
 #pragma region Instructions
 	void interruptRequest();
 
-	std::string GetNESTestLine() {
+	std::string getNESTestLine() {
 		std::stringstream ss;
 
 		ss << "PC:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) PC()
@@ -457,33 +457,33 @@ public:
 
 
 // Flags
-inline void CPU::SetFlag(Flags f, bool bit) {
+inline void CPU::setFlag(Flags f, bool bit) {
 	p ^= (-(static_cast<u32>(bit)) ^ p) & (1u << f);
 }
 
-inline bool CPU::GetFlag(Flags f) const {
+inline bool CPU::getFlag(Flags f) const {
 	return (p & (0x1u << f)) > 0;
 }
 
 inline void CPU::UpdV(u8 _x, u8 _y, u16 r) {
-	V(static_cast<bool>(~(_x ^ _y) & (r ^ x) & 0x80u));
+	V(static_cast<bool>(~(_x ^ _y) & (r ^ _x) & 0x80u));
 }
 
-inline void CPU::UpdC(u16 r) {
+inline void CPU::updC(u16 r) {
 	C(0xff < r);
 }
 
 inline void CPU::UpdCV(u8 pX, u8 pY, u16 r) {
 	UpdV(pX, pY, r);
-	UpdC(r);
+	updC(r);
 }
 
 inline void CPU::UpdN(u8 _x) {
-	SetFlag(Flags::N, static_cast<bool>(_x & 0x80));
+	setFlag(Flags::N, static_cast<bool>(_x & 0x80));
 }
 
 inline void CPU::UpdZ(u8 _x) {
-	SetFlag(Flags::Z, !_x);
+	setFlag(Flags::Z, !_x);
 }
 
 inline void CPU::UpdNZ(u8 _x) {

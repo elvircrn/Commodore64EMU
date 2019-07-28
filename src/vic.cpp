@@ -1,6 +1,6 @@
 #include "vic.h"
-
 #include "core.h"
+#include "GraphicsConstants.h"
 
 u64 VIC::getCharData(u16 characterId) {
 	u64 data{};
@@ -45,41 +45,28 @@ void VIC::tick() {
 	if (!isVBlank(rasterCounter)) {
 		if (isBorderLine(rasterCounter)) {
 			for (size_t i = 0; i < 403; i++) {
-				screen.drawPixel(i, rasterCounter - FIRST_BORDER_LINE, 0, borderColor);
+				screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, 0, borderColor);
 			}
-//		screen.drawPixel()
-			// Draw border
 			blockRowId = 0;
 		} else {
-			for (u32 i = 0; i < FIRST_VISIBLE_VERTICAL_LINE; i++) {
-				screen.drawPixel(i, rasterCounter - FIRST_BORDER_LINE, 0, borderColor);
+			for (u32 i = 0; i < GraphicsConstants::FIRST_VISIBLE_VERTICAL_LINE; i++) {
+				screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, 0, borderColor);
 			}
 
-			for (u32 i = FIRST_VISIBLE_VERTICAL_LINE; i < LAST_VISIBLE_VERTICAL_LINE; i++) {
-				u32 pixelId = i - FIRST_VISIBLE_VERTICAL_LINE;
+			for (u32 i = GraphicsConstants::FIRST_VISIBLE_VERTICAL_LINE; i < GraphicsConstants::LAST_VISIBLE_VERTICAL_LINE; i++) {
+				u32 pixelId = i - GraphicsConstants::FIRST_VISIBLE_VERTICAL_LINE;
 
 				u8 blockColumn = pixelId / 8; // TODO: Extract 25 as constant
-				u8 blockRow = (rasterCounter - FIRST_VISIBLE_LINE - FIRST_BORDER_LINE) / 8;
+				u8 blockRow = (rasterCounter - GraphicsConstants::FIRST_VISIBLE_LINE - GraphicsConstants::FIRST_BORDER_LINE) / 8;
 
 				u8 characterId = mmu.read(screenMemBase + blockRow * 40 + blockColumn);
 				u8 charPixelId = (blockRowId * 8) + pixelId % 8;
 				bool charData = getCharData(characterId, charPixelId, 0xd000);
-				screen.drawPixel(i, rasterCounter - FIRST_BORDER_LINE, charData, get(BACKGROUND_COLOR_0));
+				screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, charData, get(BACKGROUND_COLOR_0));
 			}
 
-//		for (size_t k = 0; k < 8; k++) {
-//			for (size_t l = 0; l < 8; l++) {
-//				if (getCharData(32, k * 8 + l)) {
-//					std::cout << '*';
-//				} else {
-//					std::cout << ' ';
-//				}
-//			}
-//			std::cout << '\n';
-//		}
-
-			for (u32 i = LAST_VISIBLE_VERTICAL_LINE; i < 403; i++) {
-				screen.drawPixel(i, rasterCounter - FIRST_BORDER_LINE, 0, borderColor);
+			for (u32 i = GraphicsConstants::LAST_VISIBLE_VERTICAL_LINE; i < 403; i++) {
+				screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, 0, borderColor);
 			}
 			blockRowId = (blockRowId + 1) % 8;
 		}

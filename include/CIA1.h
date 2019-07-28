@@ -4,7 +4,6 @@
 #ifndef NESEMU_CIA1_H
 #define NESEMU_CIA1_H
 
-#include <iostream>
 #include <iomanip>
 #include <array>
 #include <SDL2/SDL_scancode.h>

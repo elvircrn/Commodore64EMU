@@ -6,7 +6,6 @@
 #include <array>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_render.h>
-#include <iostream>
 #include "core.h"
 
 class Screen {
@@ -80,16 +79,6 @@ public:
 	}
 
 	void draw() {
-//		for (size_t i = 0; i < 284; i++) {
-//			for (size_t j = 0; j < 403; j++) {
-//				if (screen[i * 403 + j]) {
-//					std::cout << '*';
-//				} else {
-//					std::cout << ' ';
-//				}
-//			}
-//			std::cout << '\n';
-//		}
 		SDL_RenderPresent(renderer);
 	}
 };

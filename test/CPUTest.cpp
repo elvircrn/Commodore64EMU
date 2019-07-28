@@ -3,14 +3,9 @@
 #include "catch.hpp"
 #include "StreamUtil.h"
 #include "cmrc/cmrc.hpp"
-#include <boost/filesystem.hpp>
-#include "Debugger.h"
 
 #include <fstream>
 #include <iomanip>
-#include <iostream>
-#include "cmrc/cmrc.hpp"
-#include "MMULoader.h"
 #include "MMU.h"
 CMRC_DECLARE(test_resources);
 

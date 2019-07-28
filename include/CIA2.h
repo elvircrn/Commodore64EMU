@@ -1,7 +1,6 @@
 #ifndef NESEMU_CIA2_H
 #define NESEMU_CIA2_H
 
-#include <iostream>
 #include <iomanip>
 #include <array>
 

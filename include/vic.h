@@ -5,6 +5,7 @@
 #include "MMU.h"
 #include "Screen.h"
 #include "RegisterHolder.h"
+#include "GraphicsConstants.h"
 
 class VIC : public RegisterHolder<0xd000u> {
 	static constexpr u16 VIC_REGISTER_ADDRESS_BASE = 0xd000u;
@@ -19,16 +20,6 @@ class VIC : public RegisterHolder<0xd000u> {
 	static constexpr u16 BORDER_COLOR = 0xD020; // Border color |  - |  - |  - |  - |         EC        | Border color
 	static constexpr u16 BACKGROUND_COLOR_0 = 0xD021; // Background color 0 |  - |  - |  - |  - |        B0C        |
 
-	static constexpr u16 TEXT_AREA_HEIGHT = 200;
-	static constexpr u16 FIRST_VISIBLE_LINE = 42;
-	static constexpr u16 LAST_VISIBLE_LINE = TEXT_AREA_HEIGHT + FIRST_VISIBLE_LINE;
-
-	static constexpr u16 FIRST_VISIBLE_VERTICAL_LINE = 42;
-	static constexpr u16 LAST_VISIBLE_VERTICAL_LINE = 361;
-
-	static constexpr u16 FIRST_BORDER_LINE = 14;
-	static constexpr u16 LAST_BORDER_LINE = 284; // TODO: Can be computed
-	static constexpr u16 BORDER_DIMENSIONS = 42;
 
 	u8 blockRowId{};
 
@@ -57,12 +48,12 @@ public:
 	bool isBadLine(u8 rasterCounter, u8 yscroll, bool wasDENSet);
 
 
-	inline bool isVBlank(u16 rasterCounter) {
-		return rasterCounter < FIRST_BORDER_LINE || FIRST_BORDER_LINE + LAST_BORDER_LINE <= rasterCounter;
+	static inline bool isVBlank(u16 rasterCounter) {
+		return rasterCounter < GraphicsConstants::FIRST_BORDER_LINE || GraphicsConstants::FIRST_BORDER_LINE + GraphicsConstants::LAST_BORDER_LINE <= rasterCounter;
 	}
 
-	inline bool isBorderLine(u16 rasterCounter) {
-		return rasterCounter <= BORDER_DIMENSIONS + FIRST_BORDER_LINE || 257 <= rasterCounter;
+	static inline bool isBorderLine(u16 rasterCounter) {
+		return rasterCounter <= GraphicsConstants::BORDER_DIMENSIONS + GraphicsConstants::FIRST_BORDER_LINE || 257 <= rasterCounter;
 	}
 
 	inline u8 getControlRegister1() {

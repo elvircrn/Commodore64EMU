@@ -38,7 +38,7 @@ void CPU::init(u16 _pc) {
 	pc = _pc;
 }
 
-#include <iostream>
+#include "LogUtil.h"
 #include <CPU.h>
 
 void CPU::execute() {
@@ -63,7 +63,7 @@ void CPU::execute() {
 		instrHist.emplace_back(pc,
 													 Instructions::Name(Read(pc - 1)),
 													 std::array<u8, 4>({Read(pc - 1), Read(pc), Read(pc + 1), Read(pc + 2)}));
-		std::cout << Instructions::Name(Read(pc - 1)) <<  ' ' << std::hex << ' ' << (int) Read(pc - 1) << ' ' << (int) Read(pc) << ' ' << (int) Read(pc + 1) << ' ' << GetNESTestLine() << '\n';
+		L_DEBUG(std::cout << Instructions::Name(Read(pc - 1)) <<  ' ' << std::hex << ' ' << (int) Read(pc - 1) << ' ' << (int) Read(pc) << ' ' << (int) Read(pc + 1) << ' ' << GetNESTestLine() << '\n');
 		for (int i = 0; i < 5; i++)
 			bitStack.push_back(Read(pc - 1 + i));
 	}
@@ -105,7 +105,6 @@ void CPU::execute() {
 			break;
 		case 0x31: AND<AddressingModes::INDIRECT_INDEXED>();
 			break;
-			// TODO: Check Zero Page, Y!!!
 		case 0x0A: ASL<AddressingModes::ACCUMULATOR>();
 			break;
 		case 0x06: ASL<AddressingModes::ZERO_PAGE>();
@@ -136,7 +135,6 @@ void CPU::execute() {
 			break;
 		case 0xF0: BEQ<AddressingModes::RELATIVE>();
 			break;
-			// TODO :Implement the BRK instruction
 		case 0x00: BRK<AddressingModes::IMPLIED>();
 			break;
 		case 0xC9: CMP<AddressingModes::IMMEDIATE>();
@@ -377,34 +375,12 @@ void CPU::execute() {
 			break;
 		case 0xEA: NOP<AddressingModes::IMPLIED>();
 			break;
-
-			// Unofficial opcodes
-//		case 0x47: LSE<AddressingModes::ZERO_PAGE>(); // NOTE: Alias, SRE
-//			break;
-//		case 0x4F: LSE<AddressingModes::ABSOLUTE>();
-//			break;
-//
-//		case 0x2F: RLA<AddressingModes::ABSOLUTE>();
-//			break;
-//		case 0x3F: RLA<AddressingModes::ABSOLUTE_INDEXED_X>();
-//			break;
-//		case 0x3B: RLA<AddressingModes::ABSOLUTE_INDEXED_Y>();
-//			break;
-//		case 0x27: RLA<AddressingModes::ZERO_PAGE>();
-//			break;
-//		case 0x37: RLA<AddressingModes::ZERO_PAGE_X>();
-//			break;
-//		case 0x23: RLA<AddressingModes::INDEXED_INDIRECT_X>();
-//			break;
-//		case 0x33: RLA<AddressingModes::INDIRECT_INDEXED>();
-//			break;
-
 		default: std::stringstream ss;
 			if constexpr (DEBUG && !ignoreUnknownInstr) {
 				for (int i = pcHist.back(); i < pcHist.back() + 10; i++)
 					ss << std::hex << (int) Read(i) << ' ';
 				debugDump();
-				std::cout << "Instruction not found at pc: " + std::to_string(pc) + "\nDump: " + ss.str() << '\n';
+				L_ERROR(std::cout << "Instruction not found at pc: " + std::to_string(pc) + "\nDump: " + ss.str() << '\n');
 			}
 		}
 	}

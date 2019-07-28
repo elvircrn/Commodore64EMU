@@ -10,11 +10,20 @@
 #define L_INFO(c) do {} while(0)
 #endif
 
-
 #ifdef LOG_LEVEL_DEBUG
 #define L_DEBUG(c) c
 #else
 #define L_DEBUG(c) do {} while (0)
+#endif
+
+#ifdef LOG_LEVEL_ERROR
+#define L_ERROR(c) c
+#else
+#define L_ERROR(c) do {} while (0)
+#endif
+
+#if defined(LOG_LEVEL_DEBUG) || defined(LOG_LEVEL_INFO) || defined(LOG_LEVEL_ERROR)
+#include <iostream>
 #endif
 
 

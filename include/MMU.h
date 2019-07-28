@@ -8,7 +8,6 @@
 #include "CIA1.h"
 #include "CIA2.h"
 
-#include <iostream>
 class MMU {
 	constexpr static int RAM_SIZE = 65536;
 

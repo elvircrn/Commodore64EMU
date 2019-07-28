@@ -1,7 +1,6 @@
 #include <utility>
 #include <iomanip>
 #include <thread>
-#include <chrono>
 
 #include <SDL2/SDL.h>
 #include <vic.h>
@@ -31,9 +30,9 @@ int main() {
 
 	auto window{sdl2::make_window("c64 Emulator", 0, 0, 403, 284, SDL_WINDOW_OPENGL)};
 	auto renderer{sdl2::make_renderer(window.get(), -1, SDL_RENDERER_ACCELERATED)};
-
 	auto texture
 			{sdl2::make_bmp(renderer.get(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, 403, 284)};
+	Screen screen{texture.get(), renderer.get()};
 
 	std::string basicFileName = "rom/basic.rom";
 	std::string kernalFileName = "rom/kernal.rom";
@@ -53,7 +52,6 @@ int main() {
 	CIA1 cia1{event};
 	CIA2 cia2{};
 
-	Screen screen{texture.get(), renderer.get()};
 	ROM rom(kernal, basic, chargen, vicIO);
 	MMU mmu(rom, cia1, cia2);
 	CPU cpu(clk, mmu);
@@ -72,7 +70,6 @@ int main() {
 	mmu.setVICReadListener([&vic](const u16 &addr) -> u8 {
 		return vic.get(addr);
 	});
-	using clock = std::chrono::high_resolution_clock;
 
 	u64 buff{};
 	bool dEnabled = false;

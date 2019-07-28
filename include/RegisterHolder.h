@@ -3,9 +3,10 @@
 
 #include "core.h"
 
-template<u32 addressBase, u32 size = 0xffu>
+template<u32 addressBase, u32 size>
 class RegisterHolder {
 private:
+	static constexpr u32 bits = size - 1;
 	std::array<u8, size> mem;
 
 public:
@@ -32,7 +33,7 @@ public:
 	}
 
 	inline u16 normalize(u16 addr) const {
-		return addressBase + (addr & size);
+		return addressBase + (addr & bits);
 	}
 };
 

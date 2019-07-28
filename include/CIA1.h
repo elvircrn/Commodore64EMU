@@ -13,47 +13,47 @@
 #include "LogUtil.h"
 #include "RegisterHolder.h"
 
-class CIA1 : public RegisterHolder<0xDC00> {
+class CIA1 : public RegisterHolder<0xDC00, 0x10> {
 	/**
 	 * Addresses
 	 */
-	static const u16 ADDRESS_COUNTER_A = 0xDC04u;
-	static const u16 ADDRESS_COUNTER_B = 0xDC06u;
-	static const u16 TIMER_CONTROL_REGISTER_A = 0xDC0Eu;
-	static const u16 TIMER_CONTROL_REGISTER_B = 0xDC0Fu;
-	static const u16 INTERRUPT_CONTROL_STATUS = 0xDC0Du;
+	static constexpr u16 ADDRESS_COUNTER_A = 0xDC04u;
+	static constexpr u16 ADDRESS_COUNTER_B = 0xDC06u;
+	static constexpr u16 TIMER_CONTROL_REGISTER_A = 0xDC0Eu;
+	static constexpr u16 TIMER_CONTROL_REGISTER_B = 0xDC0Fu;
+	static constexpr u16 INTERRUPT_CONTROL_STATUS = 0xDC0Du;
 
 	/**
 	 * DC0D Control values, read values
 	 */
 	// Bit #0
 	void setTimerAUnderflow(bool val) {
-		get(INTERRUPT_CONTROL_STATUS) |= (0xffu & (u8(val << 0x0u)));
+		set(INTERRUPT_CONTROL_STATUS, get(INTERRUPT_CONTROL_STATUS) | (0xffu & (u8(val << 0x0u))));
 	}
 
 	// Bit #1
 	void setTimerBUnderflow(bool val) {
-		get(INTERRUPT_CONTROL_STATUS) |= (0xffu & (u8(val << 0x1u)));
+		set(INTERRUPT_CONTROL_STATUS, get(INTERRUPT_CONTROL_STATUS) | (0xffu & (u8(val << 0x1u))));
 	}
 
 	// Bit #2
 	void setTimerTODEqual(bool val) {
-		get(INTERRUPT_CONTROL_STATUS) |= (0xffu & (u8(val << 0x2u)));
+		set(INTERRUPT_CONTROL_STATUS, get(INTERRUPT_CONTROL_STATUS) | (0xffu & (u8(val << 0x2u))));
 	}
 
 	// Bit #3
 	void setShiftRegisterOverflow(bool val) {
-		get(INTERRUPT_CONTROL_STATUS) |= (0xffu & (u8(val << 0x3u)));
+		set(INTERRUPT_CONTROL_STATUS, get(INTERRUPT_CONTROL_STATUS) | (0xffu & (u8(val << 0x3u))));
 	}
 
 	// Bit #4
 	void setSignalLevelOnFLAGPin(bool val) {
-		get(INTERRUPT_CONTROL_STATUS) |= (0xffu & (u8(val << 0x4u)));
+		set(INTERRUPT_CONTROL_STATUS, get(INTERRUPT_CONTROL_STATUS) | (0xffu & (u8(val << 0x4u))));
 	}
 
 	// Bit #7
 	void setInterruptGenerated(bool val) {
-		get(INTERRUPT_CONTROL_STATUS) |= (0xffu & (u8(val << 0x7u)));
+		set(INTERRUPT_CONTROL_STATUS, get(INTERRUPT_CONTROL_STATUS) | (0xffu & (u8(val << 0x7u))));
 	}
 
 	/**
@@ -68,25 +68,6 @@ class CIA1 : public RegisterHolder<0xDC00> {
 	SDL_Event &event;
 
 	Keyboard keyboard{};
-
-	/**
-	 * Map external addresses into internal buffer
-	 * @param addr External address
-	 * @return Value from internal memory @mem
-	 */
-	inline u8 &get(u16 addr) {
-		return mem[(addr - 0xDC00u) & 0xfu];
-	}
-
-	inline u16 get16(u16 addr) {
-		return (get(addr + 1) << 0x8u) + get(addr);
-	}
-
-	inline void set16(u16 addr, u16 val) {
-		// TODO: Check if this the right order of operations
-		get(addr) = LO(val);
-		get(addr + 1) = HI(val);
-	}
 
 	inline bool isInterruptAEnabled() {
 		return BIT(get(INTERRUPT_CONTROL_STATUS), 0);
@@ -134,9 +115,9 @@ public:
 
 		if (addr == 0xdc0du) {
 			if (BIT(val, 7)) {
-				get(addr) = val;
+				set(addr, val);
 			} else {
-				get(addr) = 0;
+				set(addr, 0);
 			}
 		} else if (addr == 0xdc0e) {
 			// Bit 4: 1 = Load latch into the timer once.
@@ -148,7 +129,7 @@ public:
 				timerB = timerBLatch();
 			}
 		}
-		return get(addr) = val;
+		return set(addr, val);
 	}
 
 	inline u8 read(u16 addr) {

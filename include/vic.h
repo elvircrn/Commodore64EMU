@@ -7,7 +7,7 @@
 #include "RegisterHolder.h"
 #include "GraphicsConstants.h"
 
-class VIC : public RegisterHolder<0xd000u> {
+class VIC : public RegisterHolder<0xd000u, 0x100u> {
 	static constexpr u16 VIC_REGISTER_ADDRESS_BASE = 0xd000u;
 	static constexpr u8 VIC_REGISTER_COUNT = 47;
 
@@ -76,7 +76,7 @@ public:
 	}
 
 	u8 set(const u16 &addr, const u8 &val) override {
-		u16 mappedAddr = (addr & 0xd0ffu);
+		u16 mappedAddr = normalize(addr);
 
 		L_DEBUG(
 		if (mappedAddr != 0xd012) {

@@ -3,6 +3,8 @@
 #include "CPU.h"
 #include "core.h"
 
+class CPU;
+
 class Debugger
 {
 	CPU *cpu;

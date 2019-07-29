@@ -1,22 +1,21 @@
 
-#pragma once
+#ifndef NESEMU_CPU_H
+#define NESEMU_CPU_H
 
 #include <cstdint>
 #include <vector>
-#include "variant.h"
+#include <deque>
 #include <tuple>
 #include "MMU.h"
-#include "optional.h"
 #include "Clock.h"
 #include <functional>
 
 #include "core.h"
 #include "ROM.h"
-#include "PPU.h"
 
 // Interrupt types along with their respective vectors
-enum Interrupts { BRK, IRQ, NMI, RST };
-constexpr u16 vect[] = {0xFFFE, 0xFFFE, 0xFFFA, 0xFFFC};
+enum Interrupts { BRK = 0, IRQ, NMI, RST };
+constexpr std::array<u16, 4> vect = {0xFFFE, 0xFFFE, 0xFFFA, 0xFFFC};
 
 // CPU Flags, _ -> empty
 enum Flags { C, Z, I, D, B, _, V, N };
@@ -33,13 +32,11 @@ enum AddressingModes {
 	ZERO_PAGE,
 	ABSOLUTE_INDEXED_X,
 	ABSOLUTE_INDEXED_Y,
-	ZERO_PAGE_INDEXED,
 	ZERO_PAGE_X,
 	ZERO_PAGE_Y,
 	INDEXED_INDIRECT_X
 };
 
-// TODO: Check if every instructions increases the PC by at least 1.
 class CPU {
 	static constexpr bool ignoreUnknownInstr = true;
 	Clock &clock;
@@ -56,36 +53,56 @@ class CPU {
 	bool nmi = false;
 
 	// Memory
-	MMU mmu;
+	MMU &mmu;
 
 	// Instructions
-	std::vector<bool> isOfficial;
-	bool zeroPageCrossed;
-	bool calcCrossed;
+	bool zeroPageCrossed{};
+	bool calcCrossed{};
 
 	// Buffers
-	u16 buff16;
-	u8 buff8;
+	u8 buff8{};
 
 	// Absolute along with its variants, and immediate reads mutate the program counter, therefore
 	// the value obtained via these two methods should only be calculated once during the instruction
 	// cycle.
-	std::experimental::optional<u16> instructionDataLatch;
+	std::optional<u16> instructionDataLatch;
 
 	// Instruction helpers
-	inline u8 _ASL(const u8 &x) {
-		C(x & 0x80);
-		return (x << 1);
+	inline u8 _ASL(const u8 &_x) {
+		C(_x & 0x80u);
+		return (_x << 0x1u);
 	}
-	inline u16 _ASL(u16 &x) {
-		C(x & 0x8000);
-		return (x << 1);
+
+/**
+ * Get @nib-th nibble of @val.
+ * @param val Value that contains the nibble
+ * @param nibIdx Nibble index
+ * @return
+ */
+	inline u8 getNibble(u16 val, u8 nibIdx) {
+		return (u32) (val >> (4u * nibIdx)) & 0xfu;
+	}
+
+	inline u16 toBinary(u16 in) {
+		return (((in / 1000u) % 10) << 16u) + (((in / 100u) % 10) << 8u) + (((in / 10u) % 10) << 4u) + (in % 10u);
+	}
+
+	inline u8 toBCD(u8 in) {
+		u8 pow = 1, res{};
+		for (size_t i = 0; i < 2; pow *= 10, i++) {
+			u8 nib = getNibble(in, i);
+			if (nib > 9) {
+				nib += 6;
+			}
+			res += nib * pow;
+		}
+		return res;
 	}
 
 	// Addressing helpers
 	inline u8 Imm() {
 		if (!instructionDataLatch) {
-			instructionDataLatch = Read(pc++);
+			instructionDataLatch.emplace(read(pc++));
 		}
 		return static_cast<u8>(instructionDataLatch.value());
 	}
@@ -93,7 +110,7 @@ class CPU {
 	inline u16 Abs() {
 		if (!instructionDataLatch) {
 			pc += 2;
-			instructionDataLatch = Read16(static_cast<u16>(pc - 2));
+			instructionDataLatch.emplace(read16(static_cast<u16>(pc - 2)));
 		}
 		return instructionDataLatch.value();
 	}
@@ -110,18 +127,18 @@ class CPU {
 		return abs + y;
 	}
 	inline u16 Zp16(u8 addr) {
-		return (mmu.read(static_cast<u16>((addr + 1) & 0xff)) << 8) + mmu.read(addr);
+		return (mmu.read(static_cast<u16>((u16) (addr + 0x1u) & 0xffu)) << 0x8u) + mmu.read(addr);
 	}
 	inline void CrossesPage(u16 addr, u8 offset) {
-		zeroPageCrossed |= ((addr & 0xff00) != ((addr + offset) & 0xff00));
+		zeroPageCrossed |= ((addr & 0xff00u) != ((u16) (addr + offset) & 0xff00u));
 	}
-	// 		return static_cast<u8 &>(mmu(static_cast<u16>(0x0100 + static_cast<u32>(addr))));
+
 	inline void Push8(u8 val) {
 		mmu.write(static_cast<u16>(0x0100 + static_cast<u32>(sp--)), val);
 	}
 	inline void Push16(u16 val) {
-		Push8(static_cast<u8>(val >> 8));
-		Push8(static_cast<u8>(val & 0xFF));
+		Push8(static_cast<u8>(val >> 0x8u));
+		Push8(static_cast<u8>(val & 0xffu));
 	}
 	inline u8 Pop8() {
 		sp++;
@@ -129,28 +146,27 @@ class CPU {
 	}
 	inline u16 Pop16() {
 		u8 lo = Pop8();
-		u16 hi = Pop8() << 8;
+		u16 hi = Pop8() << 0x8u;
 		return hi + lo;
 	}
 
 	// Flag helpers
-	inline bool N() { return GetFlag(Flags::N); }
-	inline bool V() { return GetFlag(Flags::V); }
-	inline bool U() { return GetFlag(Flags::_); }
-	inline bool B() { return GetFlag(Flags::B); }
-	inline bool D() { return GetFlag(Flags::D); }
-	inline bool I() { return GetFlag(Flags::I); }
-	inline bool Z() { return GetFlag(Flags::Z); }
-	inline bool C() { return GetFlag(Flags::C); }
+	inline bool N() { return getFlag(Flags::N); }
+	inline bool V() { return getFlag(Flags::V); }
+	inline bool U() { return getFlag(Flags::_); }
+	inline bool D() { return getFlag(Flags::D); }
+	inline bool I() { return getFlag(Flags::I); }
+	inline bool Z() { return getFlag(Flags::Z); }
+	inline bool C() { return getFlag(Flags::C); }
 
-	inline void N(bool x) { SetFlag(Flags::N, x); }
-	inline void V(bool x) { SetFlag(Flags::V, x); }
-	inline void U(bool x) { SetFlag(Flags::_, x); }
-	inline void B(bool x) { SetFlag(Flags::B, x); }
-	inline void D(bool x) { SetFlag(Flags::D, x); }
-	inline void I(bool x) { SetFlag(Flags::I, x); }
-	inline void Z(bool x) { SetFlag(Flags::Z, x); }
-	inline void C(bool x) { SetFlag(Flags::C, x); }
+	inline void N(bool _x) { setFlag(Flags::N, _x); }
+	inline void V(bool _x) { setFlag(Flags::V, _x); }
+	inline void U(bool _x) { setFlag(Flags::_, _x); }
+	inline void B(bool _x) { setFlag(Flags::B, _x); }
+	inline void D(bool _x) { setFlag(Flags::D, _x); }
+	inline void I(bool _x) { setFlag(Flags::I, _x); }
+	inline void Z(bool _x) { setFlag(Flags::Z, _x); }
+	inline void C(bool _x) { setFlag(Flags::C, _x); }
 
 public:
 	inline u8 A() { return a; }
@@ -160,27 +176,21 @@ public:
 	inline u8 SP() { return sp; }
 	inline u8 P() { return p; }
 
-	inline u8 A(u8 _a) { return a = _a; }
-	inline u8 X(u8 _x) { return x = _x; }
-	inline u8 Y(u8 _y) { return y = _y; }
-	inline u16 PC(u16 _pc) { return pc = _pc; }
-	inline u8 SP(u8 _sp) { return sp = _sp; }
-	inline u8 P(u8 _p) { return p = _p; }
-
 #pragma region Debug
 	static constexpr bool DEBUG = true;
-	std::vector<u16> pcHist;
-	std::vector<u8> opHist;
-	std::vector<u8> bitStack;
-	std::vector<std::pair<std::string, u16>> vectors;
-	std::vector<std::tuple<u16, std::string, std::array<u8, 3>>> instrHist;
-	inline bool IsOfficial() { return isOfficial[Read(pc)]; }
+	bool debug = false;
+	void setDebug(bool debug);
+	std::deque<u16> pcHist;
+	std::deque<u8> opHist;
+	std::deque<u8> bitStack;
+	std::deque<std::pair<std::string, u16>> vectors;
+	std::deque<std::tuple<u16, std::string, std::array<u8, 4>>> instrHist;
 	void debugDump();
 #pragma endregion
 
 #pragma region Setup
-	// TODO: Consider refactoring into an external class?
-	void powerUp();
+	void init();
+	void init(u16 pc);
 	// Called before instruction execution
 	inline void clear() {
 		zeroPageCrossed = false;
@@ -191,64 +201,54 @@ public:
 #pragma endregion
 
 #pragma region Memory
-	bool inline isOAMDMA(u16 addr) {
-		return addr == 0x4014;
-	}
 
 	// Default memory layout, no reference to PPU
-	inline u8 Read(u16 addr) const {
+	inline u8 read(u16 addr) const {
 		return mmu.read(addr);
 	}
 
 	inline bool write(const u16 &addr, const u8 &value) {
-		if (!oamDmaIdx && isOAMDMA(addr)) {
-			oamDmaIdx = 256;
-		}
 		mmu.write(addr, value);
 		return true;
 	}
 
-	inline u16 Read16(u16 addr) { return Read(addr) + (Read(addr + 1) << 8); }
-	inline u16 Ind(u16 addr) {
+	inline u16 read16(u16 addr) { return read(addr) + (read(addr + 1) << 8u); }
+	inline u16 ind(u16 addr) {
 		tick(3);
-		u8 lo = Read(addr);
-		u8 hi = Read((addr & 0xff00) + LO(addr + 1));
-		return lo + (hi << 8);
+		u8 lo = read(addr);
+		u8 hi = read((addr & 0xff00u) + LO(addr + 1));
+		return lo + (hi << 8u);
 	}
 #pragma endregion
 
 #pragma region Flags
-	inline void SetFlag(Flags, bool);
-	inline bool GetFlag(Flags) const;
+	inline void setFlag(Flags, bool);
+	inline bool getFlag(Flags) const;
 
-	inline void UpdC(u8, u8, s16);
-	inline void UpdV(u8, u8, s16);
-	inline void UpdCV(u8, u8, s16);
+	inline void updC(u16 r);
+	inline void UpdV(u8, u8, u16);
+	inline void UpdCV(u8, u8, u16);
 
 	inline void UpdN(u8);
 	inline void UpdZ(u8);
 	inline void UpdNZ(u8);
 
-	inline void setNMI(bool _nmi) { nmi = _nmi; }
-	inline bool GetNMI() { return nmi; }
+	inline bool getNMI() { return nmi; }
 #pragma endregion
 
-	void loadROM(const ROM &rom);
-
 #pragma region Constructors
-	explicit CPU(Clock &, const MMU &mmu);
+	explicit CPU(Clock &, MMU &mmu);
+	explicit CPU(Clock &, MMU &mmu, u16 _pc);
 	~CPU();
 #pragma endregion
 
 #pragma region Timing
 	int cycleCount;
-	int delta;
+	int delta{};
 	inline void tick(int cycles = 1) {
 		cycleCount += cycles;
 		delta += cycles;
 	}
-
-	inline int Delta() { return delta; }
 
 	// NOTE Do not use with jumps or returns!
 #pragma region Tick calculation
@@ -306,6 +306,21 @@ public:
 	void execute();
 
 #pragma region Instructions
+	void interruptRequest();
+
+	std::string getNESTestLine() {
+		std::stringstream ss;
+
+		ss << "PC:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) PC()
+			 << " A:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) A()
+			 << " X:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) X()
+			 << " Y:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) Y()
+			 << " P:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) P()
+			 << " SP:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) SP();
+
+		return ss.str();
+	}
+
 	template<AddressingModes mode>
 	void ADC();  //....	add with carry
 	template<AddressingModes mode>
@@ -420,34 +435,17 @@ public:
 	void TYA();  //....	transfer Y to accumulator
 	template<Interrupts inter>
 	void INT();
-
-	// Unofficial opcodes
-	template<AddressingModes mode>
-	void LAX();
-	template<AddressingModes mode>
-	void SAX();
-	template<AddressingModes mode>
-	void ALR();
-	template<AddressingModes mode>
-	void ANC();
-	template<AddressingModes mode>
-	void ARR();
-	template<AddressingModes mode>
-	void AXS();
 #pragma endregion
 
 #pragma region Operand calculator
 	template<AddressingModes m>
 	u16 getOperand16();
 	template<AddressingModes m>
-	u8 GetOperand8();
+	u8 getOperand8();
 	template<AddressingModes m>
 	bool writeOperandVal(const u8 &val);
 	template<AddressingModes m>
 	u16 getPureOperand();
-
-	template<AddressingModes m>
-	constexpr inline bool Is8Bit() { return !(0 <= m && m < 2); }
 #pragma endregion
 	u16 oamDmaIdx = 0;
 };
@@ -456,37 +454,42 @@ public:
 
 
 // Flags
-inline void CPU::SetFlag(Flags f, bool bit) {
-	p ^= (-(static_cast<int>(bit)) ^ p) & (1 << f);
+inline void CPU::setFlag(Flags f, bool bit) {
+	p ^= (-(static_cast<u32>(bit)) ^ p) & (1u << f);
 }
 
-inline bool CPU::GetFlag(Flags f) const {
-	return (p & (1 << f)) > 0;
+inline bool CPU::getFlag(Flags f) const {
+	return (p & (0x1u << f)) > 0;
 }
 
-inline void CPU::UpdV(u8 x, u8 y, s16 r) {
-	V(static_cast<bool>(~(x ^ y) & (r ^ x) & 0x80));
+inline void CPU::UpdV(u8 _x, u8 _y, u16 r) {
+	V(static_cast<bool>(~(_x ^ _y) & (r ^ _x) & 0x80u));
 }
 
-inline void CPU::UpdC(u8 x, u8 y, s16 r) {
+inline void CPU::updC(u16 r) {
 	C(0xff < r);
 }
 
-inline void CPU::UpdCV(u8 x, u8 y, s16 r) {
-	UpdV(x, y, r);
-	UpdC(x, y, r);
+inline void CPU::UpdCV(u8 pX, u8 pY, u16 r) {
+	UpdV(pX, pY, r);
+	updC(r);
 }
 
-inline void CPU::UpdN(u8 x) {
-	SetFlag(Flags::N, static_cast<bool>(x & 0x80));
+inline void CPU::UpdN(u8 _x) {
+	setFlag(Flags::N, static_cast<bool>(_x & 0x80));
 }
 
-inline void CPU::UpdZ(u8 x) {
-	SetFlag(Flags::Z, !x);
+inline void CPU::UpdZ(u8 _x) {
+	setFlag(Flags::Z, !_x);
 }
 
-inline void CPU::UpdNZ(u8 x) {
-	UpdN(x);
-	UpdZ(x);
+inline void CPU::UpdNZ(u8 _x) {
+	UpdN(_x);
+	UpdZ(_x);
 }
 
+inline void CPU::setDebug(bool _debug) {
+	CPU::debug = _debug;
+}
+
+#endif

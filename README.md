@@ -8,8 +8,17 @@
 
 # Build
 
+I use [CMRC](https://vector-of-bool.github.io/2017/01/21/cmrc.html) for resource management.
+
 For some god-forsaken reason, gcc builds fail both on Mac and Windows. MSVC and clang should
 work as expected, bearing in mind the specifics of each one's C++ implementation.
+
+# Conan
+```
+cd ~/NESEmu
+pip3 install conan
+conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
+```
 
 # Windows
 ## Visual Studio(MSVC)
@@ -19,19 +28,14 @@ https://docs.conan.io/en/1.3/howtos/vs2017_cmake.html
 Furthermore, the contents of `.conan/profiles/default` which contain the settings that I 
 used for compiling under VS and MSVC are as follows:
 ```
-os=Windows
-os_build=Windows
-arch=x86_64
-arch_build=x86_64
-build_type=Release
-compiler=Visual Studio
-compiler.version=15
-``` 
+conan install . -if=C:/Users/elvircrn/CMakeBuilds/0730974a-797b-6738-a0b9-9daee0626596/build/x64-Debug --build=missing -s os=Windows -s os_build=Windows -s arch=x86_64 -s arch_build=x86_64 -s build_type=Release -s compiler="Visual Studio" -s compiler.version=15
 
+
+```
 # Mac OS X
 
 ```
-sudo conan install . --install-folder=cmake-build-debug  --build=missing -s compiler=apple-clang -s compiler.version=9.1 -s compiler.libcxx=libc++ -s build_type=Debug
+conan install . --install-folder=cmake-build-debug  --build=missing -s compiler=apple-clang -s compiler.version=10.0 -s compiler.libcxx=libc++ -s build_type=Debug
 ```
 
 # TODOs

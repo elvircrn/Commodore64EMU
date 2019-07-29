@@ -1,0 +1,8 @@
+#ifndef NESEMU_KEYBOARDCONSTANTS_H
+#define NESEMU_KEYBOARDCONSTANTS_H
+
+class KeyboardConstants {
+
+};
+
+#endif //NESEMU_KEYBOARDCONSTANTS_H

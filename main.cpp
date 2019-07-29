@@ -1,125 +1,101 @@
-#include <cstdio>
-#include <cstdlib>
+#include <utility>
+#include <iomanip>
 #include <thread>
-#include <iostream>
-#include <chrono>
 
-#include "boost/filesystem.hpp"
 #include <SDL2/SDL.h>
+#include <vic.h>
+#include <Loop.h>
+#include "cmrc/cmrc.hpp"
 
-#include "graphics_demo.h"
-#include "NES.h"
-#include "CPU.h"
-#include "FileHandler.h"
-#include "GUI.h"
-#include "MMU.h"
-#include "NanoLog.h"
-#include "Clock.h"
 #include "sdl2.h"
 
-int _main(int argc, char *args[]) {
-	patternTablesDemo();
-	return 0;
-}
+#include "CIA1.h"
+#include "CIA2.h"
+#include "TimingConstants.h"
+#include "CPU.h"
+#include "StreamUtil.h"
+#include "MMU.h"
+#include "Clock.h"
 
-int main(int argc, char *args[]) {
+CMRC_DECLARE(resources);
+
+using namespace std::chrono_literals;
+
+int main() {
+	auto fs = cmrc::resources::get_filesystem();
 	std::ios_base::sync_with_stdio(false);
-	nanolog::initialize(nanolog::NonGuaranteedLogger(3), "/tmp/", "nanolog", 1);
-	LOG_INFO << "Sample NanoLog: ";
-	LOG_INFO << 123;
-	SDL_Init(SDL_INIT_VIDEO);
 	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Couldn't initialize SDL: %s", SDL_GetError());
 	}
 
-	constexpr u16 WINDOW_WIDTH = 256, WINDOW_HEIGHT = 240;
-	auto window = sdl2::make_window("NES Emulator", 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
-	auto renderer = sdl2::make_renderer(window.get(), -1, 0);
-	auto texture =
-			sdl2::make_bmp(renderer.get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, WINDOW_WIDTH, WINDOW_HEIGHT);
+	auto window{sdl2::make_window("c64 Emulator", 0, 0, GraphicsConstants::WINDOW_WIDTH, GraphicsConstants::WINDOW_HEIGHT, SDL_WINDOW_OPENGL)};
+	auto renderer{sdl2::make_renderer(window.get(), -1, SDL_RENDERER_ACCELERATED)};
+	auto texture
+			{sdl2::make_bmp(renderer.get(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, GraphicsConstants::WINDOW_WIDTH, GraphicsConstants::WINDOW_HEIGHT)};
+	Screen screen{texture.get(), renderer.get()};
 
-	std::string fileName = "donkeykong.nes";
-	std::string filePath = boost::filesystem::path(__FILE__)
-			.parent_path()
-			.append(fileName)
-			.string();
+	std::string basicFileName = "rom/basic.rom";
+	std::string kernalFileName = "rom/kernal.rom";
+	std::string chargenFileName = "rom/chargen.rom";
 
-	LOG_INFO << "Trying to load: " << filePath << '\n';
-	std::ifstream file(filePath, std::ios::binary);
+	auto basicStream = fs.open(basicFileName);
+	auto kernalStream = fs.open(kernalFileName);
+	auto chargenStream = fs.open(chargenFileName);
 
-	if (!file) {
-		LOG_INFO << "Failed to read rom given: " << filePath << '\n';
-		return 0;
-	}
+	std::vector<u8> kernal{kernalStream.begin(), kernalStream.end()};
+	std::vector<u8> basic{basicStream.begin(), basicStream.end()};
+	std::vector<u8> chargen{chargenStream.begin(), chargenStream.end()};
+	std::vector<u8> vicIO(0xffff);
 
-	file.unsetf(std::ios::skipws);
+	Clock clk{};
 	SDL_Event event;
+	CIA1 cia1{event};
+	CIA2 cia2{};
 
-	Clock clk(std::chrono::milliseconds(1));
-	ROM rom(file);
-	PPU ppu(rom);
-	IO io(event);
-	MMU mmu(ppu, io);
+	ROM rom(kernal, basic, chargen, vicIO);
+	MMU mmu(rom, cia1, cia2);
+	CPU cpu(clk, mmu);
+	VIC vic{clk, mmu, screen};
+	Loop loop{screen, event};
 
-	try {
-		CPU cpu(clk, mmu);
-		cpu.powerUp();
+	cia1.setGenerateInterrupt([&cpu]() {
+		cpu.interruptRequest();
+	});
 
-		cpu.loadROM(rom);
+	mmu.setVICWriteListener([&vic](const u16 &addr, const u8 &val) {
+		return vic.set(addr, val);
+	});
 
-		std::thread clockThread([&]() {
-			clk.startTicking();
-		});
+	mmu.setVICReadListener([&vic](const u16 &addr) -> u8 {
+		return vic.get(addr);
+	});
 
-		std::thread cpuThread([&]() {
-			try {
-				while (true) {
-					cpu.execute();
-				}
-			} catch (const std::string &error) {
-				std::cout << error << '\n';
-			}
-		});
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000)); // Wait until CPU is initialized.
-		for (;;) {
-			ppu.startVBlank();
-			cpu.setNMI(true);
-			std::this_thread::sleep_for(std::chrono::milliseconds(900));
-			SDL_PollEvent(&event);
-			if (event.type == SDL_QUIT)
-				break;
-
-			// Make the screen black
-			SDL_SetRenderDrawColor(renderer.get(), 0x00, 0x00, 0x00, 0x00);
-
-			// Set a texture as the current rendering target
-			SDL_SetRenderTarget(renderer.get(), texture.get());
-
-			// Should this be set to false, the screen would slowly get
-			// filled with red rectangles
-			SDL_RenderClear(renderer.get());
-
-			ppu.drawStuff(renderer.get());
-
-			SDL_SetRenderTarget(renderer.get(), nullptr);
-
-			// SDL_RenderCopy is responsible for making the gameloop understand that there's
-			// something that wants to be rendered, inside the parentheses are (the renderer's name,
-			// the name of the texture, the area it wants to crop but you can leave this as NULL
-			// if you don't want the texture to be cropped, and the texture's rect).
-			SDL_RenderCopy(renderer.get(), texture.get(), nullptr, nullptr);
-
-			SDL_RenderPresent(renderer.get());
+	u64 buff{};
+	bool dEnabled = false;
+	cpu.setDebug(dEnabled);
+	while (true) {
+		if (!loop.update()) {
+			break;
 		}
-		cpuThread.join();
-	} catch (const std::string &error) {
-		std::cout << error << '\n';
-		LOG_INFO << error << '\n';
+
+		for (size_t amp = 0; amp < 10000; amp++) {
+			buff++;
+			if (amp % 100 == 0) {
+				vic.tick();
+			}
+			if (amp % 5 == 0) {
+				cia1.tick();
+			}
+			cpu.execute();
+		}
+		if (buff % TimingConstants::CONSOLE_RATIO == 0) {
+			loop.draw();
+		}
+
+		loop.draw();
 	}
 
-//	GUI gui;
-//	SDL_Quit();
+	SDL_Quit();
 
 	return 0;
 }

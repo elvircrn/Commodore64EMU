@@ -12834,10 +12834,10 @@ namespace Catch {
         bool includeResults = m_config->includeSuccessfulResults() || !result.isOk();
 
         if( includeResults || result.getResultType() == ResultWas::Warning ) {
-            // Print any info messages in <Info> tags.
+            // Print any info messages in <info> tags.
             for( auto const& msg : assertionStats.infoMessages ) {
                 if( msg.type == ResultWas::Info && includeResults ) {
-                    m_xml.scopedElement( "Info" )
+                    m_xml.scopedElement( "info" )
                             .writeText( msg.message );
                 } else if ( msg.type == ResultWas::Warning ) {
                     m_xml.scopedElement( "Warning" )
@@ -12879,7 +12879,7 @@ namespace Catch {
                 m_xml.endElement();
                 break;
             case ResultWas::Info:
-                m_xml.scopedElement( "Info" )
+                m_xml.scopedElement( "info" )
                     .writeText( result.getMessage() );
                 break;
             case ResultWas::Warning:

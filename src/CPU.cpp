@@ -2,464 +2,396 @@
 #include "Instructions.h"
 
 #include <array>
-#include <tuple>
 #include <sstream>
-#include <string>
-#include "NanoLog.h"
 
-void CPU::loadROM(const ROM &rom) {
-	for (int i = 0; i < 0x4000; i++)
-		mmu.write(0xC000 + i, rom[i]);
+CPU::CPU(Clock &_clock, MMU &_mmu)
+		: clock(_clock), mmu(_mmu), cycleCount{} {
+	init();
 }
 
-CPU::CPU(Clock &_clock, const MMU &_mmu)
-		: clock(_clock), mmu(_mmu), isOfficial(0xff), cycleCount(0) {
-	u8 official[] = {0x69, 0x65, 0x75, 0x6D, 0x7D, 0x79, 0x61, 0x71, 0x28, 0xEA,
-									 0x29, 0x25, 0x35, 0x2D, 0x3D, 0x39, 0x21, 0x31, 0x0A, 0x06,
-									 0x16, 0x0E, 0x1E, 0x24, 0x2C, 0x10, 0x30, 0x50, 0x70, 0x90,
-									 0xB0, 0xD0, 0xF0, 0x00, 0xC9, 0xC5, 0xD5, 0xCD, 0xDD, 0xD9,
-									 0xC1, 0xD1, 0xE0, 0xE4, 0xEC, 0xC0, 0xC4, 0xCC, 0xC6, 0xD6,
-									 0xCE, 0xDE, 0x49, 0x45, 0x55, 0x4D, 0x5D, 0x59, 0x41, 0x51,
-									 0x18, 0x38, 0x58, 0x78, 0xB8, 0xD8, 0xF8, 0xE6, 0xF6, 0xEE,
-									 0xFE, 0x4C, 0x6C, 0x20, 0xA9, 0xA5, 0xB5, 0xAD, 0xBD, 0xB9,
-									 0xA1, 0xB1, 0xA2, 0xA6, 0xB6, 0xAE, 0xBE, 0xA0, 0xA4, 0xB4,
-									 0xAC, 0xBC, 0x4A, 0x46, 0x56, 0x4E, 0x5E, 0x09, 0x05, 0x15,
-									 0x0D, 0x1D, 0x19, 0x01, 0x11, 0xAA, 0x8A, 0xCA, 0xE8, 0xA8,
-									 0x98, 0x88, 0xC8, 0x2A, 0x26, 0x36, 0x2E, 0x3E, 0x6A, 0x66,
-									 0x76, 0x6E, 0x7E, 0x40, 0x60, 0xE9, 0xE5, 0xF5, 0xED, 0xFD,
-									 0xF9, 0xE1, 0xF1, 0x85, 0x95, 0x8D, 0x9D, 0x99, 0x81, 0x91,
-									 0x86, 0x96, 0x8E, 0x84, 0x94, 0x8C, 0x9A, 0xBA, 0x48, 0x68, 0x08};
-	for (u8 o : official)
-		isOfficial[o] = true;
+CPU::CPU(Clock &_clock, MMU &_mmu, u16 _pc)
+		: clock(_clock), mmu(_mmu), cycleCount{} {
+	init(_pc);
 }
 
 CPU::~CPU() = default;
 
-void CPU::powerUp() {
-	// TODO: Check if IRQ should be disabled
+void CPU::init() {
 	p = 0x24; // IRQ disabled
 	a = 0;
 	x = 0;
 	y = 0;
 	sp = 0xfd;
-	pc = 0xC000;
+	pc = read16(vect[Interrupts::RST]);
 }
 
-#include <iostream>
+void CPU::init(u16 _pc) {
+	p = 0x24; // IRQ disabled
+	a = 0;
+	x = 0;
+	y = 0;
+	sp = 0xfd;
+	pc = _pc;
+}
+
+#include "LogUtil.h"
 #include <CPU.h>
-#include <Debugger.h>
 
 void CPU::execute() {
 	clock.waitTick();
 	clear();
 	tick(2);
 
-	if (oamDmaIdx) {
-		oamDmaIdx--;
-		u8 high = Read(PPU::OAMDMA_ADDR);
-		u8 low = static_cast<u8>(255 - oamDmaIdx);
-		u16 addr = (high << 8) | low;
-		u8 ramVal = Read(addr);
-		mmu.write(PPU::OAMDATA_ADDR, ramVal);
-		return;
-	}
-
-	u8 op = Read(pc++);
-	if constexpr (DEBUG) {
-		std::cout << Debugger(this).GetNESTestLine() << '\n';
-		opHist.push_back(op);
-		pcHist.push_back(pc - 1);
+	u8 op = read(pc++);
+	if (debug && DEBUG) {
+		opHist.push_front(op);
+		if (opHist.size() == 100) {
+			opHist.pop_back();
+		}
+		if (pcHist.size() == 100) {
+			opHist.pop_back();
+		}
+		if (instrHist.size() == 100) {
+			opHist.pop_front();
+		}
+		pcHist.push_front(pc - 1);
 		bitStack.clear();
 		instrHist.emplace_back(pc,
-													 Instructions::Name(Read(pc)),
-													 std::array<u8, 3>({Read(pc + 1), Read(pc + 2), Read(pc + 3)}));
+													 Instructions::Name(read(pc - 1)),
+													 std::array<u8, 4>({read(pc - 1), read(pc), read(pc + 1), read(pc + 2)}));
+		L_DEBUG(std::cout << Instructions::Name(read(pc - 1)) << ' ' << std::hex << ' ' << (int) read(pc - 1) << ' '
+											<< (int) read(
+													pc) << ' ' << (int) read(
+				pc + 1) << ' ' << getNESTestLine() << '\n');
 		for (int i = 0; i < 5; i++)
-			bitStack.push_back(Read(pc - 1 + i));
-		std::cout << Instructions::Name(op) << '\n'; // TODO: Remove
+			bitStack.push_back(read(pc - 1 + i));
 	}
 
-	switch (op) {
-	case 0x69: ADC<AddressingModes::IMMEDIATE>();
-		break;
-	case 0x65: ADC<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0x75: ADC<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0x6D: ADC<AddressingModes::ABSOLUTE>();
-		break;
-	case 0x7D: ADC<AddressingModes::ABSOLUTE_INDEXED_X>();
-		break;
-	case 0x79: ADC<AddressingModes::ABSOLUTE_INDEXED_Y>();
-		break;
-	case 0x61: ADC<AddressingModes::INDEXED_INDIRECT_X>();
-		break;
-	case 0x71: ADC<AddressingModes::INDIRECT_INDEXED>();
-		break;
-
-	case 0x29: AND<AddressingModes::IMMEDIATE>();
-		break;
-	case 0x25: AND<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0x35: AND<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0x2D: AND<AddressingModes::ABSOLUTE>();
-		break;
-	case 0x3D: AND<AddressingModes::ABSOLUTE_INDEXED_X>();
-		break;
-	case 0x39: AND<AddressingModes::ABSOLUTE_INDEXED_Y>();
-		break;
-	case 0x21: AND<AddressingModes::INDEXED_INDIRECT_X>();
-		break;
-	case 0x31: AND<AddressingModes::INDIRECT_INDEXED>();
-		break;
-		// TODO: Check Zero Page, Y!!!
-	case 0x0A: ASL<AddressingModes::ACCUMULATOR>();
-		break;
-	case 0x06: ASL<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0x16: ASL<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0x0E: ASL<AddressingModes::ABSOLUTE>();
-		break;
-	case 0x1E: ASL<AddressingModes::ABSOLUTE_INDEXED_X>();
-		break;
-	case 0x24: BIT<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0x2C: BIT<AddressingModes::ABSOLUTE>();
-		break;
-	case 0x10: BPL<AddressingModes::RELATIVE>();
-		break;
-	case 0x30: BMI<AddressingModes::RELATIVE>();
-		break;
-	case 0x50: BVC<AddressingModes::RELATIVE>();
-		break;
-	case 0x70: BVS<AddressingModes::RELATIVE>();
-		break;
-	case 0x90: BCC<AddressingModes::RELATIVE>();
-		break;
-	case 0xB0: BCS<AddressingModes::RELATIVE>();
-		break;
-	case 0xD0: BNE<AddressingModes::RELATIVE>();
-		break;
-	case 0xF0: BEQ<AddressingModes::RELATIVE>();
-		break;
-		// TODO :Implement the BRK instruction
-	case 0x00: BRK<AddressingModes::IMPLIED>();
-		break;
-	case 0xC9: CMP<AddressingModes::IMMEDIATE>();
-		break;
-	case 0xC5: CMP<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0xD5: CMP<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0xCD: CMP<AddressingModes::ABSOLUTE>();
-		break;
-	case 0xDD: CMP<AddressingModes::ABSOLUTE_INDEXED_X>();
-		break;
-	case 0xD9: CMP<AddressingModes::ABSOLUTE_INDEXED_Y>();
-		break;
-	case 0xC1: CMP<AddressingModes::INDEXED_INDIRECT_X>();
-		break;
-	case 0xD1: CMP<AddressingModes::INDIRECT_INDEXED>();
-		break;
-	case 0xE0: CPX<AddressingModes::IMMEDIATE>();
-		break;
-	case 0xE4: CPX<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0xEC: CPX<AddressingModes::ABSOLUTE>();
-		break;
-	case 0xC0: CPY<AddressingModes::IMMEDIATE>();
-		break;
-	case 0xC4: CPY<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0xCC: CPY<AddressingModes::ABSOLUTE>();
-		break;
-	case 0xC6: DEC<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0xD6: DEC<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0xCE: DEC<AddressingModes::ABSOLUTE>();
-		break;
-	case 0xDE: DEC<AddressingModes::ABSOLUTE_INDEXED_X>();
-		break;
-	case 0x49: EOR<AddressingModes::IMMEDIATE>();
-		break;
-	case 0x45: EOR<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0x55: EOR<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0x4D: EOR<AddressingModes::ABSOLUTE>();
-		break;
-	case 0x5D: EOR<AddressingModes::ABSOLUTE_INDEXED_X>();
-		break;
-	case 0x59: EOR<AddressingModes::ABSOLUTE_INDEXED_Y>();
-		break;
-	case 0x41: EOR<AddressingModes::INDEXED_INDIRECT_X>();
-		break;
-	case 0x51: EOR<AddressingModes::INDIRECT_INDEXED>();
-		break;
-	case 0x18: CLC<AddressingModes::IMPLIED>();
-		break;
-	case 0x38: SEC<AddressingModes::IMPLIED>();
-		break;
-	case 0x58: CLI<AddressingModes::IMPLIED>();
-		break;
-	case 0x78:
-		SEI<AddressingModes::IMPLIED>();
-		break;
-	case 0xB8: CLV<AddressingModes::IMPLIED>();
-		break;
-	case 0xD8: CLD<AddressingModes::IMPLIED>();
-		break;
-	case 0xF8: SED<AddressingModes::IMPLIED>();
-		break;
-	case 0xE6: INC<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0xF6: INC<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0xEE: INC<AddressingModes::ABSOLUTE>();
-		break;
-	case 0xFE: INC<AddressingModes::ABSOLUTE_INDEXED_X>();
-		break;
-	case 0x4C: JMP<AddressingModes::ABSOLUTE>();
-		break;
-	case 0x6C: JMP<AddressingModes::INDIRECT>();
-		break;
-	case 0x20: JSR<AddressingModes::ABSOLUTE>();
-		break;
-	case 0xA9: LDA<AddressingModes::IMMEDIATE>();
-		break;
-	case 0xA5: LDA<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0xB5: LDA<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0xAD: LDA<AddressingModes::ABSOLUTE>();
-		break;
-	case 0xBD: LDA<AddressingModes::ABSOLUTE_INDEXED_X>();
-		break;
-	case 0xB9: LDA<AddressingModes::ABSOLUTE_INDEXED_Y>();
-		break;
-	case 0xA1: LDA<AddressingModes::INDEXED_INDIRECT_X>();
-		break;
-	case 0xB1: LDA<AddressingModes::INDIRECT_INDEXED>();
-		break;
-	case 0xA2: LDX<AddressingModes::IMMEDIATE>();
-		break;
-	case 0xA6: LDX<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0xB6: LDX<AddressingModes::ZERO_PAGE_Y>();
-		break;
-	case 0xAE: LDX<AddressingModes::ABSOLUTE>();
-		break;
-	case 0xBE: LDX<AddressingModes::ABSOLUTE_INDEXED_Y>();
-		break;
-	case 0xA0: LDY<AddressingModes::IMMEDIATE>();
-		break;
-	case 0xA4: LDY<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0xB4: LDY<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0xAC: LDY<AddressingModes::ABSOLUTE>();
-		break;
-	case 0xBC: LDY<AddressingModes::ABSOLUTE_INDEXED_X>();
-		break;
-	case 0x4A: LSR<AddressingModes::ACCUMULATOR>();
-		break;
-	case 0x46: LSR<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0x56: LSR<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0x4E: LSR<AddressingModes::ABSOLUTE>();
-		break;
-	case 0x5E: LSR<AddressingModes::ABSOLUTE_INDEXED_X>();
-		break;
-	case 0x09: ORA<AddressingModes::IMMEDIATE>();
-		break;
-	case 0x05: ORA<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0x15: ORA<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0x0D: ORA<AddressingModes::ABSOLUTE>();
-		break;
-	case 0x1D: ORA<AddressingModes::ABSOLUTE_INDEXED_X>();
-		break;
-	case 0x19: ORA<AddressingModes::ABSOLUTE_INDEXED_Y>();
-		break;
-	case 0x01: ORA<AddressingModes::INDEXED_INDIRECT_X>();
-		break;
-	case 0x11: ORA<AddressingModes::INDIRECT_INDEXED>();
-		break;
-	case 0xAA: TAX<AddressingModes::IMPLIED>();
-		break;
-	case 0x8A: TXA<AddressingModes::IMPLIED>();
-		break;
-	case 0xCA: DEX<AddressingModes::IMPLIED>();
-		break;
-	case 0xE8: INX<AddressingModes::IMPLIED>();
-		break;
-	case 0xA8: TAY<AddressingModes::IMPLIED>();
-		break;
-	case 0x98: TYA<AddressingModes::IMPLIED>();
-		break;
-	case 0x88: DEY<AddressingModes::IMPLIED>();
-		break;
-	case 0xC8: INY<AddressingModes::IMPLIED>();
-		break;
-	case 0x2A: ROL<AddressingModes::ACCUMULATOR>();
-		break;
-	case 0x26: ROL<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0x36: ROL<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0x2E: ROL<AddressingModes::ABSOLUTE>();
-		break;
-	case 0x3E: ROL<AddressingModes::ABSOLUTE_INDEXED_X>();
-		break;
-	case 0x6A: ROR<AddressingModes::ACCUMULATOR>();
-		break;
-	case 0x66: ROR<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0x76: ROR<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0x6E: ROR<AddressingModes::ABSOLUTE>();
-		break;
-	case 0x7E: ROR<AddressingModes::ABSOLUTE_INDEXED_X>();
-		break;
-	case 0x40: RTI<AddressingModes::IMPLIED>();
-		break;
-	case 0x60: RTS<AddressingModes::IMPLIED>();
-		break;
-	case 0xE9: SBC<AddressingModes::IMMEDIATE>();
-		break;
-	case 0xE5: SBC<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0xF5: SBC<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0xED: SBC<AddressingModes::ABSOLUTE>();
-		break;
-	case 0xFD: SBC<AddressingModes::ABSOLUTE_INDEXED_X>();
-		break;
-	case 0xF9: SBC<AddressingModes::ABSOLUTE_INDEXED_Y>();
-		break;
-	case 0xE1: SBC<AddressingModes::INDEXED_INDIRECT_X>();
-		break;
-	case 0xF1: SBC<AddressingModes::INDIRECT_INDEXED>();
-		break;
-	case 0x85: STA<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0x95: STA<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0x8D: STA<AddressingModes::ABSOLUTE>();
-		break;
-	case 0x9D: STA<AddressingModes::ABSOLUTE_INDEXED_X>();
-		break;
-	case 0x99: STA<AddressingModes::ABSOLUTE_INDEXED_Y>();
-		break;
-	case 0x81: STA<AddressingModes::INDEXED_INDIRECT_X>();
-		break;
-	case 0x91: STA<AddressingModes::INDIRECT_INDEXED>();
-		break;
-	case 0x86: STX<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0x96: STX<AddressingModes::ZERO_PAGE_Y>();
-		break;
-	case 0x8E: STX<AddressingModes::ABSOLUTE>();
-		break;
-	case 0x84: STY<AddressingModes::ZERO_PAGE>();
-		break;
-	case 0x94: STY<AddressingModes::ZERO_PAGE_X>();
-		break;
-	case 0x8C: STY<AddressingModes::ABSOLUTE>();
-		break;
-	case 0x9A: TXS<AddressingModes::IMPLIED>();
-		break;
-	case 0xBA: TSX<AddressingModes::IMPLIED>();
-		break;
-	case 0x48: PHA<AddressingModes::IMPLIED>();
-		break;
-	case 0x68: PLA<AddressingModes::IMPLIED>();
-		break;
-	case 0x08: PHP<AddressingModes::IMPLIED>();
-		break;
-	case 0x28: PLP<AddressingModes::IMPLIED>();
-		break;
-	case 0xEA: NOP<AddressingModes::IMPLIED>();
-		break;
-
-		//Unofficial opcodes
-		// NOP - skip 0, 2 cycles
-	case 0x1A: NOP<AddressingModes::IMPLIED>();
-		break;
-	case 0x3A: NOP<AddressingModes::IMPLIED>();
-		break;
-	case 0x5A: NOP<AddressingModes::IMPLIED>();
-		break;
-	case 0x7A: NOP<AddressingModes::IMPLIED>();
-		break;
-	case 0xDA: NOP<AddressingModes::IMPLIED>();
-		break;
-	case 0xFA: NOP<AddressingModes::IMPLIED>();
-		break;
-
-		// NOP - skip 1
-	case 0x04: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0x44: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0x64: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0x14: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0x34: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0x54: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0x74: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0xD4: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0xF4: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-	case 0x80: NOP<AddressingModes::IMPLIED, 1>();
-		break;
-
-		// NOP - skip 2
-	case 0x0C: NOP<AddressingModes::IMPLIED, 2>();
-		break;
-	case 0x1C: NOP<AddressingModes::IMPLIED, 2>();
-		break;
-	case 0x3C: NOP<AddressingModes::IMPLIED, 2>();
-		break;
-	case 0x5C: NOP<AddressingModes::IMPLIED, 2>();
-		break;
-	case 0x7C: NOP<AddressingModes::IMPLIED, 2>();
-		break;
-	case 0xDC: NOP<AddressingModes::IMPLIED, 2>();
-		break;
-	case 0xFC: NOP<AddressingModes::IMPLIED, 2>();
-		break;
-
-	default: std::stringstream ss;
-		if constexpr (DEBUG && !ignoreUnknownInstr) {
-			for (int i = pcHist.back(); i < pcHist.back() + 10; i++)
-				ss << std::hex << (int) Read(i) << ' ';
-			debugDump();
-			std::cout << "Instruction not found at pc: " + std::to_string(pc) + "\nDump: " + ss.str() << '\n';
+	if (getNMI()) {
+		pc--;
+		INT<Interrupts::NMI>();
+	} else {
+		switch (op) {
+		case 0x69: ADC<AddressingModes::IMMEDIATE>();
+			break;
+		case 0x65: ADC<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0x75: ADC<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0x6D: ADC<AddressingModes::ABSOLUTE>();
+			break;
+		case 0x7D: ADC<AddressingModes::ABSOLUTE_INDEXED_X>();
+			break;
+		case 0x79: ADC<AddressingModes::ABSOLUTE_INDEXED_Y>();
+			break;
+		case 0x61: ADC<AddressingModes::INDEXED_INDIRECT_X>();
+			break;
+		case 0x71: ADC<AddressingModes::INDIRECT_INDEXED>();
+			break;
+		case 0x29: AND<AddressingModes::IMMEDIATE>();
+			break;
+		case 0x25: AND<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0x35: AND<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0x2D: AND<AddressingModes::ABSOLUTE>();
+			break;
+		case 0x3D: AND<AddressingModes::ABSOLUTE_INDEXED_X>();
+			break;
+		case 0x39: AND<AddressingModes::ABSOLUTE_INDEXED_Y>();
+			break;
+		case 0x21: AND<AddressingModes::INDEXED_INDIRECT_X>();
+			break;
+		case 0x31: AND<AddressingModes::INDIRECT_INDEXED>();
+			break;
+		case 0x0A: ASL<AddressingModes::ACCUMULATOR>();
+			break;
+		case 0x06: ASL<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0x16: ASL<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0x0E: ASL<AddressingModes::ABSOLUTE>();
+			break;
+		case 0x1E: ASL<AddressingModes::ABSOLUTE_INDEXED_X>();
+			break;
+		case 0x24: BIT<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0x2C: BIT<AddressingModes::ABSOLUTE>();
+			break;
+		case 0x10: BPL<AddressingModes::RELATIVE>();
+			break;
+		case 0x30: BMI<AddressingModes::RELATIVE>();
+			break;
+		case 0x50: BVC<AddressingModes::RELATIVE>();
+			break;
+		case 0x70: BVS<AddressingModes::RELATIVE>();
+			break;
+		case 0x90: BCC<AddressingModes::RELATIVE>();
+			break;
+		case 0xB0: BCS<AddressingModes::RELATIVE>();
+			break;
+		case 0xD0: BNE<AddressingModes::RELATIVE>();
+			break;
+		case 0xF0: BEQ<AddressingModes::RELATIVE>();
+			break;
+		case 0x00: BRK<AddressingModes::IMPLIED>();
+			break;
+		case 0xC9: CMP<AddressingModes::IMMEDIATE>();
+			break;
+		case 0xC5: CMP<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0xD5: CMP<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0xCD: CMP<AddressingModes::ABSOLUTE>();
+			break;
+		case 0xDD: CMP<AddressingModes::ABSOLUTE_INDEXED_X>();
+			break;
+		case 0xD9: CMP<AddressingModes::ABSOLUTE_INDEXED_Y>();
+			break;
+		case 0xC1: CMP<AddressingModes::INDEXED_INDIRECT_X>();
+			break;
+		case 0xD1: CMP<AddressingModes::INDIRECT_INDEXED>();
+			break;
+		case 0xE0: CPX<AddressingModes::IMMEDIATE>();
+			break;
+		case 0xE4: CPX<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0xEC: CPX<AddressingModes::ABSOLUTE>();
+			break;
+		case 0xC0: CPY<AddressingModes::IMMEDIATE>();
+			break;
+		case 0xC4: CPY<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0xCC: CPY<AddressingModes::ABSOLUTE>();
+			break;
+		case 0xC6: DEC<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0xD6: DEC<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0xCE: DEC<AddressingModes::ABSOLUTE>();
+			break;
+		case 0xDE: DEC<AddressingModes::ABSOLUTE_INDEXED_X>();
+			break;
+		case 0x49: EOR<AddressingModes::IMMEDIATE>();
+			break;
+		case 0x45: EOR<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0x55: EOR<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0x4D: EOR<AddressingModes::ABSOLUTE>();
+			break;
+		case 0x5D: EOR<AddressingModes::ABSOLUTE_INDEXED_X>();
+			break;
+		case 0x59: EOR<AddressingModes::ABSOLUTE_INDEXED_Y>();
+			break;
+		case 0x41: EOR<AddressingModes::INDEXED_INDIRECT_X>();
+			break;
+		case 0x51: EOR<AddressingModes::INDIRECT_INDEXED>();
+			break;
+		case 0x18: CLC<AddressingModes::IMPLIED>();
+			break;
+		case 0x38: SEC<AddressingModes::IMPLIED>();
+			break;
+		case 0x58: CLI<AddressingModes::IMPLIED>();
+			break;
+		case 0x78: SEI<AddressingModes::IMPLIED>();
+			break;
+		case 0xB8: CLV<AddressingModes::IMPLIED>();
+			break;
+		case 0xD8: CLD<AddressingModes::IMPLIED>();
+			break;
+		case 0xF8: SED<AddressingModes::IMPLIED>();
+			break;
+		case 0xE6: INC<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0xF6: INC<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0xEE: INC<AddressingModes::ABSOLUTE>();
+			break;
+		case 0xFE: INC<AddressingModes::ABSOLUTE_INDEXED_X>();
+			break;
+		case 0x4C: JMP<AddressingModes::ABSOLUTE>();
+			break;
+		case 0x6C: JMP<AddressingModes::INDIRECT>();
+			break;
+		case 0x20: JSR<AddressingModes::ABSOLUTE>();
+			break;
+		case 0xA9: LDA<AddressingModes::IMMEDIATE>();
+			break;
+		case 0xA5: LDA<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0xB5: LDA<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0xAD: LDA<AddressingModes::ABSOLUTE>();
+			break;
+		case 0xBD: LDA<AddressingModes::ABSOLUTE_INDEXED_X>();
+			break;
+		case 0xB9: LDA<AddressingModes::ABSOLUTE_INDEXED_Y>();
+			break;
+		case 0xA1: LDA<AddressingModes::INDEXED_INDIRECT_X>();
+			break;
+		case 0xB1: LDA<AddressingModes::INDIRECT_INDEXED>();
+			break;
+		case 0xA2: LDX<AddressingModes::IMMEDIATE>();
+			break;
+		case 0xA6: LDX<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0xB6: LDX<AddressingModes::ZERO_PAGE_Y>();
+			break;
+		case 0xAE: LDX<AddressingModes::ABSOLUTE>();
+			break;
+		case 0xBE: LDX<AddressingModes::ABSOLUTE_INDEXED_Y>();
+			break;
+		case 0xA0: LDY<AddressingModes::IMMEDIATE>();
+			break;
+		case 0xA4: LDY<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0xB4: LDY<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0xAC: LDY<AddressingModes::ABSOLUTE>();
+			break;
+		case 0xBC: LDY<AddressingModes::ABSOLUTE_INDEXED_X>();
+			break;
+		case 0x4A: LSR<AddressingModes::ACCUMULATOR>();
+			break;
+		case 0x46: LSR<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0x56: LSR<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0x4E: LSR<AddressingModes::ABSOLUTE>();
+			break;
+		case 0x5E: LSR<AddressingModes::ABSOLUTE_INDEXED_X>();
+			break;
+		case 0x09: ORA<AddressingModes::IMMEDIATE>();
+			break;
+		case 0x05: ORA<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0x15: ORA<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0x0D: ORA<AddressingModes::ABSOLUTE>();
+			break;
+		case 0x1D: ORA<AddressingModes::ABSOLUTE_INDEXED_X>();
+			break;
+		case 0x19: ORA<AddressingModes::ABSOLUTE_INDEXED_Y>();
+			break;
+		case 0x01: ORA<AddressingModes::INDEXED_INDIRECT_X>();
+			break;
+		case 0x11: ORA<AddressingModes::INDIRECT_INDEXED>();
+			break;
+		case 0xAA: TAX<AddressingModes::IMPLIED>();
+			break;
+		case 0x8A: TXA<AddressingModes::IMPLIED>();
+			break;
+		case 0xCA: DEX<AddressingModes::IMPLIED>();
+			break;
+		case 0xE8: INX<AddressingModes::IMPLIED>();
+			break;
+		case 0xA8: TAY<AddressingModes::IMPLIED>();
+			break;
+		case 0x98: TYA<AddressingModes::IMPLIED>();
+			break;
+		case 0x88: DEY<AddressingModes::IMPLIED>();
+			break;
+		case 0xC8: INY<AddressingModes::IMPLIED>();
+			break;
+		case 0x2A: ROL<AddressingModes::ACCUMULATOR>();
+			break;
+		case 0x26: ROL<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0x36: ROL<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0x2E: ROL<AddressingModes::ABSOLUTE>();
+			break;
+		case 0x3E: ROL<AddressingModes::ABSOLUTE_INDEXED_X>();
+			break;
+		case 0x6A: ROR<AddressingModes::ACCUMULATOR>();
+			break;
+		case 0x66: ROR<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0x76: ROR<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0x6E: ROR<AddressingModes::ABSOLUTE>();
+			break;
+		case 0x7E: ROR<AddressingModes::ABSOLUTE_INDEXED_X>();
+			break;
+		case 0x40: RTI<AddressingModes::IMPLIED>();
+			break;
+		case 0x60: RTS<AddressingModes::IMPLIED>();
+			break;
+		case 0xE9: SBC<AddressingModes::IMMEDIATE>();
+			break;
+		case 0xE5: SBC<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0xF5: SBC<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0xED: SBC<AddressingModes::ABSOLUTE>();
+			break;
+		case 0xFD: SBC<AddressingModes::ABSOLUTE_INDEXED_X>();
+			break;
+		case 0xF9: SBC<AddressingModes::ABSOLUTE_INDEXED_Y>();
+			break;
+		case 0xE1: SBC<AddressingModes::INDEXED_INDIRECT_X>();
+			break;
+		case 0xF1: SBC<AddressingModes::INDIRECT_INDEXED>();
+			break;
+		case 0x85: STA<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0x95: STA<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0x8D: STA<AddressingModes::ABSOLUTE>();
+			break;
+		case 0x9D: STA<AddressingModes::ABSOLUTE_INDEXED_X>();
+			break;
+		case 0x99: STA<AddressingModes::ABSOLUTE_INDEXED_Y>();
+			break;
+		case 0x81: STA<AddressingModes::INDEXED_INDIRECT_X>();
+			break;
+		case 0x91: STA<AddressingModes::INDIRECT_INDEXED>();
+			break;
+		case 0x86: STX<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0x96: STX<AddressingModes::ZERO_PAGE_Y>();
+			break;
+		case 0x8E: STX<AddressingModes::ABSOLUTE>();
+			break;
+		case 0x84: STY<AddressingModes::ZERO_PAGE>();
+			break;
+		case 0x94: STY<AddressingModes::ZERO_PAGE_X>();
+			break;
+		case 0x8C: STY<AddressingModes::ABSOLUTE>();
+			break;
+		case 0x9A: TXS<AddressingModes::IMPLIED>();
+			break;
+		case 0xBA: TSX<AddressingModes::IMPLIED>();
+			break;
+		case 0x48: PHA<AddressingModes::IMPLIED>();
+			break;
+		case 0x68: PLA<AddressingModes::IMPLIED>();
+			break;
+		case 0x08: PHP<AddressingModes::IMPLIED>();
+			break;
+		case 0x28: PLP<AddressingModes::IMPLIED>();
+			break;
+		case 0xEA: NOP<AddressingModes::IMPLIED>();
+			break;
+		default: std::stringstream ss;
+			if constexpr (DEBUG && !ignoreUnknownInstr) {
+				for (int i = pcHist.back(); i < pcHist.back() + 10; i++)
+					ss << std::hex << (int) read(i) << ' ';
+				debugDump();
+				L_ERROR(std::cout << "Instruction not found at pc: " + std::to_string(pc) + "\nDump: " + ss.str() << '\n');
+			}
 		}
 	}
 
 	tick(zeroPageCrossed & calcCrossed);
 	cycleCount += 4;
-
-	if (GetNMI()) {
-		INT<Interrupts::NMI>();
-	}
 }
 
 #pragma region Debug and Logging
 void CPU::debugDump() {
 	for (int i = 0xfff0; i < 0x10000; i++)
-		vectors.emplace_back(HexString(i), Read(static_cast<u16>(i)));
+		vectors.emplace_back(HexString(i), read(static_cast<u16>(i)));
 }
 #pragma endregion
 
@@ -473,22 +405,20 @@ u16 CPU::getPureOperand() {
 	if constexpr (mode < 2)
 		return getOperand16<mode>();
 	else
-		return GetOperand8<mode>();
+		return getOperand8<mode>();
 }
 
 template<AddressingModes mode>
 u16 CPU::getOperand16() {
 	// Used by branch instructions
-	// TODO: Check if -1 is needed
+	// TODO: Check if -1 is needed; Probably not?
 	if constexpr (mode == AddressingModes::RELATIVE) {
 		u8 imm = Imm();
-		return pc + imm;
+		return pc + (s8) imm;
 	}
 		// TODO: Check if -2 is needed
 	else if (mode == AddressingModes::INDIRECT)
-		return Ind(Abs());
-	else
-		throw "Invalid instruction";
+		return ind(Abs());
 }
 
 template<AddressingModes mode>
@@ -498,26 +428,26 @@ bool CPU::writeOperandVal(const u8 &val) {
 		u16 abs = Abs();
 		return write(abs, val);
 	}
-	// ADC #2 -> A + 2
+		// ADC #2 -> A + 2
 	else if (mode == AddressingModes::IMMEDIATE) {
-		throw "Attempting to assign to immediate value";
+//		throw "Attempting to assign to immediate value";
 	}
-	// ADC $3420,X -> A + contents of memory $3420 + X
+		// ADC $3420,X -> A + contents of memory $3420 + X
 	else if (mode == AddressingModes::ABSOLUTE_INDEXED_X) {
 		return write(AbsX(), val);
 	}
-	// ADC $3420,Y	-> A + contents of memory $3420 + Y
+		// ADC $3420,Y	-> A + contents of memory $3420 + Y
 	else if (mode == AddressingModes::ABSOLUTE_INDEXED_Y) {
 		return write(AbsY(), val);
 	}
-	// ADC $F6 -> A + contents of memory $F6
-	// Zero page only considers the low bytes. TODO: Refactor
+		// ADC $F6 -> A + contents of memory $F6
+		// Zero page only considers the low bytes. TODO: Refactor
 	else if (mode == AddressingModes::ZERO_PAGE) {
-		return write(Imm() & 0xFF, val);
+		return write(Imm() & 0xFFu, val);
 	} else if (mode == AddressingModes::ZERO_PAGE_X) {
-		return write((Imm() + x) & 0xFF, val);
+		return write((Imm() + x) & 0xFFu, val);
 	} else if (mode == AddressingModes::ZERO_PAGE_Y) {
-		return write((Imm() + y) & 0xFF, val);
+		return write((Imm() + y) & 0xFFu, val);
 	}
 		// https://www.csh.rit.edu/~moffitt/6502.html#ADDR-IIND
 	else if (mode == AddressingModes::INDEXED_INDIRECT_X) {
@@ -531,92 +461,93 @@ bool CPU::writeOperandVal(const u8 &val) {
 	} else if (mode == AddressingModes::ACCUMULATOR) {
 		a = val;
 	}
-		// ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
-		//case AddressingModes::INDIRECT_INDEXED:
-		//return Zp(Imm()) + y;
-	else {
-		throw "Wrong addressing mode implemented! " + std::to_string(mode);
-	}
+	// ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
+	//case AddressingModes::INDIRECT_INDEXED:
+	//return Zp(Imm()) + y;
 	return false;
 }
 
 template<AddressingModes mode>
-u8 CPU::GetOperand8() {
+u8 CPU::getOperand8() {
 	// ADC $3420 -> A + contents of memory $3420
 	if constexpr (mode == AddressingModes::ABSOLUTE) {
 		u16 abs = Abs();
-		return Read(abs);
-	}
+		return read(abs);
 		// ADC #2 -> A + 2
-	else if (mode == AddressingModes::IMMEDIATE) {
+	} else if constexpr (mode == AddressingModes::IMMEDIATE) {
 		buff8 = Imm();
 		return buff8;
-	}
 		// ADC $3420,X -> A + contents of memory $3420 + X
-	else if (mode == AddressingModes::ABSOLUTE_INDEXED_X)
-		return Read(AbsX());
+	} else if constexpr (mode == AddressingModes::ABSOLUTE_INDEXED_X) {
+		return read(AbsX());
 		// ADC $3420,Y	-> A + contents of memory $3420 + Y
-	else if (mode == AddressingModes::ABSOLUTE_INDEXED_Y)
-		return Read(AbsY());
+	} else if constexpr (mode == AddressingModes::ABSOLUTE_INDEXED_Y) {
+		return read(AbsY());
 		// ADC $F6 -> A + contents of memory $F6
-	else if (mode == AddressingModes::ZERO_PAGE)
-		return Read(Imm() & 0xFF);
-	else if (mode == AddressingModes::ZERO_PAGE_X)
-		return Read((Imm() + x) & 0xFF);
-	else if (mode == AddressingModes::ZERO_PAGE_Y)
-		return Read((Imm() + y) & 0xFF);
+	} else if constexpr (mode == AddressingModes::ZERO_PAGE) {
+		return read(Imm() & 0xffu);
+	} else if constexpr  (mode == AddressingModes::ZERO_PAGE_X) {
+		return read((Imm() + x) & 0xffu);
+	} else if constexpr (mode == AddressingModes::ZERO_PAGE_Y) {
+		return read((Imm() + y) & 0xffu);
 		// https://www.csh.rit.edu/~moffitt/6502.html#ADDR-IIND
-	else if (mode == AddressingModes::INDEXED_INDIRECT_X) {
+	} else if constexpr  (mode == AddressingModes::INDEXED_INDIRECT_X) {
 		u8 addr8 = Imm() + x;
 		u16 zp16 = Zp16(addr8);
-		return Read(zp16);
-	} else if (mode == AddressingModes::INDIRECT_INDEXED) {
+		return read(zp16);
+	} else if constexpr (mode == AddressingModes::INDIRECT_INDEXED) {
 		u16 zp16 = Zp16(Imm());
 		CrossesPage(zp16, y);
-		return Read(zp16 + y);
-	} else if (mode == AddressingModes::ACCUMULATOR)
+		return read(zp16 + y);
+	} else if constexpr (mode == AddressingModes::ACCUMULATOR) {
 		return a;
-		// ADC ($F6),Y -> A + contents of (address at $F6) + offset Y
-		//case AddressingModes::INDIRECT_INDEXED:
-		//return Zp(Imm()) + y;
-	else
-		throw "Wrong addressing mode implemented! " + std::to_string(mode);
+	}
 }
 #pragma endregion
 
-//.... add with carry
 template<AddressingModes mode>
 void CPU::ADC() {
 	tick(CalcBaseTicks<mode>());
 	calcCrossed = true;
 
+	u16 res{};
 	u8 lhs = a;
-	u8 rhs = GetOperand8<mode>();
-	s16 res = lhs + rhs + C();
-	a = static_cast<u8>(res & 0xff);
+	u8 rhs = getOperand8<mode>();
+	if (D()) {
+		res = (lhs & 0xfu) + (rhs & 0xfu) + C();
+		if (res > 0x9u) {
+			res += 0x6u;
+		}
+		res += (lhs & 0xf0u) + (rhs & 0xf0u);
+		if ((res & 0x1f0u) > 0x90u) {
+			res += 0x60u;
+		}
+	} else {
+		res = lhs + rhs + C();
+	}
+
 	UpdCV(lhs, rhs, res);
-	UpdNZ((u8) (res & 0xff));
+
+	a = res & 0xffu;
+	UpdNZ(a);
 }
 
-//....	and (with accumulator)
 template<AddressingModes mode>
 void CPU::AND() {
 	calcCrossed = true;
 	UpdNZ(a &= getPureOperand<mode>());
 }
 
-//....	arithmetic shift left
 template<AddressingModes mode>
 void CPU::ASL() {
 	tick(CalcBaseTicks<mode>());
 	tick(CalcShiftTicks<mode>());
-	u8 val = GetOperand8<mode>();
+	u8 val = getOperand8<mode>();
 	val = _ASL(val);
 	writeOperandVal<mode>(val);
 	UpdNZ(val);
 }
 
-// TODO: Consider refactoring into a non-templated function
 template<AddressingModes mode>
 void CPU::BCC() {
 	u16 loc = getPureOperand<mode>();
@@ -651,8 +582,8 @@ void CPU::BIT() {
 	u8 op = (u8) getPureOperand<mode>();
 	u8 res = a & op;
 	Z(!res);
-	N(op & (1 << 7));
-	V(op & (1 << 6));
+	N(op & (1u << 7u));
+	V(op & (1u << 6u));
 }
 
 template<AddressingModes mode>
@@ -689,7 +620,9 @@ void CPU::BPL() {
 // NOTE: Mostly used for debugging.
 template<AddressingModes mode>
 void CPU::BRK() {
-	INT<Interrupts::BRK>();
+	if (!I()) {
+		INT<Interrupts::BRK>();
+	}
 }
 
 template<AddressingModes mode>
@@ -713,16 +646,18 @@ void CPU::BVS() {
 }
 
 template<AddressingModes mode>
-void CPU::CLC() { C(0); }
+void CPU::CLC() { C(false); }
 
 template<AddressingModes mode>
-void CPU::CLD() { D(0); }
+void CPU::CLD() { D(false); }
 
 template<AddressingModes mode>
-void CPU::CLI() { I(0); }
+void CPU::CLI() {
+	I(false);
+}
 
 template<AddressingModes mode>
-void CPU::CLV() { V(0); }
+void CPU::CLV() { V(false); }
 
 template<AddressingModes mode>
 void CPU::CMP() {
@@ -751,7 +686,7 @@ void CPU::CPY() {
 template<AddressingModes mode>
 void CPU::DEC() {
 	tick(CalcBaseTicks<mode>() + CalcIncDecTicks<mode>());
-	u8 val = GetOperand8<mode>();
+	u8 val = getOperand8<mode>();
 	val--;
 	writeOperandVal<mode>(val);
 	UpdNZ(val);
@@ -775,14 +710,16 @@ void CPU::EOR() {
 template<AddressingModes mode>
 void CPU::INC() {
 	tick(CalcBaseTicks<mode>() + CalcIncDecTicks<mode>());
-	u8 val = GetOperand8<mode>();
+	u8 val = getOperand8<mode>();
 	val++;
 	writeOperandVal<mode>(val);
 	UpdNZ(val);
 }
 
 template<AddressingModes mode>
-void CPU::INX() { UpdNZ(++x); }
+void CPU::INX() {
+	UpdNZ(++x);
+}
 
 template<AddressingModes mode>
 void CPU::INY() { UpdNZ(++y); }
@@ -794,7 +731,7 @@ void CPU::JMP() {
 		tick();
 		pc = Abs();
 	} else if (mode == AddressingModes::INDIRECT)
-		pc = Ind(Abs()); // Ind calls tick
+		pc = ind(Abs()); // Ind calls tick
 }
 
 // TODO: Check if pc - 1 or pc + 1
@@ -809,14 +746,14 @@ template<AddressingModes mode>
 void CPU::LDA() {
 	calcCrossed = true;
 	tick(CalcBaseTicks<mode>());
-	UpdNZ(a = GetOperand8<mode>());
+	UpdNZ(a = getOperand8<mode>());
 }
 
 template<AddressingModes mode>
 void CPU::LDX() {
 	tick(CalcBaseTicks<mode>());
 	calcCrossed = true;
-	UpdNZ(x = GetOperand8<mode>());
+	UpdNZ(x = getOperand8<mode>());
 }
 
 template<AddressingModes mode>
@@ -828,9 +765,9 @@ void CPU::LDY() {
 
 template<AddressingModes mode>
 void CPU::LSR() {
-	u8 op = GetOperand8<mode>();
-	C(static_cast<bool>(op & 1));
-	op >>= 1;
+	u8 op = getOperand8<mode>();
+	C(static_cast<bool>(op & 1u));
+	op >>= 1u;
 	writeOperandVal<mode>(op);
 	UpdNZ(op);
 }
@@ -841,7 +778,7 @@ void CPU::NOP() { pc += waste; }
 template<AddressingModes mode>
 void CPU::ORA() {
 	calcCrossed = true;
-	UpdNZ(a |= GetOperand8<mode>());
+	UpdNZ(a |= getOperand8<mode>());
 }
 
 template<AddressingModes mode>
@@ -853,7 +790,7 @@ void CPU::PHA() {
 template<AddressingModes mode>
 void CPU::PHP() {
 	tick();
-	Push8(p | (1 << 4));
+	Push8(p | (1u << 4u));
 }
 
 template<AddressingModes mode>
@@ -876,12 +813,12 @@ template<AddressingModes mode>
 void CPU::ROL() {
 	tick(CalcBaseTicks<mode>());
 	tick(CalcShiftTicks<mode>());
-	u8 mem = GetOperand8<mode>();
+	u8 mem = getOperand8<mode>();
 	u8 t = mem;
-	mem <<= 1;
+	mem <<= 1u;
 	mem |= static_cast<u8>(C());
 	writeOperandVal<mode>(mem);
-	C(t & 0x80);
+	C(t & 0x80u);
 	UpdNZ(mem);
 }
 
@@ -889,12 +826,12 @@ template<AddressingModes mode>
 void CPU::ROR() {
 	tick(CalcBaseTicks<mode>());
 	tick(CalcShiftTicks<mode>());
-	u8 mem = GetOperand8<mode>();
+	u8 mem = getOperand8<mode>();
 	u8 t = mem;
-	mem >>= 1;
-	mem |= (C() << 7);
+	mem >>= 1u;
+	mem |= (C() << 7u);
 	writeOperandVal<mode>(mem);
-	C(t & 1);
+	C(t & 1u);
 	UpdNZ(mem);
 }
 
@@ -908,9 +845,6 @@ combination of interrupt plus RTI allows truly reentrant coding.
 */
 template<AddressingModes mode>
 void CPU::RTI() {
-	if constexpr (DEBUG) {
-		std::cout << "RTI called\n"; // TODO: Remove
-	}
 	// NOTE: Changes the p register
 	PLP<mode>(); // pop8
 	tick(2);
@@ -923,26 +857,49 @@ void CPU::RTS() {
 	pc = Pop16() + 1;
 }
 
+// TODO: Speed-up
 template<AddressingModes mode>
 void CPU::SBC() {
 	tick(CalcBaseTicks<mode>());
 	calcCrossed = true;
 	u8 lhs = a;
-	u8 rhs = GetOperand8<mode>() ^ 0xff;
-	s16 res = lhs + rhs + C();
-	UpdCV(a, rhs, res);
-	a = static_cast<u8>(res);
+	u8 rhs = getOperand8<mode>();
+
+	u16 res{};
+	if (D()) {
+		lhs = toBCD(lhs);
+		rhs = toBCD(rhs);
+		u16 sres = lhs - rhs - !C();
+		if (sres > 0x1ff) {
+			sres = 99 - (0xffff - sres) + 100;
+		}
+		res = sres;
+		res = toBinary(res);
+	} else {
+		rhs ^= 0xffu;
+		res = lhs + rhs + C();
+	}
+
+	if (D()) {
+		C(res < 0x100u);
+	} else {
+		updC(res);
+	}
+	UpdV(a, rhs, res);
+	a = res & 0xffu;
 	UpdNZ(a);
 }
 
 template<AddressingModes mode>
-void CPU::SEC() { C(1); }
+void CPU::SEC() { C(true); }
 
 template<AddressingModes mode>
 void CPU::SED() { D(true); }
 
 template<AddressingModes mode>
-void CPU::SEI() { I(true); }
+void CPU::SEI() {
+	I(true);
+}
 
 template<AddressingModes mode>
 void CPU::STA() {
@@ -998,25 +955,18 @@ void CPU::TYA() {
 	UpdNZ(a);
 }
 
-template<AddressingModes mode>
-void CPU::LAX() {
-	LDA<mode>();
-	TAX<mode>();
-}
-
 // INT is not a 6502 instruction. It is simply an interrupt handler.
 template<Interrupts inter>
 void CPU::INT() {
-	if constexpr (DEBUG) {
-		std::cout << "Interrupted, type: " << inter << '\n'; // TODO: Find a better way to log
-	}
 	// Note that BRK, although it is a one - byte instruction, needs an extra
 	// byte of padding after it.This is because the return address it puts on
 	// the stack will cause the RTI to put the program counter back not to the
 	// very next byte after the BRK, but to the second byte after it. This
 	// padding byte can be used for a signature byte to tell the BReaK interrupt
 	// routine which BRK caused the particular software interrupt.
-	pc++;
+	if constexpr (inter != Interrupts::IRQ && inter != Interrupts::NMI) {
+		pc++;
+	}
 
 	tick();
 
@@ -1028,7 +978,7 @@ void CPU::INT() {
 	// or recovery code.
 	if constexpr (inter != Interrupts::RST) {
 		Push16(pc);
-		Push8(p | ((Interrupts::BRK == inter) << 4));
+		Push8(p | (u8) ((Interrupts::BRK == inter) << 0x4u));
 	} else {
 		// s -= 3;
 		tick(3);
@@ -1042,10 +992,16 @@ void CPU::INT() {
 
 	I(true);
 
-	pc = Read16(vect[inter]);
+	pc = read16(vect[inter]);
 
-	if (inter == NMI)
+	if constexpr (inter == NMI) {
 		nmi = false;
+	}
+}
 
+void CPU::interruptRequest() {
+	if (!I()) {
+		INT<Interrupts::IRQ>();
+	}
 }
 

@@ -1,4 +1,3 @@
-#include "NanoLog.h"
 #include <string>
 #include <sstream>
 #include <iomanip>
@@ -190,7 +189,10 @@ std::string Debugger::GetNESTestLine() const
 {
 	std::stringstream ss;
 
-	ss  << "A:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->A()
+	ss
+
+			<< "PC:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->PC()
+	<< " A:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->A()
 		<< " X:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->X()
 		<< " Y:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->Y()
 		<< " P:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->P()
@@ -208,7 +210,7 @@ std::string Debugger::GetStatusLine() const
 
 void Debugger::AppendStatHist(const std::string &stat)
 {
-	statHist.push_back(instructionName[cpu->Read(cpu->PC())] + " " + stat);
+	statHist.push_back(instructionName[cpu->read(cpu->PC())] + " " + stat);
 }
 
 std::string Debugger::GetOpHistForLogging() const

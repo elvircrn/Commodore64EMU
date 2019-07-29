@@ -1,147 +1,74 @@
 #define CATCH_CONFIG_MAIN
 #include "CPU.h"
 #include "catch.hpp"
-#include "FileHandler.h"
-#include <boost/filesystem.hpp>
-#include "Debugger.h"
+#include "StreamUtil.h"
+#include "cmrc/cmrc.hpp"
 
-#include <fstream>
-#include "NanoLog.h"
 #include <iomanip>
 #include "MMU.h"
+CMRC_DECLARE(test_resources);
 
-namespace NESEmulatorTest {
-#define ASRT(X, Y) REQUIRE((X) == (Y))
+TEST_CASE("CPU Test") {
+	std::ios oldState(nullptr);
+	oldState.copyfmt(std::cout);
+	std::chrono::high_resolution_clock::time_point start(
+			std::chrono::high_resolution_clock::now());
 
-void LoggerDump(const Debugger &debugger) {
-	INFO(debugger.GetOpHistForLogging().c_str());
-	// INFO(debugger.GetPCHistForLogging().c_str());
-}
+	SDL_Event evt;
 
+	std::vector<u8> vicIO(0xffff);
+	Clock clk{};
+	CIA1 cia1{evt};
+	CIA2 cia2{};
+	ROM rom{};
+	auto fs = cmrc::test_resources::get_filesystem();
+	MMU mmu{rom, cia1, cia2};
 
-TEST_CASE("PatternLoad") {
-	std::string donkeyPatternName = "donkeypattern.txt";
-	std::string donkeyPatternPath = boost::filesystem::path(__FILE__)
-			.parent_path()
-			.append(donkeyPatternName)
-			.string();
-	std::ifstream in(donkeyPatternPath);
-	std::vector<std::vector<char>> expected(128, std::vector<char>(128));
-	for (size_t i = 0; i < 128; i++) {
-		for (size_t j = 0; j < 128; j++) {
-			in >> expected[i][j];
-			expected[i][j] -= '0';
-		}
+	auto content = fs.open("res/6502_functional_test.bin");
+	u32 addr = 0x400;
+	for (const auto& it : content) {
+		mmu.writeRAM(addr++, it);
 	}
 
-	std::string fileName = "donkeykong.nes";
-	std::string filePath = boost::filesystem::path(__FILE__)
-			.parent_path()
-			.parent_path()
-			.append(fileName)
-			.string();
+	CPU cpu(clk, mmu, 0x400);
 
-	std::cout << "Trying to load: " << filePath << '\n';
-	std::ifstream file(filePath, std::ios::binary);
+	cpu.write(1, 0);
 
-	if (!file) {
-		std::cout << "Failed to read rom given: " << filePath << '\n';
-		ASRT(true, false);
-	}
+	cpu.setDebug(false);
 
-	file.unsetf(std::ios::skipws);
+	bool passed{};
+	u16 pcPrev{};
 
-	ROM rom(file);
-	PPU ppu(rom);
+	while (true) {
+		cpu.execute();
 
-	auto actual = ppu.getPatternTable(0x0000);
-
-	ASRT(actual, expected);
-}
-
-TEST_CASE("ROMHeaderTest") {
-	auto filePath = boost::filesystem::path(__FILE__)
-			.parent_path()
-			.append("nestest.nes")
-			.string();
-
-	std::ifstream file(filePath, std::ios::binary);
-
-	if (!file) {
-		LOG_INFO << "Failed to read rom given: " << filePath << '\n';
-		ASRT(true, false);
-	}
-
-	file.unsetf(std::ios::skipws);
-
-	ROM rom(file);
-
-	ASRT(rom.CHRCnt(), 1);
-	ASRT(rom.PRGCnt(), 1);
-}
-
-TEST_CASE("NESTestNoCycleCount") {
-	auto filePath = boost::filesystem::path(__FILE__)
-			.parent_path()
-			.append("nestest.nes")
-			.string();
-
-	std::ifstream file(filePath, std::ios::binary);
-
-	if (!file) {
-		LOG_INFO << "Failed to read rom given: " << filePath << '\n';
-		ASRT(true, false);
-	}
-
-	file.unsetf(std::ios::skipws);
-	Clock clk;
-	ROM rom(file);
-	PPU ppu(rom);
-	MMU mmu(ppu);
-	CPU cpu(clk, mmu);
-	Debugger debugger(&cpu);
-	cpu.powerUp();
-	cpu.loadROM(rom);
-
-	auto res = boost::filesystem::path(__FILE__)
-			.parent_path()
-			.append("res.txt")
-			.string();
-
-	std::ifstream myfile(res);
-	std::vector<std::string> lines;
-	std::string correctLine;
-
-	int lineCount = 0;
-
-	while (std::getline(myfile, correctLine)) {
-		if (!cpu.IsOfficial())
+		if (cpu.PC() == 0x3463) {
+			passed = true;
 			break;
-
-		std::string emuLine = debugger.GetNESTestLine();
-
-		debugger.AppendStatHist(emuLine);
-
-		if (correctLine != emuLine) {
-			LoggerDump(debugger);
-			INFO(("Exp: " + correctLine + "\nFnd: " + emuLine).c_str());
-			INFO(("Failed at: " + std::to_string(lineCount)).c_str());
-			std::stringstream ss;
-			ss << std::hex << std::setfill('0') << std::setw(2) << (int) cpu.PC();
-			INFO(("PC: " + ss.str()).c_str());
-			ASRT(true, false);
+		} else if (cpu.PC() == pcPrev) {
+			std::cout << "Stuck in a loop at " << std::hex << pcPrev << '\n';
+			break;
 		}
-		try {
-			cpu.execute();
-		}
-		catch (std::string &e) {
-			LoggerDump(debugger);
-			std::stringstream ss;
-			ss << std::hex << std::setfill('0') << std::setw(2) << (int) cpu.PC();
-			INFO(("PC: " + ss.str()).c_str());
-			ASRT(true, false);
-		}
-		lineCount++;
+
+		pcPrev = cpu.PC();
 	}
-}
+
+	std::cout << std::endl;
+	for (size_t i = cpu.instrHist.size() - 50; i < cpu.instrHist.size(); i++) {
+		auto v = std::get<2>(cpu.instrHist[i]);
+		std::cout << std::hex << std::setw(2) << std::setfill('0') << std::get<0>(cpu.instrHist[i]) << ' '
+							<< std::get<1>(cpu.instrHist[i]) << ' ';
+		for (const auto &data : v) {
+			std::cout << ' ' << std::hex << std::setw(2) << std::setfill('0') << (int) data;
+		}
+		std::cout << '\n';
+	}
+
+	std::cout.copyfmt(oldState);
+
+	auto microseconds =
+			std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
+	std::cout << "Duration: " << microseconds.count() << "ms\n";
+
+	REQUIRE(passed);
 }

@@ -3,23 +3,21 @@
 
 #include <thread>
 
-Clock::Clock() { }
 
-Clock::Clock(std::chrono::nanoseconds _t) : t(_t) { }
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
+
 
 void Clock::startTicking() {
-	if (t != std::chrono::nanoseconds::zero()) {
-		for (;; stamp++) {
-			std::this_thread::sleep_for(t);
+	if (enabled) {
+		if (t != std::chrono::nanoseconds::zero()) {
+			for (;; stamp++) {
+				std::this_thread::sleep_for(t);
+			}
 		}
 	}
 }
+#pragma clang diagnostic pop
 
-void Clock::waitTick(uint32_t ticks) {
-	if (t != std::chrono::nanoseconds::zero()) {
-		while (ticks--) {
-			while (stamps[std::this_thread::get_id()] == stamp) { }
-			stamps[std::this_thread::get_id()].store(stamp);
-		}
-	}
-}
+
+Clock::Clock(std::chrono::nanoseconds t) : stamp{}, t(t), enabled(true) { }

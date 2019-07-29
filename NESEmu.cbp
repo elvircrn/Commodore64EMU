@@ -1,0 +1,949 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="NESEmu"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;CMake Files\cmake-build-debug\;CMake Files\test\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/Users/elvir/CLionProjects/NESEmu"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="NESEmuLib">
+				<Option output="/Users/elvir/CLionProjects/NESEmu/lib/libNESEmuLib.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/elvir/CLionProjects/NESEmu"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/elvir/.conan/data/boost_filesystem/1.67.0/bincrafters/stable/package/49e88768d91f14040ffa62b3c917a0313645b4c4/filesystem/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_io/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/io/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_range/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/range/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_system/1.67.0/bincrafters/stable/package/1bdd4d5d01fdeef29d05e7afff6a7f7b1493eec1/system/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include/freetype2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_array/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/array/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_numeric_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/numeric_conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_regex/1.67.0/bincrafters/stable/package/c93808469a7990bbbbbfdc9e1c2b9686116aa4dc/regex/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_winapi/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/winapi/include"/>
+					<Add directory="/Users/elvir/.conan/data/libpng/1.6.36/bincrafters/stable/package/578b8eece3b2a6547d988711343c11038dc98f5f/include"/>
+					<Add directory="/Users/elvir/.conan/data/bzip2/1.0.6/conan/stable/package/78ab9b2bad3359502e214008abda7b45b0b9daa0/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_iterator/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/iterator/include"/>
+					<Add directory="/Users/elvir/.conan/data/zlib/1.2.11/conan/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_concept_check/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/concept_check/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_fusion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/fusion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_optional/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/optional/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_container_hash/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/container_hash/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_smart_ptr/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/smart_ptr/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_typeof/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/typeof/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_function_types/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/function_types/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_tuple/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/tuple/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_detail/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/detail/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_integer/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/integer/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_move/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/move/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_mpl/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/mpl/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_predef/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/predef/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_utility/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/utility/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_preprocessor/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/preprocessor/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_type_traits/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/type_traits/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_throw_exception/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/throw_exception/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_core/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/core/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_static_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/static_assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_config/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/config/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 NESEmuLib"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="NESEmuLib/fast">
+				<Option output="/Users/elvir/CLionProjects/NESEmu/lib/libNESEmuLib.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/elvir/CLionProjects/NESEmu"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/elvir/.conan/data/boost_filesystem/1.67.0/bincrafters/stable/package/49e88768d91f14040ffa62b3c917a0313645b4c4/filesystem/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_io/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/io/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_range/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/range/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_system/1.67.0/bincrafters/stable/package/1bdd4d5d01fdeef29d05e7afff6a7f7b1493eec1/system/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include/freetype2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_array/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/array/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_numeric_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/numeric_conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_regex/1.67.0/bincrafters/stable/package/c93808469a7990bbbbbfdc9e1c2b9686116aa4dc/regex/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_winapi/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/winapi/include"/>
+					<Add directory="/Users/elvir/.conan/data/libpng/1.6.36/bincrafters/stable/package/578b8eece3b2a6547d988711343c11038dc98f5f/include"/>
+					<Add directory="/Users/elvir/.conan/data/bzip2/1.0.6/conan/stable/package/78ab9b2bad3359502e214008abda7b45b0b9daa0/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_iterator/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/iterator/include"/>
+					<Add directory="/Users/elvir/.conan/data/zlib/1.2.11/conan/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_concept_check/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/concept_check/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_fusion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/fusion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_optional/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/optional/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_container_hash/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/container_hash/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_smart_ptr/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/smart_ptr/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_typeof/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/typeof/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_function_types/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/function_types/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_tuple/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/tuple/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_detail/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/detail/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_integer/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/integer/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_move/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/move/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_mpl/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/mpl/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_predef/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/predef/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_utility/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/utility/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_preprocessor/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/preprocessor/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_type_traits/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/type_traits/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_throw_exception/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/throw_exception/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_core/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/core/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_static_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/static_assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_config/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/config/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 NESEmuLib/fast"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/Users/elvir/CLionProjects/NESEmu"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="resources">
+				<Option output="/Users/elvir/CLionProjects/NESEmu/lib/libresources.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/elvir/CLionProjects/NESEmu"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/elvir/.conan/data/boost_filesystem/1.67.0/bincrafters/stable/package/49e88768d91f14040ffa62b3c917a0313645b4c4/filesystem/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_io/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/io/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_range/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/range/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_system/1.67.0/bincrafters/stable/package/1bdd4d5d01fdeef29d05e7afff6a7f7b1493eec1/system/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include/freetype2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_array/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/array/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_numeric_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/numeric_conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_regex/1.67.0/bincrafters/stable/package/c93808469a7990bbbbbfdc9e1c2b9686116aa4dc/regex/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_winapi/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/winapi/include"/>
+					<Add directory="/Users/elvir/.conan/data/libpng/1.6.36/bincrafters/stable/package/578b8eece3b2a6547d988711343c11038dc98f5f/include"/>
+					<Add directory="/Users/elvir/.conan/data/bzip2/1.0.6/conan/stable/package/78ab9b2bad3359502e214008abda7b45b0b9daa0/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_iterator/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/iterator/include"/>
+					<Add directory="/Users/elvir/.conan/data/zlib/1.2.11/conan/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_concept_check/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/concept_check/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_fusion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/fusion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_optional/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/optional/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_container_hash/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/container_hash/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_smart_ptr/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/smart_ptr/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_typeof/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/typeof/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_function_types/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/function_types/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_tuple/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/tuple/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_detail/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/detail/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_integer/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/integer/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_move/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/move/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_mpl/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/mpl/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_predef/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/predef/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_utility/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/utility/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_preprocessor/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/preprocessor/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_type_traits/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/type_traits/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_throw_exception/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/throw_exception/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_core/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/core/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_static_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/static_assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_config/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/config/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 resources"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="resources/fast">
+				<Option output="/Users/elvir/CLionProjects/NESEmu/lib/libresources.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/elvir/CLionProjects/NESEmu"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/elvir/.conan/data/boost_filesystem/1.67.0/bincrafters/stable/package/49e88768d91f14040ffa62b3c917a0313645b4c4/filesystem/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_io/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/io/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_range/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/range/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_system/1.67.0/bincrafters/stable/package/1bdd4d5d01fdeef29d05e7afff6a7f7b1493eec1/system/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include/freetype2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_array/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/array/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_numeric_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/numeric_conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_regex/1.67.0/bincrafters/stable/package/c93808469a7990bbbbbfdc9e1c2b9686116aa4dc/regex/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_winapi/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/winapi/include"/>
+					<Add directory="/Users/elvir/.conan/data/libpng/1.6.36/bincrafters/stable/package/578b8eece3b2a6547d988711343c11038dc98f5f/include"/>
+					<Add directory="/Users/elvir/.conan/data/bzip2/1.0.6/conan/stable/package/78ab9b2bad3359502e214008abda7b45b0b9daa0/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_iterator/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/iterator/include"/>
+					<Add directory="/Users/elvir/.conan/data/zlib/1.2.11/conan/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_concept_check/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/concept_check/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_fusion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/fusion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_optional/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/optional/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_container_hash/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/container_hash/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_smart_ptr/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/smart_ptr/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_typeof/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/typeof/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_function_types/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/function_types/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_tuple/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/tuple/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_detail/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/detail/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_integer/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/integer/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_move/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/move/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_mpl/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/mpl/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_predef/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/predef/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_utility/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/utility/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_preprocessor/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/preprocessor/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_type_traits/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/type_traits/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_throw_exception/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/throw_exception/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_core/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/core/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_static_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/static_assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_config/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/config/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 resources/fast"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/Users/elvir/CLionProjects/NESEmu"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="NESEmu">
+				<Option output="/Users/elvir/CLionProjects/NESEmu/bin/NESEmu" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/elvir/CLionProjects/NESEmu/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/elvir/.conan/data/boost_filesystem/1.67.0/bincrafters/stable/package/49e88768d91f14040ffa62b3c917a0313645b4c4/filesystem/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_io/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/io/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_range/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/range/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_system/1.67.0/bincrafters/stable/package/1bdd4d5d01fdeef29d05e7afff6a7f7b1493eec1/system/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include/freetype2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_array/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/array/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_numeric_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/numeric_conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_regex/1.67.0/bincrafters/stable/package/c93808469a7990bbbbbfdc9e1c2b9686116aa4dc/regex/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_winapi/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/winapi/include"/>
+					<Add directory="/Users/elvir/.conan/data/libpng/1.6.36/bincrafters/stable/package/578b8eece3b2a6547d988711343c11038dc98f5f/include"/>
+					<Add directory="/Users/elvir/.conan/data/bzip2/1.0.6/conan/stable/package/78ab9b2bad3359502e214008abda7b45b0b9daa0/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_iterator/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/iterator/include"/>
+					<Add directory="/Users/elvir/.conan/data/zlib/1.2.11/conan/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_concept_check/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/concept_check/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_fusion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/fusion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_optional/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/optional/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_container_hash/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/container_hash/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_smart_ptr/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/smart_ptr/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_typeof/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/typeof/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_function_types/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/function_types/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_tuple/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/tuple/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_detail/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/detail/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_integer/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/integer/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_move/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/move/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_mpl/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/mpl/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_predef/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/predef/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_utility/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/utility/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_preprocessor/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/preprocessor/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_type_traits/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/type_traits/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_throw_exception/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/throw_exception/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_core/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/core/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_static_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/static_assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_config/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/config/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 NESEmu"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="NESEmu/fast">
+				<Option output="/Users/elvir/CLionProjects/NESEmu/bin/NESEmu" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/elvir/CLionProjects/NESEmu/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/elvir/.conan/data/boost_filesystem/1.67.0/bincrafters/stable/package/49e88768d91f14040ffa62b3c917a0313645b4c4/filesystem/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_io/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/io/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_range/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/range/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_system/1.67.0/bincrafters/stable/package/1bdd4d5d01fdeef29d05e7afff6a7f7b1493eec1/system/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include/freetype2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_array/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/array/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_numeric_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/numeric_conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_regex/1.67.0/bincrafters/stable/package/c93808469a7990bbbbbfdc9e1c2b9686116aa4dc/regex/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_winapi/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/winapi/include"/>
+					<Add directory="/Users/elvir/.conan/data/libpng/1.6.36/bincrafters/stable/package/578b8eece3b2a6547d988711343c11038dc98f5f/include"/>
+					<Add directory="/Users/elvir/.conan/data/bzip2/1.0.6/conan/stable/package/78ab9b2bad3359502e214008abda7b45b0b9daa0/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_iterator/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/iterator/include"/>
+					<Add directory="/Users/elvir/.conan/data/zlib/1.2.11/conan/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_concept_check/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/concept_check/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_fusion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/fusion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_optional/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/optional/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_container_hash/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/container_hash/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_smart_ptr/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/smart_ptr/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_typeof/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/typeof/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_function_types/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/function_types/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_tuple/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/tuple/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_detail/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/detail/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_integer/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/integer/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_move/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/move/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_mpl/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/mpl/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_predef/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/predef/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_utility/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/utility/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_preprocessor/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/preprocessor/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_type_traits/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/type_traits/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_throw_exception/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/throw_exception/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_core/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/core/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_static_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/static_assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_config/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/config/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 NESEmu/fast"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_resources">
+				<Option output="/Users/elvir/CLionProjects/NESEmu/test/lib/libtest_resources.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/elvir/CLionProjects/NESEmu/test"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/elvir/.conan/data/boost_filesystem/1.67.0/bincrafters/stable/package/49e88768d91f14040ffa62b3c917a0313645b4c4/filesystem/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_io/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/io/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_range/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/range/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_system/1.67.0/bincrafters/stable/package/1bdd4d5d01fdeef29d05e7afff6a7f7b1493eec1/system/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include/freetype2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_array/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/array/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_numeric_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/numeric_conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_regex/1.67.0/bincrafters/stable/package/c93808469a7990bbbbbfdc9e1c2b9686116aa4dc/regex/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_winapi/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/winapi/include"/>
+					<Add directory="/Users/elvir/.conan/data/libpng/1.6.36/bincrafters/stable/package/578b8eece3b2a6547d988711343c11038dc98f5f/include"/>
+					<Add directory="/Users/elvir/.conan/data/bzip2/1.0.6/conan/stable/package/78ab9b2bad3359502e214008abda7b45b0b9daa0/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_iterator/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/iterator/include"/>
+					<Add directory="/Users/elvir/.conan/data/zlib/1.2.11/conan/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_concept_check/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/concept_check/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_fusion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/fusion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_optional/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/optional/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_container_hash/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/container_hash/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_smart_ptr/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/smart_ptr/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_typeof/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/typeof/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_function_types/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/function_types/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_tuple/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/tuple/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_detail/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/detail/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_integer/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/integer/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_move/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/move/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_mpl/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/mpl/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_predef/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/predef/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_utility/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/utility/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_preprocessor/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/preprocessor/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_type_traits/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/type_traits/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_throw_exception/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/throw_exception/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_core/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/core/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_static_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/static_assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_config/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/config/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 test_resources"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="test_resources/fast">
+				<Option output="/Users/elvir/CLionProjects/NESEmu/test/lib/libtest_resources.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/elvir/CLionProjects/NESEmu/test"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/elvir/.conan/data/boost_filesystem/1.67.0/bincrafters/stable/package/49e88768d91f14040ffa62b3c917a0313645b4c4/filesystem/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_io/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/io/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_range/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/range/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_system/1.67.0/bincrafters/stable/package/1bdd4d5d01fdeef29d05e7afff6a7f7b1493eec1/system/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include/freetype2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_array/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/array/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_numeric_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/numeric_conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_regex/1.67.0/bincrafters/stable/package/c93808469a7990bbbbbfdc9e1c2b9686116aa4dc/regex/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_winapi/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/winapi/include"/>
+					<Add directory="/Users/elvir/.conan/data/libpng/1.6.36/bincrafters/stable/package/578b8eece3b2a6547d988711343c11038dc98f5f/include"/>
+					<Add directory="/Users/elvir/.conan/data/bzip2/1.0.6/conan/stable/package/78ab9b2bad3359502e214008abda7b45b0b9daa0/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_iterator/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/iterator/include"/>
+					<Add directory="/Users/elvir/.conan/data/zlib/1.2.11/conan/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_concept_check/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/concept_check/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_fusion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/fusion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_optional/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/optional/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_container_hash/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/container_hash/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_smart_ptr/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/smart_ptr/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_typeof/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/typeof/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_function_types/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/function_types/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_tuple/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/tuple/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_detail/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/detail/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_integer/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/integer/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_move/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/move/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_mpl/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/mpl/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_predef/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/predef/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_utility/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/utility/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_preprocessor/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/preprocessor/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_type_traits/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/type_traits/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_throw_exception/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/throw_exception/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_core/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/core/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_static_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/static_assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_config/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/config/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 test_resources/fast"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="NESTest">
+				<Option output="/Users/elvir/CLionProjects/NESEmu/test/bin/NESTest" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/elvir/CLionProjects/NESEmu/test/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/elvir/.conan/data/boost_filesystem/1.67.0/bincrafters/stable/package/49e88768d91f14040ffa62b3c917a0313645b4c4/filesystem/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_io/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/io/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_range/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/range/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_system/1.67.0/bincrafters/stable/package/1bdd4d5d01fdeef29d05e7afff6a7f7b1493eec1/system/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include/freetype2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_array/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/array/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_numeric_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/numeric_conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_regex/1.67.0/bincrafters/stable/package/c93808469a7990bbbbbfdc9e1c2b9686116aa4dc/regex/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_winapi/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/winapi/include"/>
+					<Add directory="/Users/elvir/.conan/data/libpng/1.6.36/bincrafters/stable/package/578b8eece3b2a6547d988711343c11038dc98f5f/include"/>
+					<Add directory="/Users/elvir/.conan/data/bzip2/1.0.6/conan/stable/package/78ab9b2bad3359502e214008abda7b45b0b9daa0/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_iterator/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/iterator/include"/>
+					<Add directory="/Users/elvir/.conan/data/zlib/1.2.11/conan/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_concept_check/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/concept_check/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_fusion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/fusion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_optional/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/optional/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_container_hash/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/container_hash/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_smart_ptr/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/smart_ptr/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_typeof/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/typeof/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_function_types/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/function_types/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_tuple/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/tuple/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_detail/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/detail/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_integer/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/integer/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_move/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/move/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_mpl/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/mpl/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_predef/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/predef/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_utility/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/utility/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_preprocessor/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/preprocessor/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_type_traits/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/type_traits/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_throw_exception/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/throw_exception/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_core/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/core/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_static_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/static_assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_config/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/config/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 NESTest"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="NESTest/fast">
+				<Option output="/Users/elvir/CLionProjects/NESEmu/test/bin/NESTest" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/Users/elvir/CLionProjects/NESEmu/test/bin"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/Users/elvir/.conan/data/boost_filesystem/1.67.0/bincrafters/stable/package/49e88768d91f14040ffa62b3c917a0313645b4c4/filesystem/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2_ttf/2.0.15/bincrafters/stable/package/759cd65496aaf9dffec2e826558b863b762c9013/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/sdl2/2.0.9/bincrafters/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include/SDL2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_io/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/io/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_range/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/range/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_system/1.67.0/bincrafters/stable/package/1bdd4d5d01fdeef29d05e7afff6a7f7b1493eec1/system/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include"/>
+					<Add directory="/Users/elvir/.conan/data/freetype/2.9.1/bincrafters/stable/package/d3eb8030c52ed53148828b1323ac0f3823c5a86d/include/freetype2"/>
+					<Add directory="/Users/elvir/.conan/data/boost_array/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/array/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_numeric_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/numeric_conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_regex/1.67.0/bincrafters/stable/package/c93808469a7990bbbbbfdc9e1c2b9686116aa4dc/regex/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_winapi/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/winapi/include"/>
+					<Add directory="/Users/elvir/.conan/data/libpng/1.6.36/bincrafters/stable/package/578b8eece3b2a6547d988711343c11038dc98f5f/include"/>
+					<Add directory="/Users/elvir/.conan/data/bzip2/1.0.6/conan/stable/package/78ab9b2bad3359502e214008abda7b45b0b9daa0/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_iterator/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/iterator/include"/>
+					<Add directory="/Users/elvir/.conan/data/zlib/1.2.11/conan/stable/package/1513b3452ef7e2a2dd5f931247c5e02edeb98cc9/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_concept_check/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/concept_check/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_conversion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/conversion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_fusion/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/fusion/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_optional/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/optional/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_container_hash/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/container_hash/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_smart_ptr/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/smart_ptr/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_typeof/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/typeof/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_function_types/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/function_types/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_tuple/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/tuple/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_detail/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/detail/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_integer/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/integer/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_move/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/move/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_mpl/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/mpl/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_predef/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/predef/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_utility/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/utility/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_preprocessor/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/preprocessor/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_type_traits/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/type_traits/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_throw_exception/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/throw_exception/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_core/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/core/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_static_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/static_assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_assert/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/assert/include"/>
+					<Add directory="/Users/elvir/.conan/data/boost_config/1.67.0/bincrafters/stable/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/config/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/include"/>
+					<Add directory="/Users/elvir/CLionProjects/NESEmu/_cmrc/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include/c++/v1"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/lib/clang/10.0.1/include"/>
+					<Add directory="/Library/Developer/CommandLineTools/usr/include"/>
+					<Add directory="/usr/include"/>
+					<Add directory="/System/Library/Frameworks"/>
+					<Add directory="/Library/Frameworks"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 NESTest/fast"/>
+					<CompileFile command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/Library/Developer/CommandLineTools/usr/bin/make -j12 -f &quot;/Users/elvir/CLionProjects/NESEmu/test/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/__cmrc_resources/intermediate/res/6502_functional_test.bin.cpp">
+			<Option target="resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/__cmrc_resources/intermediate/res/6502_functional_test.bin.cpp.rule">
+			<Option target="resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/__cmrc_resources/intermediate/rom/basic.rom.cpp">
+			<Option target="resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/__cmrc_resources/intermediate/rom/basic.rom.cpp.rule">
+			<Option target="resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/__cmrc_resources/intermediate/rom/chargen.rom.cpp">
+			<Option target="resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/__cmrc_resources/intermediate/rom/chargen.rom.cpp.rule">
+			<Option target="resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/__cmrc_resources/intermediate/rom/kernal.rom.cpp">
+			<Option target="resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/__cmrc_resources/intermediate/rom/kernal.rom.cpp.rule">
+			<Option target="resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/__cmrc_resources/lib.cpp">
+			<Option target="resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/__cmrc_resources/lib.cpp.rule">
+			<Option target="resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/CIA1.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/CIA2.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/CPU.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/Clock.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/Debugger.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/GUI.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/Instructions.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/LogUtil.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/Loop.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/MMU.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/MMULoader.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/Palette.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/ROM.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/RegisterHolder.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/SDL_FontCache.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/Screen.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/StreamUtil.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/TimingConstants.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/color.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/core.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/optional.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/sdl2.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/sdl_util.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/variant.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/include/vic.h">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/main.cpp">
+			<Option target="NESEmu"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/CIA1.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/CPU.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/Clock.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/Debugger.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/GUI.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/Instructions.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/Loop.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/MMU.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/MMULoader.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/ROM.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/SDL_FontCache.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/StreamUtil.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/core.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/src/vic.cpp">
+			<Option target="NESEmuLib"/>
+			<Option target="NESEmu"/>
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/test/CPUTest.cpp">
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/test/__cmrc_test_resources/intermediate/res/6502_functional_test.bin.cpp">
+			<Option target="test_resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/test/__cmrc_test_resources/intermediate/res/6502_functional_test.bin.cpp.rule">
+			<Option target="test_resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/test/__cmrc_test_resources/intermediate/res/6502_functional_test.lst.cpp">
+			<Option target="test_resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/test/__cmrc_test_resources/intermediate/res/6502_functional_test.lst.cpp.rule">
+			<Option target="test_resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/test/__cmrc_test_resources/intermediate/res/65C02_extended_opcodes_test.bin.cpp">
+			<Option target="test_resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/test/__cmrc_test_resources/intermediate/res/65C02_extended_opcodes_test.bin.cpp.rule">
+			<Option target="test_resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/test/__cmrc_test_resources/intermediate/res/65C02_extended_opcodes_test.lst.cpp">
+			<Option target="test_resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/test/__cmrc_test_resources/intermediate/res/65C02_extended_opcodes_test.lst.cpp.rule">
+			<Option target="test_resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/test/__cmrc_test_resources/lib.cpp">
+			<Option target="test_resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/test/__cmrc_test_resources/lib.cpp.rule">
+			<Option target="test_resources"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/test/catch.hpp">
+			<Option target="NESTest"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/CMakeRC.cmake">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/cmake-build-debug/conanbuildinfo.cmake">
+			<Option virtualFolder="CMake Files\cmake-build-debug\"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/test/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\test\"/>
+		</Unit>
+		<Unit filename="/Users/elvir/CLionProjects/NESEmu/test/CMakeRC.cmake">
+			<Option virtualFolder="CMake Files\test\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

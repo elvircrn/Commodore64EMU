@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <array>
 #include <utility>
+#include <functional>
 
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_events.h>

@@ -32,31 +32,28 @@ int main() {
 	auto renderer{sdl2::make_renderer(window.get(), -1, SDL_RENDERER_ACCELERATED)};
 	auto texture
 			{sdl2::make_bmp(renderer.get(), SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, GraphicsConstants::WINDOW_WIDTH, GraphicsConstants::WINDOW_HEIGHT)};
+
 	Screen screen{texture.get(), renderer.get()};
+	SDL_Event event;
+	Loop loop{screen, event};
 
-	std::string basicFileName = "rom/basic.rom";
-	std::string kernalFileName = "rom/kernal.rom";
-	std::string chargenFileName = "rom/chargen.rom";
-
-	auto basicStream = fs.open(basicFileName);
-	auto kernalStream = fs.open(kernalFileName);
-	auto chargenStream = fs.open(chargenFileName);
+	auto basicStream = fs.open( "rom/basic.rom");
+	auto kernalStream = fs.open("rom/kernal.rom");
+	auto chargenStream = fs.open("rom/chargen.rom");
 
 	std::vector<u8> kernal{kernalStream.begin(), kernalStream.end()};
 	std::vector<u8> basic{basicStream.begin(), basicStream.end()};
 	std::vector<u8> chargen{chargenStream.begin(), chargenStream.end()};
-	std::vector<u8> vicIO(0xffff);
 
 	Clock clk{};
-	SDL_Event event;
 	CIA1 cia1{event};
 	CIA2 cia2{};
 
-	ROM rom(kernal, basic, chargen, vicIO);
-	MMU mmu(rom, cia1, cia2);
-	CPU cpu(clk, mmu);
+	std::vector<u8> vicIO(0xffff);
+	ROM rom{kernal, basic, chargen, vicIO};
+	MMU mmu{rom, cia1, cia2};
+	CPU cpu{clk, mmu};
 	VIC vic{clk, mmu, screen};
-	Loop loop{screen, event};
 
 	cia1.setGenerateInterrupt([&cpu]() {
 		cpu.interruptRequest();
@@ -71,7 +68,7 @@ int main() {
 	});
 
 	u64 buff{};
-	bool dEnabled = false;
+	bool dEnabled = true;
 	cpu.setDebug(dEnabled);
 	while (true) {
 		if (!loop.update()) {

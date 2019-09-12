@@ -135,15 +135,10 @@ public:
 				}
 			}
 
-			if (mask > 0) {
-				mask = ~mask;
-			} else {
-				mask = 0xffu;
-			}
-			return mask;
+			return ~mask;
+		} else {
+			return get(addr);
 		}
-
-		return get(addr);
 	}
 
 	void tick() {

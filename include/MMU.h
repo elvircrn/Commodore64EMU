@@ -31,7 +31,11 @@ public:
 
 		u8 retVal{};
 		if (addr < 0xa000) {
-			retVal = ram[addr];
+		    if (rom.isAddrCustom(addr)) {
+		        retVal = rom.customROMByte(addr);
+		    } else {
+                retVal = ram[addr];
+            }
 		} else if (addr < 0xc000) {
 			if (isBASIC(bankMask)) {
 				retVal = rom.basic[addr - 0xa000];

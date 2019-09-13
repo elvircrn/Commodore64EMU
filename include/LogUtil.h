@@ -1,7 +1,7 @@
-#ifndef NESEMU_LOGUTIL_H
-#define NESEMU_LOGUTIL_H
+#ifndef C64EMU_LOGUTIL_H
+#define C64EMU_LOGUTIL_H
 
-#define LOG_LEVEL_DEBUG
+//#define LOG_LEVEL_DEBUG
 //#define LOG_LEVEL_INFO
 #define LOG_LEVEL_TRACE
 
@@ -34,4 +34,4 @@
 #endif
 
 
-#endif //NESEMU_LOGUTIL_H
+#endif //C64EMU_LOGUTIL_H

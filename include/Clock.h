@@ -1,5 +1,5 @@
-#ifndef NESEMU_CLOCK_H
-#define NESEMU_CLOCK_H
+#ifndef C64EMU_CLOCK_H
+#define C64EMU_CLOCK_H
 
 #include "core.h"
 #include <chrono>
@@ -37,4 +37,4 @@ public:
 	}
 };
 
-#endif //NESEMU_CLOCK_H
+#endif //C64EMU_CLOCK_H

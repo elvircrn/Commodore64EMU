@@ -1,5 +1,5 @@
-#ifndef NESEMU_VIC_H
-#define NESEMU_VIC_H
+#ifndef C64EMU_VIC_H
+#define C64EMU_VIC_H
 
 #include "Clock.h"
 #include "MMU.h"
@@ -26,7 +26,7 @@ class VIC : public RegisterHolder<0xd000u, 0x100u> {
 	/**
 	The DEN bit (Display Enable, register $d011, bit 4) serves for switching on
 	and off the text/bitmap graphics. It is normally set. The bit affects two
-	functions of the VIC: The Bad Lines and the vertical border unit.
+	functions of the VIC: The Bad LiC64 and the vertical border unit.
 
 	 true, if den was set during raster line(0xd012) 0x30
 	 false, if den was set during raster line(0xd012)
@@ -100,4 +100,4 @@ public:
 	bool getCharData(u16 characterId, u8 bit, u32 base);
 };
 
-#endif //NESEMU_VIC_H
+#endif //C64EMU_VIC_H

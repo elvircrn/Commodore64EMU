@@ -1,5 +1,5 @@
-#ifndef NESEMU_KEYBOARD_H
-#define NESEMU_KEYBOARD_H
+#ifndef C64EMU_KEYBOARD_H
+#define C64EMU_KEYBOARD_H
 
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_keyboard.h>
@@ -83,4 +83,4 @@ public:
 	}
 };
 
-#endif //NESEMU_KEYBOARD_H
+#endif //C64EMU_KEYBOARD_H

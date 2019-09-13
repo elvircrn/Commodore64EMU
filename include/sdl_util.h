@@ -1,5 +1,5 @@
-#ifndef NESEMU_SDL_UTIL_H
-#define NESEMU_SDL_UTIL_H
+#ifndef C64EMU_SDL_UTIL_H
+#define C64EMU_SDL_UTIL_H
 
 #include <SDL2/SDL.h>
 
@@ -8,4 +8,4 @@ void putPixelRGB(SDL_Renderer *renderer, int x, int y, unsigned char r, unsigned
 	SDL_RenderDrawPoint(renderer, x, y);
 }
 
-#endif //NESEMU_SDL_UTIL_H
+#endif //C64EMU_SDL_UTIL_H

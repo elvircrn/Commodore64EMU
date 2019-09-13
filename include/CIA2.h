@@ -1,5 +1,5 @@
-#ifndef NESEMU_CIA2_H
-#define NESEMU_CIA2_H
+#ifndef C64EMU_CIA2_H
+#define C64EMU_CIA2_H
 
 #include <iomanip>
 #include <array>
@@ -52,4 +52,4 @@ public:
 	}
 };
 
-#endif //NESEMU_CIA2_H
+#endif //C64EMU_CIA2_H

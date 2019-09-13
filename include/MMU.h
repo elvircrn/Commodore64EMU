@@ -1,5 +1,5 @@
-#ifndef NESEMU_MMU_H
-#define NESEMU_MMU_H
+#ifndef C64EMU_MMU_H
+#define C64EMU_MMU_H
 
 #include <utility>
 #include <vector>
@@ -136,5 +136,5 @@ public:
 	}
 };
 
-#endif //NESEMU_MMU_H
+#endif //C64EMU_MMU_H
 

@@ -68,7 +68,7 @@ int main() {
 	});
 
 	u64 buff{};
-	bool dEnabled = true;
+	bool dEnabled = false;
 	cpu.setDebug(dEnabled);
 	while (true) {
 		if (!loop.update()) {

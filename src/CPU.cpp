@@ -62,7 +62,7 @@ void CPU::execute() {
 		L_DEBUG(std::cout << Instructions::Name(read(pc - 1)) << ' ' << std::hex << ' ' << (int) read(pc - 1) << ' '
 											<< (int) read(
 													pc) << ' ' << (int) read(
-				pc + 1) << ' ' << getNESTestLine() << '\n');
+				pc + 1) << ' ' << getC64TestLine() << '\n');
 		for (int i = 0; i < 5; i++)
 			bitStack.push_back(read(pc - 1 + i));
 	}

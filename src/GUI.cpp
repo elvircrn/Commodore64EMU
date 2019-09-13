@@ -4,7 +4,7 @@
 #include "GUI.h"
 #include "LogUtil.h"
 
-GUI::GUI() : window(sdl2::make_window("NESEmu",
+GUI::GUI() : window(sdl2::make_window("C64Emu",
 																			SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 																			SCREEN_WIDTH,
 																			SCREEN_HEIGHT,

@@ -1,5 +1,5 @@
-#ifndef NESEMU_SCREEN_H
-#define NESEMU_SCREEN_H
+#ifndef C64EMU_SCREEN_H
+#define C64EMU_SCREEN_H
 
 #include <vector>
 #include <algorithm>
@@ -60,4 +60,4 @@ public:
 	}
 };
 
-#endif //NESEMU_SCREEN_H
+#endif //C64EMU_SCREEN_H

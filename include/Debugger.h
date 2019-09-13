@@ -17,8 +17,8 @@ public:
 	~Debugger();
 
 	void PrintFlags() const;
-	std::string GetNESTestLine() const;
-	std::string GetNESTestLineWithCycles() const;
+	std::string GetC64TestLine() const;
+	std::string GetC64TestLineWithCycles() const;
 	std::string GetStatusLine() const;
 
 	void AppendStatHist(const std::string&);

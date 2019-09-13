@@ -1,5 +1,5 @@
-#ifndef NESEMU_LOOP_H
-#define NESEMU_LOOP_H
+#ifndef C64EMU_LOOP_H
+#define C64EMU_LOOP_H
 
 #include "Screen.h"
 
@@ -26,4 +26,4 @@ public:
 	};
 };
 
-#endif //NESEMU_LOOP_H
+#endif //C64EMU_LOOP_H

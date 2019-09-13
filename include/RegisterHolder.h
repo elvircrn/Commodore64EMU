@@ -1,5 +1,5 @@
-#ifndef NESEMU_REGISTERHOLDER_H
-#define NESEMU_REGISTERHOLDER_H
+#ifndef C64EMU_REGISTERHOLDER_H
+#define C64EMU_REGISTERHOLDER_H
 
 #include "core.h"
 
@@ -31,4 +31,4 @@ public:
 	}
 };
 
-#endif //NESEMU_REGISTERHOLDER_H
+#endif //C64EMU_REGISTERHOLDER_H

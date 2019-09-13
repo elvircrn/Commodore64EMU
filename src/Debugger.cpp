@@ -172,7 +172,7 @@ void Debugger::PrintFlags() const
 {
 }
 
-std::string Debugger::GetNESTestLineWithCycles() const
+std::string Debugger::GetC64TestLineWithCycles() const
 {
 	std::stringstream ss;
 
@@ -185,7 +185,7 @@ std::string Debugger::GetNESTestLineWithCycles() const
 	return ss.str();
 }
 
-std::string Debugger::GetNESTestLine() const
+std::string Debugger::GetC64TestLine() const
 {
 	std::stringstream ss;
 
@@ -205,7 +205,7 @@ std::string Debugger::GetStatusLine() const
 {
 	std::stringstream ss;
 	ss << "PC:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->PC();
-	return ss.str() + " " + GetNESTestLine();
+	return ss.str() + " " + GetC64TestLine();
 }
 
 void Debugger::AppendStatHist(const std::string &stat)

@@ -1,6 +1,6 @@
 
-#ifndef NESEMU_CPU_H
-#define NESEMU_CPU_H
+#ifndef C64EMU_CPU_H
+#define C64EMU_CPU_H
 
 #include <cstdint>
 #include <vector>
@@ -308,7 +308,7 @@ public:
 #pragma region Instructions
 	void interruptRequest();
 
-	std::string getNESTestLine() {
+	std::string getC64TestLine() {
 		std::stringstream ss;
 
 		ss << "PC:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) PC()

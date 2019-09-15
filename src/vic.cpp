@@ -6,7 +6,12 @@ bool VIC::isBadLine(u8 rasterCounter, u8 yscroll, bool wasDENSet) {
     return wasDENSet && 0x30u <= rasterCounter && rasterCounter <= 0xf7u && (yscroll == (rasterCounter & 0x7u));
 }
 
-void VIC::tick() {
+void VIC::standardBitmap() {
+
+}
+
+void VIC::standardText() {
+
     u16 rasterCounter = getRasterCounter();
     u8 vicBank = 0x3u - ((mmu.read(VIC_MEMORY_BANK_ADDR)) & 0x3u);
     u16 vicBaseAddr = vicBank << 14u;
@@ -25,7 +30,7 @@ void VIC::tick() {
             for (size_t i = 0; i < GraphicsConstants::WINDOW_WIDTH; i++) {
                 screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, 0, borderColor);
             }
-            blockRowId = 0;
+            blockRowId = 1;
         } else {
             for (u32 i = 0; i < GraphicsConstants::WINDOW_WIDTH; i++) {
                 if (isVerticalBorder(i)) {
@@ -52,6 +57,16 @@ void VIC::tick() {
     incrementRasterCounter();
 }
 
+void VIC::tick() {
+    GraphicsModes mode = graphicsMode();
+
+    if (mode == GraphicsModes::StandardText) {
+        standardText();
+    } else if (mode == GraphicsModes::StandardBitmap) {
+        standardBitmap();
+    }
+}
+
 bool VIC::getCharacterPixel(u16 vicBaseAddr, u16 charMemBase, u16 screenMemBase, u32 pixelId, u8 blockColumn, u8 blockRow) {
     u8 characterId = mmu.read(vicBaseAddr + screenMemBase + blockRow * 40 + blockColumn, true);
     u8 charPixelId = (blockRowId * 8) + pixelId % 8;
@@ -63,3 +78,4 @@ bool VIC::getCharacterPixel(u16 vicBaseAddr, u16 charMemBase, u16 screenMemBase,
 u8 VIC::getCharColor(u16 colorMemBase, u8 blockColumn, u8 blockRow) const {
     return mmu.read(colorMemBase + blockRow * 40 + blockColumn);
 }
+

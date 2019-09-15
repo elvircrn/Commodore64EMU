@@ -85,7 +85,7 @@ int runCustomROM(const std::string &customROMPath) {
 
         for (size_t amp = 0; amp < 10000; amp++) {
             buff++;
-            if (amp % 100 == 0) {
+            if (amp % 63 == 0) {
                 vic.tick();
             }
             if (amp % 5 == 0) {

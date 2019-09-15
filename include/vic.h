@@ -71,7 +71,7 @@ public:
 	}
 
 	inline u32 incrementRasterCounter() {
-		u32 rasterCounter = getRasterCounter() + 1;
+		u32 rasterCounter = (getRasterCounter() + 1) % 312;
 		setRasterCounter(rasterCounter);
 		return rasterCounter;
 	}
@@ -95,7 +95,11 @@ public:
 
 		return RegisterHolder::set(addr, val);
 	}
-	bool getCharData(u16 characterId, u8 bit, u32 base);
+
+    u8 getCharColor(u16 colorMemBase, u8 blockColumn, u8 blockRow) const;
+
+    bool
+    getCharacterPixel(u16 vicBaseAddr, u16 charMemBase, u16 screenMemBase, u32 pixelId, u8 blockColumn, u8 blockRow);
 };
 
 #endif //C64EMU_VIC_H

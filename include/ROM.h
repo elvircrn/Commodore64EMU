@@ -13,7 +13,6 @@ using std::array;
 
 class ROM {
     const static u8 PRG_ROM_HEADER_SIZE = 0x2u;
-    u32 offset;
 public:
 	ROM();
 	ROM(std::ifstream &kernalFile, std::ifstream &basicFile);
@@ -38,6 +37,7 @@ public:
 	vector<u8> io;
     vector<u8> customROM;
     bool hasCustom{};
+    u32 offset;
 };
 
 

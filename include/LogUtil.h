@@ -2,7 +2,7 @@
 #define C64EMU_LOGUTIL_H
 
 //#define LOG_LEVEL_DEBUG
-//#define LOG_LEVEL_INFO
+#define LOG_LEVEL_INFO
 #define LOG_LEVEL_TRACE
 
 #ifdef LOG_LEVEL_INFO

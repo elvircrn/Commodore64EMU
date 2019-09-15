@@ -11,7 +11,7 @@
 #include "core.h"
 
 class Screen {
-	const SDL_Rect screenRectrangle{0, 0, GraphicsConstants::WINDOW_WIDTH, GraphicsConstants::WINDOW_HEIGHT};
+    SDL_Rect screenRectrangle{0, 0, GraphicsConstants::WINDOW_WIDTH, GraphicsConstants::WINDOW_HEIGHT};
 
 	SDL_Texture *texture;
 	SDL_Renderer *renderer;
@@ -39,9 +39,9 @@ public:
 		colors[15] = SDL_MapRGB(format_, 0xb8, 0xb8, 0xb8);
 	}
 
-	void drawPixel(u32 x, u32 y, u8 data, u32 color) {
+	void drawPixel(u32 x, u32 y, u8 data, u32 color, u32 charColor = 1) {
 		if (data) {
-			screen[y * GraphicsConstants::WINDOW_WIDTH + x] = colors[1];
+			screen[y * GraphicsConstants::WINDOW_WIDTH + x] = colors[charColor];
 		} else {
 			screen[y * GraphicsConstants::WINDOW_WIDTH + x] = colors[color];
 		}
@@ -50,8 +50,11 @@ public:
 	void flushTexture() {
 		SDL_UpdateTexture(texture, nullptr, screen.data(), GraphicsConstants::WINDOW_WIDTH * sizeof(u32));
 
+		int w, h;
+		SDL_GetRendererOutputSize(renderer, &w, &h);
+        SDL_Rect rect{0, 0, w, h};
 		SDL_RenderClear(renderer);
-		SDL_RenderCopy(renderer, texture, nullptr, &screenRectrangle);
+		SDL_RenderCopy(renderer, texture, nullptr, &rect);
 
 	}
 

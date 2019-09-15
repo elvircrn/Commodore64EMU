@@ -42,10 +42,8 @@ public:
 
 	// Phi 0 negative edge
 	void tick();
-	u64 getCharData(u16 characterId);
 
-	bool getCharData(u16 characterId, u8 bit);
-	bool isBadLine(u8 rasterCounter, u8 yscroll, bool wasDENSet);
+    bool isBadLine(u8 rasterCounter, u8 yscroll, bool wasDENSet);
 
 	inline bool isVBlank(u16 rasterCounter) {
 		return rasterCounter < GraphicsConstants::FIRST_BORDER_LINE || GraphicsConstants::FIRST_BORDER_LINE + GraphicsConstants::LAST_BORDER_LINE <= rasterCounter;

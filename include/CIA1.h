@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <array>
 #include <utility>
+#include <bitset>
 #include <functional>
 
 #include <SDL2/SDL_scancode.h>
@@ -86,7 +87,7 @@ public:
 		addr = normalize(addr);
 
 		// Timer control
-		L_INFO(std::cout << "CIA1 write " << std::hex << std::setw(2) << std::setfill('0') << "CIA1 addr: " << (u32) addr
+		L_DEBUG(std::cout << "CIA1 write " << std::hex << std::setw(2) << std::setfill('0') << "CIA1 addr: " << (u32) addr
 										 << " val: " << (u32) val << ' ' << std::bitset<8>{val} << '\n');
 
 		if (addr == INTERRUPT_CONTROL_STATUS) {
@@ -114,7 +115,7 @@ public:
 
 	inline u8 read(u16 addr) {
 		addr = normalize(addr);
-		L_INFO(
+		L_DEBUG(
 				std::cout << "CIA1 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << ' ');
 
 		// Port B, keyboard matrix rows and joystick

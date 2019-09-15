@@ -1,8 +1,9 @@
-#include "CPU.h"
-#include "Instructions.h"
-
 #include <array>
 #include <sstream>
+
+#include "CPU.h"
+#include "LogUtil.h"
+#include "Instructions.h"
 
 CPU::CPU(Clock &_clock, MMU &_mmu)
 		: clock(_clock), mmu(_mmu), cycleCount{} {
@@ -34,8 +35,6 @@ void CPU::init(u16 _pc) {
 	pc = _pc;
 }
 
-#include "LogUtil.h"
-#include <CPU.h>
 
 void CPU::execute() {
 	clock.waitTick();
@@ -59,10 +58,13 @@ void CPU::execute() {
 		instrHist.emplace_back(pc,
 													 Instructions::Name(read(pc - 1)),
 													 std::array<u8, 4>({read(pc - 1), read(pc), read(pc + 1), read(pc + 2)}));
-		L_DEBUG(std::cout << Instructions::Name(read(pc - 1)) << ' ' << std::hex << ' ' << (int) read(pc - 1) << ' '
+//		L_DEBUG(
+		        std::cout << Instructions::Name(read(pc - 1)) << ' ' << std::hex << ' ' << (int) read(pc - 1) << ' '
 											<< (int) read(
 													pc) << ' ' << (int) read(
-				pc + 1) << ' ' << getC64TestLine() << '\n');
+				pc + 1) << ' ' << getC64TestLine() << std::endl;
+
+//				);
 		for (int i = 0; i < 5; i++)
 			bitStack.push_back(read(pc - 1 + i));
 	}

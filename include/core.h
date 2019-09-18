@@ -14,8 +14,12 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef unsigned long long u64;
 
-inline u8 LO(const u16 &addr) { return static_cast<u8>(addr & 0xffu); }
-inline u8 HI(const u16 &addr) { return static_cast<u8>((u8) (addr >> 0x8u) & 0xffu); }
+inline u8 LO(const u16 &addr) {
+	return static_cast<u8>(addr & 0xffu);
+}
+inline u8 HI(const u16 &addr) {
+	return static_cast<u8>((u8) (addr >> 0x8u) & 0xffu);
+}
 inline bool BIT(const u8 &bits, const u8 &n) { return (bits & (1u << n)) > 0; }
 inline u8 SET(const u8 &bits, const u8 &n, bool bit) {
 	return (bits & (~(1u << n))) | (bit << n);

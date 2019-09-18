@@ -16,14 +16,14 @@ public:
 	ROM();
 	ROM(std::ifstream &kernalFile, std::ifstream &basicFile);
 	ROM(vector<u8> kernal, vector<u8> basic, vector<u8> chargen, vector<u8> io);
-    ROM(vector<u8> kernal, vector<u8> basic, vector<u8> chargen, vector<u8> io, vector<u8> customROM);
+	ROM(vector<u8> kernal, vector<u8> basic, vector<u8> chargen, vector<u8> io, vector<u8> customROM);
 
-    vector<u8> kernal;
+	vector<u8> kernal;
 	vector<u8> basic;
 	vector<u8> chargen;
 	vector<u8> io;
-    vector<u8> customROM;
-    u32 prgROMOffset;
+	vector<u8> customROM;
+	u32 prgROMOffset;
 };
 
 

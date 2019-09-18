@@ -95,7 +95,6 @@ int runCustomROM(const std::string &customROMPath) {
         }
 
         if (keyboard.isKeyPressed((SDL_SCANCODE_F5))) {
-            std::cout << "Loaded custom rom" << std::endl;
             PRGLoader::loadPRG(mmu, rom);
         }
         if (buff % TimingConstants::CONSOLE_RATIO == 0) {

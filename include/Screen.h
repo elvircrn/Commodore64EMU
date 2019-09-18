@@ -11,7 +11,7 @@
 #include "core.h"
 
 class Screen {
-    SDL_Rect screenRectrangle{0, 0, GraphicsConstants::WINDOW_WIDTH, GraphicsConstants::WINDOW_HEIGHT};
+	SDL_Rect screenRectrangle{0, 0, GraphicsConstants::WINDOW_WIDTH, GraphicsConstants::WINDOW_HEIGHT};
 
 	SDL_Texture *texture;
 	SDL_Renderer *renderer;
@@ -21,16 +21,16 @@ class Screen {
 public:
 	Screen(SDL_Texture *_texture, SDL_Renderer *_renderer) : texture(_texture), renderer(_renderer) {
 		auto format_ = SDL_AllocFormat(SDL_PIXELFORMAT_ARGB8888);
-		colors[0]  = SDL_MapRGB(format_, 0x00, 0x00, 0x00);
-		colors[1]  = SDL_MapRGB(format_, 0xff, 0xff, 0xff);
-		colors[2]  = SDL_MapRGB(format_, 0xab, 0x31, 0x26);
-		colors[3]  = SDL_MapRGB(format_, 0x66, 0xda, 0xff);
-		colors[4]  = SDL_MapRGB(format_, 0xbb, 0x3f, 0xb8);
-		colors[5]  = SDL_MapRGB(format_, 0x55, 0xce, 0x58);
-		colors[6]  = SDL_MapRGB(format_, 0x1d, 0x0e, 0x97);
-		colors[7]  = SDL_MapRGB(format_, 0xea, 0xf5, 0x7c);
-		colors[8]  = SDL_MapRGB(format_, 0xb9, 0x74, 0x18);
-		colors[9]  = SDL_MapRGB(format_, 0x78, 0x53, 0x00);
+		colors[0] = SDL_MapRGB(format_, 0x00, 0x00, 0x00);
+		colors[1] = SDL_MapRGB(format_, 0xff, 0xff, 0xff);
+		colors[2] = SDL_MapRGB(format_, 0xab, 0x31, 0x26);
+		colors[3] = SDL_MapRGB(format_, 0x66, 0xda, 0xff);
+		colors[4] = SDL_MapRGB(format_, 0xbb, 0x3f, 0xb8);
+		colors[5] = SDL_MapRGB(format_, 0x55, 0xce, 0x58);
+		colors[6] = SDL_MapRGB(format_, 0x1d, 0x0e, 0x97);
+		colors[7] = SDL_MapRGB(format_, 0xea, 0xf5, 0x7c);
+		colors[8] = SDL_MapRGB(format_, 0xb9, 0x74, 0x18);
+		colors[9] = SDL_MapRGB(format_, 0x78, 0x53, 0x00);
 		colors[10] = SDL_MapRGB(format_, 0xdd, 0x93, 0x87);
 		colors[11] = SDL_MapRGB(format_, 0x5b, 0x5b, 0x5b);
 		colors[12] = SDL_MapRGB(format_, 0x8b, 0x8b, 0x8b);
@@ -52,7 +52,7 @@ public:
 
 		int w, h;
 		SDL_GetRendererOutputSize(renderer, &w, &h);
-        SDL_Rect rect{0, 0, w, h};
+		SDL_Rect rect{0, 0, w, h};
 		SDL_RenderClear(renderer);
 		SDL_RenderCopy(renderer, texture, nullptr, &rect);
 

@@ -117,28 +117,28 @@ class CPU {
 
 	inline u16 AbsX() {
 		u16 abs = Abs();
-		CrossesPage(abs, x);
+		crossesPage(abs, x);
 		return abs + x;
 	}
 
 	inline u16 AbsY() {
 		u16 abs = Abs();
-		CrossesPage(abs, y);
+		crossesPage(abs, y);
 		return abs + y;
 	}
 	inline u16 Zp16(u8 addr) {
 		return (mmu.read(static_cast<u16>((u16) (addr + 0x1u) & 0xffu)) << 0x8u) + mmu.read(addr);
 	}
-	inline void CrossesPage(u16 addr, u8 offset) {
+	inline void crossesPage(u16 addr, u8 offset) {
 		zeroPageCrossed |= ((addr & 0xff00u) != ((u16) (addr + offset) & 0xff00u));
 	}
 
-	inline void Push8(u8 val) {
+	inline void push8(u8 val) {
 		mmu.write(static_cast<u16>(0x0100 + static_cast<u32>(sp--)), val);
 	}
 	inline void Push16(u16 val) {
-		Push8(static_cast<u8>(val >> 0x8u));
-		Push8(static_cast<u8>(val & 0xffu));
+		push8(static_cast<u8>(val >> 0x8u));
+		push8(static_cast<u8>(val & 0xffu));
 	}
 	inline u8 Pop8() {
 		sp++;
@@ -177,7 +177,7 @@ public:
 	inline u8 P() { return p; }
 
 #pragma region Debug
-	static constexpr bool DEBUG = true;
+	static constexpr bool DEBUG = false;
 	bool debug = false;
 	void setDebug(bool debug);
 	std::deque<u16> pcHist;
@@ -233,7 +233,7 @@ public:
 	inline void UpdZ(u8);
 	inline void UpdNZ(u8);
 
-	inline bool getNMI() { return nmi; }
+	inline bool isNMI() { return nmi; }
 #pragma endregion
 
 #pragma region Constructors
@@ -253,7 +253,7 @@ public:
 	// NOTE Do not use with jumps or returns!
 #pragma region Tick calculation
 	template<AddressingModes mode>
-	inline int CalcBaseTicks() {
+	inline int calcBaseTicks() {
 		switch (mode) {
 		case AddressingModes::IMMEDIATE: return 0;
 		case AddressingModes::ZERO_PAGE: return 1;
@@ -269,7 +269,7 @@ public:
 	}
 
 	template<AddressingModes mode>
-	inline int CalcStoreTicks() {
+	inline int calcStoreTicks() {
 		switch (mode) {
 		case AddressingModes::ABSOLUTE_INDEXED_X: return 1;
 		case AddressingModes::ABSOLUTE_INDEXED_Y: return 1;
@@ -279,7 +279,7 @@ public:
 	}
 
 	template<AddressingModes mode>
-	inline int CalcShiftTicks() {
+	inline int calcShiftTicks() {
 		switch (mode) {
 		case AddressingModes::ZERO_PAGE: return 2;
 		case AddressingModes::ZERO_PAGE_X: return 2;
@@ -291,7 +291,7 @@ public:
 	}
 
 	template<AddressingModes mode>
-	inline int CalcIncDecTicks() {
+	inline int calcIncDecTicks() {
 		switch (mode) {
 		case AddressingModes::ZERO_PAGE: return 2;
 		case AddressingModes::ZERO_PAGE_X: return 2;
@@ -448,6 +448,8 @@ public:
 	u16 getPureOperand();
 #pragma endregion
 	u16 oamDmaIdx = 0;
+	void debugInstructions(u8 op);
+	bool isCPUDebugEnabled() const;
 };
 
 // Inlined functions
@@ -476,7 +478,7 @@ inline void CPU::UpdCV(u8 pX, u8 pY, u16 r) {
 }
 
 inline void CPU::UpdN(u8 _x) {
-	setFlag(Flags::N, static_cast<bool>(_x & 0x80));
+	setFlag(Flags::N, static_cast<bool>(_x & 0x80u));
 }
 
 inline void CPU::UpdZ(u8 _x) {

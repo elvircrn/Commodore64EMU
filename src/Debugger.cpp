@@ -4,8 +4,7 @@
 
 #include "Debugger.h"
 
-Debugger::Debugger() : instructionName(0xff + 1)
-{
+Debugger::Debugger() : instructionName(0xff + 1) {
 	instructionName[0x69] = "ADC";
 	instructionName[0x65] = "ADC";
 	instructionName[0x75] = "ADC";
@@ -159,74 +158,66 @@ Debugger::Debugger() : instructionName(0xff + 1)
 	instructionName[0xEA] = "NOP";
 }
 
-Debugger::Debugger(CPU *_cpu) : Debugger()
-{
+Debugger::Debugger(CPU *_cpu) : Debugger() {
 	cpu = _cpu;
 }
 
-Debugger::~Debugger()
-{
+Debugger::~Debugger() {
 }
 
-void Debugger::PrintFlags() const
-{
+void Debugger::PrintFlags() const {
 }
 
-std::string Debugger::GetC64TestLineWithCycles() const
-{
+std::string Debugger::GetC64TestLineWithCycles() const {
 	std::stringstream ss;
 
-	ss << "A:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->A()
-		<< " X:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->X()
-		<< " Y:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->Y()
-		<< " P:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->P()
-		<< " SP:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->SP()
-		<< " CYC:" << std::dec << std::setfill(' ') << std::setw(3) << ((int)cpu->cycleCount + (cpu->cycleCount == 0 ? 0 : 2)) % 340;
+	ss << "A:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) cpu->A()
+		 << " X:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) cpu->X()
+		 << " Y:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) cpu->Y()
+		 << " P:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) cpu->P()
+		 << " SP:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) cpu->SP()
+		 << " CYC:" << std::dec << std::setfill(' ') << std::setw(3)
+		 << ((int) cpu->cycleCount + (cpu->cycleCount == 0 ? 0 : 2)) % 340;
 	return ss.str();
 }
 
-std::string Debugger::GetC64TestLine() const
-{
+std::string Debugger::GetC64TestLine() const {
 	std::stringstream ss;
 
 	ss
 
-			<< "PC:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->PC()
-	<< " A:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->A()
-		<< " X:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->X()
-		<< " Y:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->Y()
-		<< " P:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->P()
-		<< " SP:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->SP();
+			<< "PC:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) cpu->PC()
+			<< " A:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) cpu->A()
+			<< " X:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) cpu->X()
+			<< " Y:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) cpu->Y()
+			<< " P:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) cpu->P()
+			<< " SP:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) cpu->SP();
 
 	return ss.str();
 }
 
-std::string Debugger::GetStatusLine() const
-{
+std::string Debugger::GetStatusLine() const {
 	std::stringstream ss;
-	ss << "PC:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int)cpu->PC();
+	ss << "PC:" << std::hex << std::uppercase << std::setfill('0') << std::setw(2) << (int) cpu->PC();
 	return ss.str() + " " + GetC64TestLine();
 }
 
-void Debugger::AppendStatHist(const std::string &stat)
-{
+void Debugger::AppendStatHist(const std::string &stat) {
 	statHist.push_back(instructionName[cpu->read(cpu->PC())] + " " + stat);
 }
 
-std::string Debugger::GetOpHistForLogging() const
-{
+std::string Debugger::GetOpHistForLogging() const {
 	std::stringstream ss;
 	ss << "op:\n";
 	for (size_t i = 0; i < cpu->opHist.size(); i++)
-		ss << std::hex << (int)cpu->opHist[i] << ' ' << statHist[i] << '\n';
+		ss << std::hex << (int) cpu->opHist[i] << ' ' << statHist[i] << '\n';
 	return ss.str();
 }
 
-std::string Debugger::GetPCHistForLogging() const
-{
+std::string Debugger::GetPCHistForLogging() const {
 	std::stringstream ss;
 	ss << "pc:\n";
 	for (int x : cpu->pcHist)
-		ss << std::hex << (int)x << '\n';
+		ss << std::hex << (int) x << '\n';
 	return ss.str();
 }

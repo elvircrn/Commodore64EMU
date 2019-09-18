@@ -3,10 +3,8 @@
 
 #include <thread>
 
-
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
-
 
 void Clock::startTicking() {
 	if (enabled) {
@@ -19,5 +17,4 @@ void Clock::startTicking() {
 }
 #pragma clang diagnostic pop
 
-
-Clock::Clock(std::chrono::nanoseconds t) : stamp{}, t(t), enabled(true) { }
+Clock::Clock(std::chrono::nanoseconds t) : stamp{}, t(t), enabled(true) {}

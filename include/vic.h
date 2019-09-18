@@ -8,12 +8,12 @@
 #include "GraphicsConstants.h"
 
 class VIC : public RegisterHolder<0xd000u, 0x100u> {
-    enum class GraphicsModes {
-        StandardText = 0,
-        MulticolorText,
-        StandardBitmap,
-        MulticolorBitmap
-    };
+	enum class GraphicsModes {
+		StandardText = 0,
+		MulticolorText,
+		StandardBitmap,
+		MulticolorBitmap
+	};
 
 	static constexpr u16 VIC_REGISTER_ADDRESS_BASE = 0xd000u;
 	static constexpr u8 VIC_REGISTER_COUNT = 47;
@@ -21,10 +21,11 @@ class VIC : public RegisterHolder<0xd000u, 0x100u> {
 	static constexpr u16 BANK_SIZE = 0x4000;
 
 	static constexpr u16 CONTROL_REGISTER_1 = 0xD011; // Control register 1  |RST8| ECM| BMM| DEN|RSEL|    YSCROLL   |
-    static constexpr u16 CONTROL_REGISTER_2 = 0xD016; // Control register 2  |  - |  - | RES| MCM|CSEL|    XSCROLL   |
+	static constexpr u16 CONTROL_REGISTER_2 = 0xD016; // Control register 2  |  - |  - | RES| MCM|CSEL|    XSCROLL   |
 	static constexpr u16 RASTER_COUNTER_ADDR = 0xD012; // Raster counter     |                 RASTER                |
 	static constexpr u16 VIC_MEMORY_BANK_ADDR = 0xDD00;
-	static constexpr u16 MEMORY_POINTERS = 0xD018; // Memory pointers |VM13|VM12|VM11|VM10|CB13|CB12|CB11|  - | defaults to 0x40
+	static constexpr u16
+			MEMORY_POINTERS = 0xD018; // Memory pointers |VM13|VM12|VM11|VM10|CB13|CB12|CB11|  - | defaults to 0x40
 	static constexpr u16 BORDER_COLOR = 0xD020; // Border color |  - |  - |  - |  - |         EC        | Border color
 	static constexpr u16 BACKGROUND_COLOR_0 = 0xD021; // Background color 0 |  - |  - |  - |  - |        B0C        |
 
@@ -51,37 +52,40 @@ public:
 	// Phi 0 negative edge
 	void tick();
 
-    bool isBadLine(u8 rasterCounter, u8 yscroll, bool wasDENSet);
+	bool isBadLine(u8 rasterCounter, u8 yscroll, bool wasDENSet);
 
 	inline bool isVBlank(u16 rasterCounter) {
-		return rasterCounter < GraphicsConstants::FIRST_BORDER_LINE || GraphicsConstants::FIRST_BORDER_LINE + GraphicsConstants::LAST_BORDER_LINE <= rasterCounter;
+		return rasterCounter < GraphicsConstants::FIRST_BORDER_LINE
+				|| GraphicsConstants::FIRST_BORDER_LINE + GraphicsConstants::LAST_BORDER_LINE <= rasterCounter;
 	}
 
 	inline bool isHorizontalBorder(u16 rasterCounter) {
-		return rasterCounter <= GraphicsConstants::BORDER_DIMENSIONS + GraphicsConstants::FIRST_BORDER_LINE || 257 <= rasterCounter;
+		return rasterCounter <= GraphicsConstants::BORDER_DIMENSIONS + GraphicsConstants::FIRST_BORDER_LINE
+				|| 257 <= rasterCounter;
 	}
 
 	inline bool isVerticalBorder(u16 x) {
-		return x < GraphicsConstants::BORDER_DIMENSIONS || x >= GraphicsConstants::BORDER_DIMENSIONS + GraphicsConstants::TEXT_AREA_WIDTH;
+		return x < GraphicsConstants::BORDER_DIMENSIONS
+				|| x >= GraphicsConstants::BORDER_DIMENSIONS + GraphicsConstants::TEXT_AREA_WIDTH;
 	}
 
 	inline u8 getControlRegister1() {
 		return get(CONTROL_REGISTER_1);
 	}
 
-    inline u8 getControlRegister2() {
-        return get(CONTROL_REGISTER_2);
-    }
+	inline u8 getControlRegister2() {
+		return get(CONTROL_REGISTER_2);
+	}
 
-    inline GraphicsModes graphicsMode() {
-        u8 ctrl1 = getControlRegister1();
-        u8 ctrl2 = getControlRegister2();
-        bool bmm = BIT(ctrl1, 5);
-        bool ecm = BIT(ctrl1, 6);
-        bool mcm = BIT(ctrl2, 5); // TODO: Handle this flag
+	inline GraphicsModes graphicsMode() {
+		u8 ctrl1 = getControlRegister1();
+		u8 ctrl2 = getControlRegister2();
+		bool bmm = BIT(ctrl1, 5);
+		bool ecm = BIT(ctrl1, 6);
+		bool mcm = BIT(ctrl2, 5); // TODO: Handle this flag
 
-        return GraphicsModes{(u8) (ecm << 0x1u) | bmm};
-    }
+		return GraphicsModes{(u8) (ecm << 0x1u) | bmm};
+	}
 
 	inline u32 getRasterCounter() {
 		return (((u32) BIT(getControlRegister1(), 7)) << 0x8u) | ((u32) get(RASTER_COUNTER_ADDR));
@@ -102,9 +106,9 @@ public:
 		u16 mappedAddr = normalize(addr);
 
 		L_DEBUG(
-		if (mappedAddr != 0xd012) {
-			std::cout << std::hex << (u32) addr << ' ' << (u32) val << '\n';
-		}
+				if (mappedAddr != 0xd012) {
+					std::cout << std::hex << (u32) addr << ' ' << (u32) val << '\n';
+				}
 		);
 
 		if (mappedAddr == CONTROL_REGISTER_1) {
@@ -118,14 +122,14 @@ public:
 		return RegisterHolder::set(addr, val);
 	}
 
-    u8 getCharColor(u16 colorMemBase, u8 blockColumn, u8 blockRow) const;
+	u8 getCharColor(u16 colorMemBase, u8 blockColumn, u8 blockRow) const;
 
-    bool
-    getCharacterPixel(u16 vicBaseAddr, u16 charMemBase, u16 screenMemBase, u32 pixelId, u8 blockColumn, u8 blockRow);
+	bool
+	getCharacterPixel(u16 vicBaseAddr, u16 charMemBase, u16 screenMemBase, u32 pixelId, u8 blockColumn, u8 blockRow);
 
-    void standardText();
+	void standardText();
 
-    void standardBitmap();
+	void standardBitmap();
 };
 
 #endif //C64EMU_VIC_H

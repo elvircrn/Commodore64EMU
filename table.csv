@@ -1,0 +1,13 @@
+\renewcommand{\arraystretch}{1.5} % prosirivanje redova u tabeli
+\begin{table} [!ht]
+  \caption{Raspored statusnih flegova unutar registra P}
+  \begin{center}
+\begin{tabular}{llllllll}
+7                       & 6                      & 5                     & 4                      & 3                      & 2                      & 1                      & 0                      \\ \hline
+\multicolumn{1}{|l|}{N} & \multicolumn{1}{l|}{V} & \multicolumn{1}{l|}{} & \multicolumn{1}{l|}{B} & \multicolumn{1}{l|}{D} & \multicolumn{1}{l|}{I} & \multicolumn{1}{l|}{Z} & \multicolumn{1}{l|}{C} \\ \hline
+
+\end{tabular}
+  \label{tab:confusion_matrix}    
+\end{center} 
+\end{table}
+\renewcommand{\arraystretch}{1} % vraćeno na staro

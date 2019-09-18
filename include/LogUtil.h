@@ -2,8 +2,8 @@
 #define C64EMU_LOGUTIL_H
 
 //#define LOG_LEVEL_DEBUG
-#define LOG_LEVEL_INFO
-#define LOG_LEVEL_TRACE
+//#define LOG_LEVEL_INFO
+//#define LOG_LEVEL_TRACE
 
 #ifdef LOG_LEVEL_INFO
 #define L_INFO(c) c
@@ -32,6 +32,5 @@
 #if defined(LOG_LEVEL_DEBUG) || defined(LOG_LEVEL_INFO) || defined(LOG_LEVEL_ERROR) || defined(LOG_LEVEL_TRACE)
 #include <iostream>
 #endif
-
 
 #endif //C64EMU_LOGUTIL_H

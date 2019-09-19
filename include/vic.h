@@ -6,6 +6,7 @@
 #include "Screen.h"
 #include "RegisterHolder.h"
 #include "GraphicsConstants.h"
+#include "CPU.h"
 
 class VIC : public RegisterHolder<0xd000u, 0x100u> {
 	enum class GraphicsModes {
@@ -14,11 +15,6 @@ class VIC : public RegisterHolder<0xd000u, 0x100u> {
 		StandardBitmap,
 		MulticolorBitmap
 	};
-
-	static constexpr u16 VIC_REGISTER_ADDRESS_BASE = 0xd000u;
-	static constexpr u8 VIC_REGISTER_COUNT = 47;
-
-	static constexpr u16 BANK_SIZE = 0x4000;
 
 	static constexpr u16 CONTROL_REGISTER_1 = 0xD011; // Control register 1  |RST8| ECM| BMM| DEN|RSEL|    YSCROLL   |
 	static constexpr u16 CONTROL_REGISTER_2 = 0xD016; // Control register 2  |  - |  - | RES| MCM|CSEL|    XSCROLL   |
@@ -45,9 +41,10 @@ class VIC : public RegisterHolder<0xd000u, 0x100u> {
 	Clock &clock;
 	MMU &mmu;
 	Screen &screen;
+	CPU cpu;
 
 public:
-	VIC(Clock &_clock, MMU &_mmu, Screen &_screen) : clock(_clock), mmu(_mmu), screen(_screen) {}
+	VIC(Clock &_clock, MMU &_mmu, Screen &_screen, CPU &_cpu) : clock(_clock), mmu(_mmu), screen(_screen), cpu(_cpu) {}
 
 	// Phi 0 negative edge
 	void tick();
@@ -100,6 +97,15 @@ public:
 		u32 rasterCounter = (getRasterCounter() + 1) % 312;
 		setRasterCounter(rasterCounter);
 		return rasterCounter;
+	}
+
+	u8 get(const u16 &addr) const override {
+		u16 mappedAddr = toMem(addr);
+		if (0x46u < mappedAddr) {
+			return 0xffu;
+		} else {
+			return RegisterHolder::get(mappedAddr);
+		}
 	}
 
 	u8 set(const u16 &addr, const u8 &val) override {

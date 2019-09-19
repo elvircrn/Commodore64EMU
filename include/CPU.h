@@ -177,7 +177,7 @@ public:
 	inline u8 P() { return p; }
 
 #pragma region Debug
-	static constexpr bool DEBUG = false;
+	static constexpr bool DEBUG = true;
 	bool debug = false;
 	void setDebug(bool debug);
 	std::deque<u16> pcHist;
@@ -237,8 +237,8 @@ public:
 #pragma endregion
 
 #pragma region Constructors
-	explicit CPU(Clock &, MMU &mmu);
-	explicit CPU(Clock &, MMU &mmu, u16 _pc);
+	CPU(Clock &, MMU &mmu);
+	CPU(Clock &, MMU &mmu, u16 _pc);
 	~CPU();
 #pragma endregion
 

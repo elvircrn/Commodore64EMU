@@ -369,6 +369,7 @@ void CPU::execute() {
 bool CPU::isCPUDebugEnabled() const { return DEBUG; }
 
 void CPU::debugInstructions(u8 op) {
+	L_TRACE(
 	opHist.push_front(op);
 	if (opHist.size() == 100) {
 		opHist.pop_back();
@@ -384,12 +385,13 @@ void CPU::debugInstructions(u8 op) {
 	instrHist.emplace_back(pc,
 												 Instructions::Name(read(pc - 1)),
 												 std::__1::array<u8, 4>({read(pc - 1), read(pc), read(pc + 1), read(pc + 2)}));
-	L_INFO (std::cout << Instructions::Name(read(pc - 1)) << ' ' << std::hex << ' ' << (int) read(pc - 1) << ' '
+		std::cout << Instructions::Name(read(pc - 1)) << ' ' << std::hex << ' ' << (int) read(pc - 1) << ' '
 						<< (int) read(
 								pc) << ' ' << (int) read(
-			pc + 1) << ' ' << getC64TestLine() << std::endl);
+			pc + 1) << ' ' << getC64TestLine() << std::endl;
 	for (int i = 0; i < 5; i++)
 		bitStack.push_back(read(pc - 1 + i));
+	);
 }
 
 #pragma region Debug and Logging

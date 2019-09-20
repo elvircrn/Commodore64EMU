@@ -88,12 +88,10 @@ public:
 		addr = normalize(addr);
 
 		// Timer control
-//		L_DEBUG(
-
+		L_DEBUG(
 				std::cout << "CIA1 write " << std::hex << std::setw(2) << std::setfill('0') << "CIA1 addr: " << (u32) addr
-											<< " val: " << (u32) val << ' ' << std::bitset<8>{val} << '\n';
-
-//											);
+									<< " val: " << (u32) val << ' ' << std::bitset<8>{val} << '\n';
+		);
 
 		if (addr == INTERRUPT_CONTROL_STATUS) {
 			// Any bits set to 1 other than the 7-th bit, get their values from the bit #7.

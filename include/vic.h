@@ -57,8 +57,8 @@ public:
 	}
 
 	inline bool isHorizontalBorder(u16 rasterCounter) {
-		return rasterCounter <= GraphicsConstants::BORDER_DIMENSIONS + GraphicsConstants::FIRST_BORDER_LINE
-				|| 257 <= rasterCounter;
+		return rasterCounter < GraphicsConstants::BORDER_DIMENSIONS + GraphicsConstants::FIRST_BORDER_LINE
+				|| 255 <= rasterCounter;
 	}
 
 	inline bool isVerticalBorder(u16 x) {
@@ -101,7 +101,7 @@ public:
 
 	u8 get(const u16 &addr) const override {
 		u16 mappedAddr = toMem(addr);
-		if (0x46u < mappedAddr) {
+		if (46 < mappedAddr) {
 			return 0xffu;
 		} else {
 			return RegisterHolder::get(mappedAddr);

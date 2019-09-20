@@ -177,7 +177,7 @@ public:
 	inline u8 P() { return p; }
 
 #pragma region Debug
-	static constexpr bool DEBUG = true;
+	static constexpr bool DEBUG = false;
 	bool debug = false;
 	void setDebug(bool debug);
 	std::deque<u16> pcHist;

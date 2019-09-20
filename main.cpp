@@ -89,15 +89,14 @@ int runCustomROM(const std::string &customROMPath) {
 
 		for (size_t amp = 0; amp < 10000; amp++) {
 			buff++;
-			for (u8 i = 0; i < 63; i++) {
-				cpu.execute();
+			if (amp % 63 == 0) {
+				vic.tick();
 			}
-			vic.tick();
-			for (u8 i = 0; i < 5; i++) {
-				cpu.execute();
+			if (amp % 5 == 0) {
+				cia1.tick();
+				cia2.tick();
 			}
-			cia1.tick();
-			cia2.tick();
+			cpu.execute();
 		}
 
 //		std::this_thread::sleep_for(2ms);

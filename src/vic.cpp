@@ -29,12 +29,13 @@ void VIC::standardText() {
 			for (size_t i = 0; i < GraphicsConstants::WINDOW_WIDTH; i++) {
 				screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, 0, borderColor);
 			}
-			blockRowId = 1;
 		} else {
 			for (u32 i = 0; i < GraphicsConstants::WINDOW_WIDTH; i++) {
 				if (isVerticalBorder(i)) {
 					screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, 0, borderColor);
 				} else {
+					blockRowId = (rasterCounter - GraphicsConstants::FIRST_VISIBLE_LINE -
+							GraphicsConstants::FIRST_BORDER_LINE) % 8;
 					u32 pixelId = i - GraphicsConstants::FIRST_VISIBLE_VERTICAL_LINE;
 
 					u8 blockColumn = pixelId / 8;
@@ -49,7 +50,6 @@ void VIC::standardText() {
 													 get(BACKGROUND_COLOR_0), charColor);
 				}
 			}
-			blockRowId = (blockRowId + 1) % 8;
 		}
 	}
 

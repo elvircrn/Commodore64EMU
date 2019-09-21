@@ -31,12 +31,8 @@ public:
 		colors[7] = SDL_MapRGB(format_, 0xea, 0xf5, 0x7c); colors[15] = SDL_MapRGB(format_, 0xb8, 0xb8, 0xb8);
 	}
 
-	void drawPixel(u32 x, u32 y, u8 data, u32 backgroundColor, u32 characterColor = 1) {
-		if (data) {
+	void drawPixel(u32 x, u32 y, u32 characterColor) {
 			screen[y * GraphicsConstants::WINDOW_WIDTH + x] = colors[characterColor];
-		} else {
-			screen[y * GraphicsConstants::WINDOW_WIDTH + x] = colors[backgroundColor];
-		}
 	}
 
 	void flushTexture() {

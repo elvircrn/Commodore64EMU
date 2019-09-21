@@ -6,10 +6,6 @@ bool VIC::isBadLine(u8 rasterCounter, u8 yscroll, bool wasDENSet) {
 	return wasDENSet && 0x30u <= rasterCounter && rasterCounter <= 0xf7u && (yscroll == (rasterCounter & 0x7u));
 }
 
-void VIC::standardBitmap() {
-
-}
-
 void VIC::tick() {
 	u16 rasterCounter = getRasterCounter();
 	// C-Access base
@@ -32,16 +28,17 @@ void VIC::tick() {
 
 	if (!isVBlank(rasterCounter)) {
 		u8 borderColor = get(BORDER_COLOR);
+		u16 pixelY = rasterCounter - GraphicsConstants::FIRST_BORDER_LINE;
 		if (isHorizontalBorder(rasterCounter)) {
 			for (size_t i = 0; i < GraphicsConstants::WINDOW_WIDTH; i++) {
-				screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, 0, borderColor);
+				screen.drawPixel(i, pixelY, borderColor);
 			}
 		} else {
 			u16 y = rasterCounter - GraphicsConstants::FIRST_VISIBLE_LINE - GraphicsConstants::FIRST_BORDER_LINE;
 			u16 blockRow = y / blockHeight;
 			for (u32 i = 0; i < GraphicsConstants::WINDOW_WIDTH; i++) {
 				if (isVerticalBorder(i)) {
-					screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, 0, borderColor);
+					screen.drawPixel(i, pixelY, borderColor);
 				} else {
 					u32 x = i - GraphicsConstants::FIRST_VISIBLE_VERTICAL_LINE;
 					u8 blockColumn = x / blockWidth;
@@ -54,21 +51,56 @@ void VIC::tick() {
 					// G-Access
 					u16 gAccessAddress = charMemBase | (cData << 0x3u) | (y % 8u);
 
-					u16 characterData = mmu.read(gAccessAddress, true);
+					u8 gData = mmu.read(gAccessAddress, true);
 
-					bool pixel = BIT(characterData, 7 - (x % 8));
+					if (get(INTERRUPT_ENABLED) & 1) {
+						std::cout << "VIC interrupt enabled" << std::endl;
+					}
 
-					u8 charColor = getCharColor(colorMemBase, blockColumn, blockRow);
-
-					screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, pixel, get(BACKGROUND_COLOR_0), charColor);
+					if (graphicsMode() == GraphicsModes::MulticolorText) {
+						u8 colorData = LO_NIBBLE(mmu.read(colorMemBase | screenCellLocation));
+						bool mcFlag = BIT(colorData, 3u);
+						if (mcFlag) {
+							u8 charColor;
+							for (s32 columnId = 7; columnId > -1; columnId -= 2, i += 2) {
+								u8 d = BIT(gData, columnId) | (BIT(gData, columnId - 1) << 1u);
+								if (d < 3) {
+									charColor = get(BACKGROUND_COLOR_0 + d);
+								} else {
+									charColor = colorData & 0x7u;
+								}
+								screen.drawPixel(i, pixelY, charColor);
+								screen.drawPixel(i + 1, pixelY, charColor);
+							}
+						} else {
+							for (s32 columnId = 7; columnId >= 0; columnId--, i++) {
+								bool pixel = BIT(gData, columnId);
+								u8 charColor;
+								if (pixel) {
+									charColor = colorData & 7u;
+								} else {
+									charColor = get(BACKGROUND_COLOR_0);
+								}
+								screen.drawPixel(i, pixelY, charColor);
+							}
+						}
+					} else {
+						for (s32 columnId = 7; columnId >= 0; columnId--, i++) {
+							bool pixel = BIT(gData, columnId);
+							u8 charColor;
+							if (pixel) {
+								charColor = mmu.read(colorMemBase | screenCellLocation);
+							} else {
+								charColor = get(BACKGROUND_COLOR_0);
+							}
+							screen.drawPixel(i, pixelY, charColor);
+						}
+					}
+					i--;
 				}
 			}
 		}
 	}
 	incrementRasterCounter();
-}
-
-u8 VIC::getCharColor(u16 colorMemBase, u8 blockColumn, u8 blockRow) const {
-	return mmu.read(colorMemBase + blockRow * 40 + blockColumn);
 }
 

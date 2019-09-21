@@ -11,7 +11,7 @@
 class VIC : public RegisterHolder<0xd000u, 0x100u> {
 	enum class GraphicsModes {
 		StandardText = 0,
-		MulticolorText,
+		MulticolorText = 1,
 		StandardBitmap,
 		MulticolorBitmap
 	};
@@ -19,11 +19,13 @@ class VIC : public RegisterHolder<0xd000u, 0x100u> {
 	static constexpr u16 CONTROL_REGISTER_1 = 0xD011; // Control register 1  |RST8| ECM| BMM| DEN|RSEL|    YSCROLL   |
 	static constexpr u16 CONTROL_REGISTER_2 = 0xD016; // Control register 2  |  - |  - | RES| MCM|CSEL|    XSCROLL   |
 	static constexpr u16 RASTER_COUNTER_ADDR = 0xD012; // Raster counter     |                 RASTER                |
-	static constexpr u16 VIC_MEMORY_BANK_ADDR = 0xDD00;
-	static constexpr u16
-			MEMORY_POINTERS = 0xD018; // Memory pointers |VM13|VM12|VM11|VM10|CB13|CB12|CB11|  - | defaults to 0x40
-	static constexpr u16 BORDER_COLOR = 0xD020; // Border color |  - |  - |  - |  - |         EC        | Border color
+	static constexpr u16 MEMORY_POINTERS = 0xD018; // Memory pointers |VM13|VM12|VM11|VM10|CB13|CB12|CB11|  - | defaults to 0x40
+	static constexpr u16 INTERRUPT_REGISTER  = 0xD019; // Interrupt register | IRQ|  - |  - |  - | ILP|IMMC|IMBC|IRST|
+	static constexpr u16 INTERRUPT_ENABLED = 0xD01A; // Interrupt enabled  |  - |  - |  - |  - | ELP|EMMC|EMBC|ERST|
+	static constexpr u16 BORDER_COLOR = 0xD020;   // Border color |  - |  - |  - |  - |         EC        | Border color
 	static constexpr u16 BACKGROUND_COLOR_0 = 0xD021; // Background color 0 |  - |  - |  - |  - |        B0C        |
+
+	static constexpr u16 VIC_MEMORY_BANK_ADDR = 0xDD00;
 
 	/**
 	The DEN bit (Display Enable, register $d011, bit 4) serves for switching on
@@ -76,9 +78,9 @@ public:
 		u8 ctrl2 = getControlRegister2();
 		bool bmm = BIT(ctrl1, 5);
 		bool ecm = BIT(ctrl1, 6);
-		bool mcm = BIT(ctrl2, 5); // TODO: Handle this flag
+		bool mcm = BIT(ctrl2, 4); // TODO: Handle this flag
 
-		return GraphicsModes{(u8) (ecm << 0x1u) | bmm};
+		return GraphicsModes{mcm | (bmm << 1u) | (ecm << 2u)};
 	}
 
 	inline u32 getRasterCounter() {
@@ -121,13 +123,8 @@ public:
 				wasDENSetOn30 = true;
 			}
 		}
-
 		return RegisterHolder::set(addr, val);
 	}
-
-	u8 getCharColor(u16 colorMemBase, u8 blockColumn, u8 blockRow) const;
-
-	void standardBitmap();
 };
 
 #endif //C64EMU_VIC_H

@@ -10,73 +10,62 @@ void VIC::standardBitmap() {
 
 }
 
-void VIC::standardText() {
+void VIC::tick() {
 	u16 rasterCounter = getRasterCounter();
-	u8 vicBank = 0x3u - ((mmu.read(VIC_MEMORY_BANK_ADDR)) & 0x3u);
-	u16 vicBaseAddr = vicBank << 14u;
+	// C-Access base
+	const u8 vicBank = 0x3u - ((mmu.read(VIC_MEMORY_BANK_ADDR)) & 0x3u);
+	const u16 vicBaseAddr = vicBank << 14u; // VM15 - VM14 provided by CIA2 chip
+	const u8 memoryPointers = get(MEMORY_POINTERS); //
+	const u16 screenMemBase = (HI_NIBBLE(memoryPointers) << 10u); // Screen memory addresss, VM13 - VM10 will come from this register
+	const u16 cAccessAddressBase = vicBaseAddr | screenMemBase;
 
-	u8 memoryPointers = get(MEMORY_POINTERS);
-	u8 vm = memoryPointers >> 0x4u;
-	u8 cb = (u8) (memoryPointers >> 0x1u) & 0x7u;
 
-	u16 charMemBase = (cb * 0x800u);
-	u16 screenMemBase = (vm * 0x400u);
-	u16 colorMemBase = 0xd800u;
+	// Character memory base
+	const u8 cb = (u8) (memoryPointers >> 0x1u) & 0x7u;
+	u16 charMemBase = (cb << 11u); // CB13 CB12 CB11
 
-	u8 borderColor = get(BORDER_COLOR);
+	// Color rom base
+	const u16 colorMemBase = 0xd800u;
+
+	u8 blockWidth = 8;
+	u8 blockHeight = 8;
+
 	if (!isVBlank(rasterCounter)) {
+		u8 borderColor = get(BORDER_COLOR);
 		if (isHorizontalBorder(rasterCounter)) {
 			for (size_t i = 0; i < GraphicsConstants::WINDOW_WIDTH; i++) {
 				screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, 0, borderColor);
 			}
 		} else {
+			u16 y = rasterCounter - GraphicsConstants::FIRST_VISIBLE_LINE - GraphicsConstants::FIRST_BORDER_LINE;
+			u16 blockRow = y / blockHeight;
 			for (u32 i = 0; i < GraphicsConstants::WINDOW_WIDTH; i++) {
 				if (isVerticalBorder(i)) {
 					screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, 0, borderColor);
 				} else {
-					blockRowId = (rasterCounter - GraphicsConstants::FIRST_VISIBLE_LINE -
-							GraphicsConstants::FIRST_BORDER_LINE) % 8;
-					u32 pixelId = i - GraphicsConstants::FIRST_VISIBLE_VERTICAL_LINE;
+					u32 x = i - GraphicsConstants::FIRST_VISIBLE_VERTICAL_LINE;
+					u8 blockColumn = x / blockWidth;
 
-					u8 blockColumn = pixelId / 8;
-					u8 blockRow =
-							(rasterCounter - GraphicsConstants::FIRST_VISIBLE_LINE -
-									GraphicsConstants::FIRST_BORDER_LINE) / 8;
+					u16 screenCellLocation = blockRow * 40 + blockColumn;
+					u16 cAccessFullAddress = cAccessAddressBase | screenCellLocation;
+					// C-Access
+					u16 cData = mmu.read(cAccessFullAddress, true); // This tells us which character we want to draw, D7 - D0
+
+					// G-Access
+					u16 gAccessAddress = charMemBase | (cData << 0x3u) | (y % 8u);
+
+					u16 characterData = mmu.read(gAccessAddress, true);
+
+					bool pixel = BIT(characterData, 7 - (x % 8));
 
 					u8 charColor = getCharColor(colorMemBase, blockColumn, blockRow);
-					bool charData = getCharacterPixel(vicBaseAddr, charMemBase, screenMemBase, pixelId, blockColumn,
-																						blockRow);
-					screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, charData,
-													 get(BACKGROUND_COLOR_0), charColor);
+
+					screen.drawPixel(i, rasterCounter - GraphicsConstants::FIRST_BORDER_LINE, pixel, get(BACKGROUND_COLOR_0), charColor);
 				}
 			}
 		}
 	}
-
 	incrementRasterCounter();
-}
-
-void VIC::tick() {
-	GraphicsModes mode = graphicsMode();
-
-	if (mode == GraphicsModes::StandardText) {
-		standardText();
-	} else if (mode == GraphicsModes::StandardBitmap) {
-		standardBitmap();
-	}
-}
-
-bool VIC::getCharacterPixel(u16 vicBaseAddr,
-														u16 charMemBase,
-														u16 screenMemBase,
-														u32 pixelId,
-														u8 blockColumn,
-														u8 blockRow) {
-	u8 characterId = mmu.read(vicBaseAddr + screenMemBase + blockRow * 40 + blockColumn, true);
-	u8 charPixelId = (blockRowId * 8) + pixelId % 8;
-	u16 offset = charMemBase + (8u * characterId);
-	bool charData = BIT(mmu.read(offset + charPixelId / 8, true), 7 - (charPixelId % 8));
-	return charData;
 }
 
 u8 VIC::getCharColor(u16 colorMemBase, u8 blockColumn, u8 blockRow) const {

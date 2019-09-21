@@ -25,9 +25,6 @@ class VIC : public RegisterHolder<0xd000u, 0x100u> {
 	static constexpr u16 BORDER_COLOR = 0xD020; // Border color |  - |  - |  - |  - |         EC        | Border color
 	static constexpr u16 BACKGROUND_COLOR_0 = 0xD021; // Background color 0 |  - |  - |  - |  - |        B0C        |
 
-
-	u8 blockRowId{};
-
 	/**
 	The DEN bit (Display Enable, register $d011, bit 4) serves for switching on
 	and off the text/bitmap graphics. It is normally set. The bit affects two
@@ -129,11 +126,6 @@ public:
 	}
 
 	u8 getCharColor(u16 colorMemBase, u8 blockColumn, u8 blockRow) const;
-
-	bool
-	getCharacterPixel(u16 vicBaseAddr, u16 charMemBase, u16 screenMemBase, u32 pixelId, u8 blockColumn, u8 blockRow);
-
-	void standardText();
 
 	void standardBitmap();
 };

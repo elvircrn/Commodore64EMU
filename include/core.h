@@ -26,6 +26,9 @@ inline u8 LO_NIBBLE(const u8 &addr) {
 inline u8 HI_NIBBLE(const u8 &addr) {
 	return static_cast<u8>((u8) (addr >> 0x4u) & 0xfu);
 }
+inline u8 NOT8(const u8 &addr) {
+	return u8(~((u16)addr));
+}
 inline bool BIT(const u8 &bits, const u8 &n) { return (bits & (1u << n)) > 0; }
 inline u8 SET(const u8 &bits, const u8 &n, bool bit) {
 	return (bits & (~(1u << n))) | (bit << n);

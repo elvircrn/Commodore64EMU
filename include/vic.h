@@ -17,8 +17,8 @@ class VIC : public RegisterHolder<0xd000u, 0x100u> {
 	};
 
 	static constexpr u16 CONTROL_REGISTER_1 = 0xD011; // Control register 1  |RST8| ECM| BMM| DEN|RSEL|    YSCROLL   |
-	static constexpr u16 CONTROL_REGISTER_2 = 0xD016; // Control register 2  |  - |  - | RES| MCM|CSEL|    XSCROLL   |
 	static constexpr u16 RASTER_COUNTER_ADDR = 0xD012; // Raster counter     |                 RASTER                |
+	static constexpr u16 CONTROL_REGISTER_2 = 0xD016; // Control register 2  |  - |  - | RES| MCM|CSEL|    XSCROLL   |
 	static constexpr u16 MEMORY_POINTERS = 0xD018; // Memory pointers |VM13|VM12|VM11|VM10|CB13|CB12|CB11|  - | defaults to 0x40
 	static constexpr u16 INTERRUPT_REGISTER  = 0xD019; // Interrupt register | IRQ|  - |  - |  - | ILP|IMMC|IMBC|IRST|
 	static constexpr u16 INTERRUPT_ENABLED = 0xD01A; // Interrupt enabled  |  - |  - |  - |  - | ELP|EMMC|EMBC|ERST|
@@ -41,6 +41,8 @@ class VIC : public RegisterHolder<0xd000u, 0x100u> {
 	MMU &mmu;
 	Screen &screen;
 	CPU cpu;
+
+	u32 rasterCounterInt;
 
 public:
 	VIC(Clock &_clock, MMU &_mmu, Screen &_screen, CPU &_cpu) : clock(_clock), mmu(_mmu), screen(_screen), cpu(_cpu) {}
@@ -88,7 +90,7 @@ public:
 	}
 
 	inline void setRasterCounter(u32 rasterCounter) {
-		set(RASTER_COUNTER_ADDR, rasterCounter & 0xffu);
+		RegisterHolder::set(RASTER_COUNTER_ADDR, rasterCounter & 0xffu);
 		set(CONTROL_REGISTER_1, SET(getControlRegister1(), 7, (rasterCounter & 0x100u) > 0));
 	}
 
@@ -122,8 +124,12 @@ public:
 			if (den && getRasterCounter() == 0x30) {
 				wasDENSetOn30 = true;
 			}
+			return RegisterHolder::set(addr, val);
+		} else if (mappedAddr == RASTER_COUNTER_ADDR) {
+			return rasterCounterInt = val;
+		} else {
+			return RegisterHolder::set(addr, val);
 		}
-		return RegisterHolder::set(addr, val);
 	}
 };
 

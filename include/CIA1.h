@@ -140,7 +140,7 @@ public:
 				}
 			}
 
-			return ~mask;
+			return NOT8(mask);
 		} else {
 			return get(addr);
 		}

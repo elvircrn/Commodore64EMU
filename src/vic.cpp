@@ -36,6 +36,11 @@ void VIC::tick() {
 		} else {
 			u16 y = rasterCounter - GraphicsConstants::FIRST_VISIBLE_LINE - GraphicsConstants::FIRST_BORDER_LINE;
 			u16 blockRow = y / blockHeight;
+			if ((get(INTERRUPT_ENABLED) & 1u) && rasterCounterInt == getRasterCounter()) {
+				set(INTERRUPT_REGISTER, SET(get(INTERRUPT_REGISTER), 0, false));
+				cpu.interruptRequest();
+			}
+
 			for (u32 i = 0; i < GraphicsConstants::WINDOW_WIDTH; i++) {
 				if (isVerticalBorder(i)) {
 					screen.drawPixel(i, pixelY, borderColor);
@@ -52,10 +57,6 @@ void VIC::tick() {
 					u16 gAccessAddress = charMemBase | (cData << 0x3u) | (y % 8u);
 
 					u8 gData = mmu.read(gAccessAddress, true);
-
-					if (get(INTERRUPT_ENABLED) & 1) {
-						std::cout << "VIC interrupt enabled" << std::endl;
-					}
 
 					if (graphicsMode() == GraphicsModes::MulticolorText) {
 						u8 colorData = LO_NIBBLE(mmu.read(colorMemBase | screenCellLocation));

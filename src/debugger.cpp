@@ -2,7 +2,7 @@
 #include <sstream>
 #include <iomanip>
 
-#include "Debugger.h"
+#include "debugger.h"
 
 Debugger::Debugger() : instructionName(0xff + 1) {
 	instructionName[0x69] = "ADC";

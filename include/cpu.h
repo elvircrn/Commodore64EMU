@@ -6,12 +6,12 @@
 #include <vector>
 #include <deque>
 #include <tuple>
-#include "MMU.h"
-#include "Clock.h"
+#include "mmu.h"
+#include "clock.h"
 #include <functional>
 
 #include "core.h"
-#include "ROM.h"
+#include "rom.h"
 
 // Interrupt types along with their respective vectors
 enum Interrupts { BRK = 0, IRQ, NMI, RST };

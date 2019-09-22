@@ -1,6 +1,6 @@
 #include "vic.h"
 #include "core.h"
-#include "GraphicsConstants.h"
+#include "graphics_constants.h"
 
 bool VIC::isBadLine(u8 rasterCounter, u8 yscroll, bool wasDENSet) {
 	return wasDENSet && 0x30u <= rasterCounter && rasterCounter <= 0xf7u && (yscroll == (rasterCounter & 0x7u));
@@ -36,10 +36,6 @@ void VIC::tick() {
 		} else {
 			u16 y = rasterCounter - GraphicsConstants::FIRST_VISIBLE_LINE - GraphicsConstants::FIRST_BORDER_LINE;
 			u16 blockRow = y / blockHeight;
-			if ((get(INTERRUPT_ENABLED) & 1u) && rasterCounterInt == getRasterCounter()) {
-				set(INTERRUPT_REGISTER, SET(get(INTERRUPT_REGISTER), 0, false));
-				cpu.interruptRequest();
-			}
 
 			for (u32 i = 0; i < GraphicsConstants::WINDOW_WIDTH; i++) {
 				if (isVerticalBorder(i)) {

@@ -103,6 +103,8 @@ public:
 
 	void tick() {
 		u8 controlA = get(TIMER_CONTROL_REGISTER_A);
+		u8 controlB = get(TIMER_CONTROL_REGISTER_B);
+
 
 		setInterruptGenerated(false);
 		setTimerAUnderflow(false);
@@ -121,6 +123,22 @@ public:
 					generateInterrupt();
 				}
 				timerA = timerALatch();
+			}
+		}
+
+		// StBrt timer
+		if (BIT(controlB, 0)) {
+			u16 timerBPrev = timerB;
+			timerB--;
+
+			// Timer B underflow occurred.
+			if (timerBPrev && !timerB) {
+				if (isInterruptBEnabled()) {
+					setTimerBUnderflow(true);
+					setInterruptGenerated(true);
+					generateInterrupt();
+				}
+				timerB = timerBLatch();
 			}
 		}
 	}

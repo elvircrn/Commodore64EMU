@@ -1,7 +1,7 @@
 #include <utility>
 
-#include "ROM.h"
-#include "StreamUtil.h"
+#include "rom.h"
+#include "stream_util.h"
 
 ROM::ROM() {}
 

@@ -1,5 +1,5 @@
-#include "Clock.h"
-#include "Clock.h"
+#include "clock.h"
+#include "clock.h"
 
 #include <thread>
 

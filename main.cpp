@@ -4,17 +4,17 @@
 #include "cmrc/cmrc.hpp"
 
 #include "sdl2.h"
-#include "CIA1.h"
+#include "cia1.h"
 #include "vic.h"
-#include "Loop.h"
-#include "PRGLoader.h"
-#include "Keyboard.h"
-#include "CIA2.h"
-#include "TimingConstants.h"
-#include "CPU.h"
-#include "StreamUtil.h"
-#include "MMU.h"
-#include "Clock.h"
+#include "loop.h"
+#include "prg_loader.h"
+#include "keyboard.h"
+#include "cia2.h"
+#include "timing_constants.h"
+#include "cpu.h"
+#include "stream_util.h"
+#include "mmu.h"
+#include "clock.h"
 
 CMRC_DECLARE(resources);
 

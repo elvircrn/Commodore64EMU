@@ -1,9 +1,9 @@
 #include <array>
 #include <sstream>
 
-#include "CPU.h"
-#include "LogUtil.h"
-#include "Instructions.h"
+#include "cpu.h"
+#include "log_util.h"
+#include "instructions.h"
 
 CPU::CPU(Clock &_clock, MMU &_mmu)
 		: clock(_clock), mmu(_mmu), cycleCount{} {

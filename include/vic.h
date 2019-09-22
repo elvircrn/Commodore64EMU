@@ -1,12 +1,12 @@
 #ifndef C64EMU_VIC_H
 #define C64EMU_VIC_H
 
-#include "Clock.h"
-#include "MMU.h"
-#include "Screen.h"
-#include "RegisterHolder.h"
-#include "GraphicsConstants.h"
-#include "CPU.h"
+#include "clock.h"
+#include "mmu.h"
+#include "screen.h"
+#include "register_holder.h"
+#include "graphics_constants.h"
+#include "cpu.h"
 
 class VIC : public RegisterHolder<0xd000u, 0x100u> {
 	enum class GraphicsModes {

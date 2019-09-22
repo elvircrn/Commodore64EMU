@@ -1,7 +1,7 @@
-#ifndef C64EMU_PRGLOADER_H
-#define C64EMU_PRGLOADER_H
+#ifndef C64EMU_PRG_LOADER_H
+#define C64EMU_PRG_LOADER_H
 
-#include "MMU.h"
+#include "mmu.h"
 
 class PRGLoader {
 	constexpr static u8 PRG_ROM_HEADER_SIZE = 0x2u;
@@ -22,4 +22,4 @@ public:
 	}
 };
 
-#endif //C64EMU_PRGLOADER_H
+#endif //C64EMU_PRG_LOADER_H

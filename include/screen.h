@@ -7,7 +7,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_render.h>
 
-#include "GraphicsConstants.h"
+#include "graphics_constants.h"
 #include "core.h"
 
 class Screen {
@@ -31,7 +31,7 @@ public:
 		colors[7] = SDL_MapRGB(format_, 0xea, 0xf5, 0x7c); colors[15] = SDL_MapRGB(format_, 0xb8, 0xb8, 0xb8);
 	}
 
-	void drawPixel(u32 x, u32 y, u32 characterColor) {
+	inline void drawPixel(u32 x, u32 y, u32 characterColor) {
 			screen[y * GraphicsConstants::WINDOW_WIDTH + x] = colors[characterColor];
 	}
 

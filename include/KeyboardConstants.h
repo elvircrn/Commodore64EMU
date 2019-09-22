@@ -1,8 +1,0 @@
-#ifndef C64EMU_KEYBOARDCONSTANTS_H
-#define C64EMU_KEYBOARDCONSTANTS_H
-
-class KeyboardConstants {
-
-};
-
-#endif //C64EMU_KEYBOARDCONSTANTS_H

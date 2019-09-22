@@ -1,11 +1,11 @@
 #define CATCH_CONFIG_MAIN
-#include "CPU.h"
+#include "cpu.h"
 #include "catch.hpp"
-#include "StreamUtil.h"
+#include "stream_util.h"
 #include "cmrc/cmrc.hpp"
 
 #include <iomanip>
-#include "MMU.h"
+#include "mmu.h"
 CMRC_DECLARE(test_resources);
 
 TEST_CASE("CPU Test") {

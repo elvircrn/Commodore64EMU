@@ -12,9 +12,9 @@
 #include <iostream>
 
 #include "core.h"
-#include "Keyboard.h"
-#include "LogUtil.h"
-#include "RegisterHolder.h"
+#include "keyboard.h"
+#include "log_util.h"
+#include "register_holder.h"
 
 class CIA1 : public RegisterHolder<0xDC00, 0x10> {
 	static constexpr u16 ADDRESS_COUNTER_A = 0xDC04u;
@@ -118,10 +118,8 @@ public:
 
 	inline u8 read(u16 addr) {
 		addr = normalize(addr);
-		L_DEBUG(
-				std::cout << "CIA1 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << ' ');
+		L_DEBUG(std::cout << "CIA1 read " << std::hex << std::setw(2) << std::setfill('0') << " addr: " << (u32) addr << ' ');
 
-		// Port B, keyboard matrix rows and joystick
 		if (addr == 0xdc01) {
 			u8 pos{}, val = get(0xdc00);
 			if (!val) {
@@ -148,6 +146,7 @@ public:
 
 	void tick() {
 		u8 controlA = get(TIMER_CONTROL_REGISTER_A);
+		u8 controlB = get(TIMER_CONTROL_REGISTER_B);
 
 		setInterruptGenerated(false);
 		setTimerAUnderflow(false);
@@ -167,6 +166,23 @@ public:
 					generateInterrupt();
 				}
 				timerA = timerALatch();
+			}
+		}
+
+		// StBrt timer
+		if (BIT(controlB, 0)) {
+			u16 timerBPrev = timerB;
+			timerB--;
+
+			// Timer B underflow occurred.
+			if (timerBPrev && !timerB) {
+				if (isInterruptBEnabled()) {
+					SDL_PollEvent(&event);
+					setTimerBUnderflow(true);
+					setInterruptGenerated(true);
+					generateInterrupt();
+				}
+				timerB = timerBLatch();
 			}
 		}
 	}

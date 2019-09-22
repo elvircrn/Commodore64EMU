@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CPU.h"
+#include "cpu.h"
 #include "core.h"
 
 class CPU;

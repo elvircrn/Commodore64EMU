@@ -4,9 +4,9 @@
 #include <utility>
 #include <vector>
 #include "core.h"
-#include "ROM.h"
-#include "CIA1.h"
-#include "CIA2.h"
+#include "rom.h"
+#include "cia1.h"
+#include "cia2.h"
 
 class MMU {
 	constexpr static int RAM_SIZE = 65536;

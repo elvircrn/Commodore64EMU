@@ -5,7 +5,7 @@
 #include <iterator>
 #include <tuple>
 
-#include "ROM.h"
+#include "rom.h"
 #include "core.h"
 
 using std::vector;

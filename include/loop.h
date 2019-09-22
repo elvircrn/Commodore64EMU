@@ -1,7 +1,7 @@
 #ifndef C64EMU_LOOP_H
 #define C64EMU_LOOP_H
 
-#include "Screen.h"
+#include "screen.h"
 
 class Loop {
 	Screen &screen;

@@ -1,5 +1,5 @@
-#ifndef C64EMU_LOGUTIL_H
-#define C64EMU_LOGUTIL_H
+#ifndef C64EMU_LOG_UTIL_H
+#define C64EMU_LOG_UTIL_H
 
 //#define LOG_LEVEL_DEBUG
 //#define LOG_LEVEL_INFO
@@ -33,4 +33,4 @@
 #include <iostream>
 #endif
 
-#endif //C64EMU_LOGUTIL_H
+#endif //C64EMU_LOG_UTIL_H

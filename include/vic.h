@@ -131,6 +131,8 @@ public:
 			return RegisterHolder::set(addr, val);
 		}
 	}
+	u32 drawMulticolorTextLine(const u16 colorMemBase, u16 pixelY, u32 i, u16 screenCellLocation, u8 gData) const;
+	u32 drawStandardTextLine(const u16 colorMemBase, u16 pixelY, u32 i, u16 screenCellLocation, u8 gData) const;
 };
 
 #endif //C64EMU_VIC_H

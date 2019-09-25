@@ -432,7 +432,7 @@ bool CPU::writeOperandVal(const u8 &val) {
 		u16 abs = Abs();
 		return write(abs, val);
 	}
-		// ADC #2 -> A + 2
+		// ADC #2 -> A +
 	else if constexpr (mode == AddressingModes::IMMEDIATE) {
 //		throw "Attempting to assign to immediate value";
 	}
@@ -530,16 +530,16 @@ void CPU::ADC() {
 		res = lhs + rhs + C();
 	}
 
-	UpdCV(lhs, rhs, res);
+	updCV(lhs, rhs, res);
 
 	a = res & 0xffu;
-	UpdNZ(a);
+	updNZ(a);
 }
 
 template<AddressingModes mode>
 void CPU::AND() {
 	calcCrossed = true;
-	UpdNZ(a &= getPureOperand<mode>());
+	updNZ(a &= getPureOperand<mode>());
 }
 
 template<AddressingModes mode>
@@ -549,7 +549,7 @@ void CPU::ASL() {
 	u8 val = getOperand8<mode>();
 	val = _ASL(val);
 	writeOperandVal<mode>(val);
-	UpdNZ(val);
+	updNZ(val);
 }
 
 template<AddressingModes mode>
@@ -667,7 +667,7 @@ template<AddressingModes mode>
 void CPU::CMP() {
 	calcCrossed = true;
 	u8 mem = (u8) getPureOperand<mode>();
-	UpdNZ(a - mem);
+	updNZ(a - mem);
 	C(a >= mem);
 }
 
@@ -675,7 +675,7 @@ template<AddressingModes mode>
 void CPU::CPX() {
 	calcCrossed = true;
 	u8 mem = (u8) getPureOperand<mode>();
-	UpdNZ(x - mem);
+	updNZ(x - mem);
 	C(x >= mem);
 }
 
@@ -683,7 +683,7 @@ template<AddressingModes mode>
 void CPU::CPY() {
 	calcCrossed = true;
 	u8 mem = (u8) getPureOperand<mode>();
-	UpdNZ(y - mem);
+	updNZ(y - mem);
 	C(y >= mem);
 }
 
@@ -693,22 +693,22 @@ void CPU::DEC() {
 	u8 val = getOperand8<mode>();
 	val--;
 	writeOperandVal<mode>(val);
-	UpdNZ(val);
+	updNZ(val);
 }
 
 // No additional cycles
 template<AddressingModes mode>
-void CPU::DEX() { UpdNZ(--x); }
+void CPU::DEX() { updNZ(--x); }
 
 // No additional cycles
 template<AddressingModes mode>
-void CPU::DEY() { UpdNZ(--y); }
+void CPU::DEY() { updNZ(--y); }
 
 template<AddressingModes mode>
 void CPU::EOR() {
 	tick(calcBaseTicks<mode>());
 	calcCrossed = true;
-	UpdNZ(a ^= getPureOperand<mode>());
+	updNZ(a ^= getPureOperand<mode>());
 }
 
 template<AddressingModes mode>
@@ -717,16 +717,16 @@ void CPU::INC() {
 	u8 val = getOperand8<mode>();
 	val++;
 	writeOperandVal<mode>(val);
-	UpdNZ(val);
+	updNZ(val);
 }
 
 template<AddressingModes mode>
 void CPU::INX() {
-	UpdNZ(++x);
+	updNZ(++x);
 }
 
 template<AddressingModes mode>
-void CPU::INY() { UpdNZ(++y); }
+void CPU::INY() { updNZ(++y); }
 
 template<AddressingModes mode>
 void CPU::JMP() {
@@ -749,21 +749,21 @@ template<AddressingModes mode>
 void CPU::LDA() {
 	calcCrossed = true;
 	tick(calcBaseTicks<mode>());
-	UpdNZ(a = getOperand8<mode>());
+	updNZ(a = getOperand8<mode>());
 }
 
 template<AddressingModes mode>
 void CPU::LDX() {
 	tick(calcBaseTicks<mode>());
 	calcCrossed = true;
-	UpdNZ(x = getOperand8<mode>());
+	updNZ(x = getOperand8<mode>());
 }
 
 template<AddressingModes mode>
 void CPU::LDY() {
 	tick(calcBaseTicks<mode>());
 	calcCrossed = true;
-	UpdNZ(y = (u8) getPureOperand<mode>());
+	updNZ(y = (u8) getPureOperand<mode>());
 }
 
 template<AddressingModes mode>
@@ -772,7 +772,7 @@ void CPU::LSR() {
 	C(static_cast<bool>(op & 1u));
 	op >>= 1u;
 	writeOperandVal<mode>(op);
-	UpdNZ(op);
+	updNZ(op);
 }
 
 template<AddressingModes mode, int waste>
@@ -781,7 +781,7 @@ void CPU::NOP() { pc += waste; }
 template<AddressingModes mode>
 void CPU::ORA() {
 	calcCrossed = true;
-	UpdNZ(a |= getOperand8<mode>());
+	updNZ(a |= getOperand8<mode>());
 }
 
 template<AddressingModes mode>
@@ -799,14 +799,14 @@ void CPU::PHP() {
 template<AddressingModes mode>
 void CPU::PLA() {
 	tick(2);
-	a = Pop8();
-	UpdNZ(a);
+	a = pop8();
+	updNZ(a);
 }
 
 template<AddressingModes mode>
 void CPU::PLP() {
 	tick(2);
-	p = Pop8();
+	p = pop8();
 	B(false);
 	// TODO: What?
 	U(true);
@@ -822,7 +822,7 @@ void CPU::ROL() {
 	mem |= static_cast<u8>(C());
 	writeOperandVal<mode>(mem);
 	C(t & 0x80u);
-	UpdNZ(mem);
+	updNZ(mem);
 }
 
 template<AddressingModes mode>
@@ -835,7 +835,7 @@ void CPU::ROR() {
 	mem |= (C() << 7u);
 	writeOperandVal<mode>(mem);
 	C(t & 1u);
-	UpdNZ(mem);
+	updNZ(mem);
 }
 
 /**
@@ -851,13 +851,13 @@ void CPU::RTI() {
 	// NOTE: Changes the p register
 	PLP<mode>(); // pop8
 	tick(2);
-	pc = Pop16(); // pop16
+	pc = pop16(); // pop16
 }
 
 template<AddressingModes mode>
 void CPU::RTS() {
 	tick(4);
-	pc = Pop16() + 1;
+	pc = pop16() + 1;
 }
 
 // TODO: Speed-up
@@ -888,9 +888,9 @@ void CPU::SBC() {
 	} else {
 		updC(res);
 	}
-	UpdV(a, rhs, res);
+	updV(a, rhs, res);
 	a = res & 0xffu;
-	UpdNZ(a);
+	updNZ(a);
 }
 
 template<AddressingModes mode>
@@ -928,25 +928,25 @@ void CPU::STY() {
 template<AddressingModes mode>
 void CPU::TAX() {
 	x = a;
-	UpdNZ(x);
+	updNZ(x);
 }
 
 template<AddressingModes mode>
 void CPU::TAY() {
 	y = a;
-	UpdNZ(y);
+	updNZ(y);
 }
 
 template<AddressingModes mode>
 void CPU::TSX() {
 	x = sp;
-	UpdNZ(x);
+	updNZ(x);
 }
 
 template<AddressingModes mode>
 void CPU::TXA() {
 	a = x;
-	UpdNZ(a);
+	updNZ(a);
 }
 
 template<AddressingModes mode>
@@ -955,7 +955,7 @@ void CPU::TXS() { sp = x; }
 template<AddressingModes mode>
 void CPU::TYA() {
 	a = y;
-	UpdNZ(a);
+	updNZ(a);
 }
 
 // INT is not a 6502 instruction. It is simply an interrupt handler.

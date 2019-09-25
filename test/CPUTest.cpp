@@ -14,11 +14,8 @@ TEST_CASE("CPU Test") {
 	std::chrono::high_resolution_clock::time_point start(
 			std::chrono::high_resolution_clock::now());
 
-	SDL_Event evt;
-
-	std::vector<u8> vicIO(0xffff);
 	Clock clk{};
-	CIA1 cia1{evt};
+	CIA1 cia1{};
 	CIA2 cia2{};
 	ROM rom{};
 	auto fs = cmrc::test_resources::get_filesystem();
@@ -47,24 +44,22 @@ TEST_CASE("CPU Test") {
 			break;
 		} else if (cpu.PC() == pcPrev) {
 			std::cout << "Stuck in a loop at " << std::hex << pcPrev << '\n';
+			std::cout << std::endl;
+			for (size_t i = cpu.instrHist.size() - 50; i < cpu.instrHist.size(); i++) {
+				auto v = std::get<2>(cpu.instrHist[i]);
+				std::cout << std::hex << std::setw(2) << std::setfill('0') << std::get<0>(cpu.instrHist[i]) << ' '
+									<< std::get<1>(cpu.instrHist[i]) << ' ';
+				for (const auto &data : v) {
+					std::cout << ' ' << std::hex << std::setw(2) << std::setfill('0') << (int) data;
+				}
+				std::cout << '\n';
+			}
+			std::cout.copyfmt(oldState);
 			break;
 		}
 
 		pcPrev = cpu.PC();
 	}
-
-	std::cout << std::endl;
-	for (size_t i = cpu.instrHist.size() - 50; i < cpu.instrHist.size(); i++) {
-		auto v = std::get<2>(cpu.instrHist[i]);
-		std::cout << std::hex << std::setw(2) << std::setfill('0') << std::get<0>(cpu.instrHist[i]) << ' '
-							<< std::get<1>(cpu.instrHist[i]) << ' ';
-		for (const auto &data : v) {
-			std::cout << ' ' << std::hex << std::setw(2) << std::setfill('0') << (int) data;
-		}
-		std::cout << '\n';
-	}
-
-	std::cout.copyfmt(oldState);
 
 	auto microseconds =
 			std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);

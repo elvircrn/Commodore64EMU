@@ -1,0 +1,54 @@
+    \resizebox{0.9\textwidth}{!}{%
+    \begin{tabular}{@{}lrcrccccccc@{}}
+        \toprule
+         \# &  Adr.   & Bit7 & Bit6 & Bit5 & Bit4 & Bit3 & Bit2 & Bit1 & Bit0 &  Funkcija \\
+        \midrule
+         0 &  \$d000  &     &    &      &  M0X &      &  &  &    &  X koordinata sprajta 0 \\
+         1 &  \$d001  &     &    &      &  M0Y &      &  &  &    &  Y koordinata sprajta 0 \\
+         2 &  \$d002  &     &    &      &  M1X &      &  &  &    &  X koordinata sprajta 1 \\
+         3 &  \$d003  &     &    &      &  M1Y &      &  &  &    &  Y koordinata sprajta 1 \\
+         4 &  \$d004  &     &    &      &  M2X &      &  &  &    &  X koordinata sprajta 2 \\
+         5 &  \$d005  &     &    &      &  M2Y &      &  &  &    &  Y koordinata sprajta 2 \\
+         6 &  \$d006  &     &    &      &  M3X &      &  &  &    &  X koordinata sprajta 3 \\
+         7 &  \$d007  &     &    &      &  M3Y &      &  &  &    &  Y koordinata sprajta 3 \\
+         8 &  \$d008  &     &    &      &  M4X &      &  &  &    &  X koordinata sprajta 4 \\
+         9 &  \$d009  &     &    &      &  M4Y &      &  &  &    &  Y koordinata sprajta 4 \\
+        10 &  \$d00a  &     &    &      &  M5X &      &  &  &    &  X koordinata sprajta 5 \\
+        11 &  \$d00b  &     &    &      &  M5Y &      &  &  &    &  Y koordinata sprajta 5 \\
+        12 &  \$d00c  &     &    &      &  M6X &      &  &  &    &  X koordinata sprajta 6 \\
+        13 &  \$d00d  &     &    &      &  M6Y &      &  &  &    &  Y koordinata sprajta 6 \\
+        14 &  \$d00e  &     &    &      &  M7X &      &  &  &    &  X koordinata sprajta 7 \\
+        15 &  \$d00f  &     &    &      &  M7Y &      &  &  &    &  Y koordinata sprajta 7 \\
+        16 &  \$d010  & M7X8 & M6X8 & M5X8 & M4X8 & M3X8 & M2X8 & M1X8 & M0X8 &  Značajni bit X koordinate \\
+        17 &  \$d011  & RST8 &  ECM &  BMM &  DEN & RSEL &       & YSCROLL &   &  Kontrolni registar 1 \\
+        18 &  \$d012  &     &     &     &   RASTER &      &     &    &       &  Raster brojač \\
+        19 &  \$d013  &     &     &     &    LPX   &      &     &    &       &  Svjetlosna olovka X \\
+        20 &  \$d014  &     &     &     &    LPY   &      &     &    &        &  Svjetlosna olovka Y \\
+        21 &  \$d015  &  M7E &  M6E &  M5E &  M4E &  M3E &  M2E &  M1E &  M0E &  Sprajtovi omogućeni \\
+        22 &  \$d016  &   -  &   -  &  RES &  MCM & CSEL &     XSCROLL  & -& -  &  Kontrolni registar 2 \\
+        23 &  \$d017  & M7YE & M6YE & M5YE & M4YE & M3YE & M2YE & M1YE & M0YE &  sprajta Y expansion \\
+        24 &  \$d018  & VM13 & VM12 & VM11 & VM10 & CB13 & CB12 & CB11 &   -  &  Memory pointers \\
+        25 &  \$d019  &  IRQ &   -  &   -  &   -  &  ILP & IMMC & IMBC & IRST &  Interrupt register \\
+        26 &  \$d01a  &   -  &   -  &   -  &   -  &  ELP & EMMC & EMBC & ERST &  Interrupt enabled \\
+        27 &  \$d01b  & M7DP & M6DP & M5DP & M4DP & M3DP & M2DP & M1DP & M0DP &  sprajta data priority \\
+        28 &  \$d01c  & M7MC & M6MC & M5MC & M4MC & M3MC & M2MC & M1MC & M0MC &  sprajta multiboja \\
+        29 &  \$d01d  & M7XE & M6XE & M5XE & M4XE & M3XE & M2XE & M1XE & M0XE &  sprajta X expansion \\
+        30 &  \$d01e  &  M7M &  M6M &  M5M &  M4M &  M3M &  M2M &  M1M &  M0M &  sprajta-sprajta collision \\
+        31 &  \$d01f  &  M7D &  M6D &  M5D &  M4D &  M3D &  M2D &  M1D &  M0D &  sprajta-data collision \\
+        32 &  \$d020  &   -  &   -  &   -  &   -  &   -  &     &    EC   &       &  Border boja \\
+        33 &  \$d021  &   -  &   -  &   -  &   -  &   -  &     &   B0C   &       &  Pozadinska boja 0 \\
+        34 &  \$d022  &   -  &   -  &   -  &   -  &   -  &     &   B1C   &       &  Pozadinska boja 1 \\
+        35 &  \$d023  &   -  &   -  &   -  &   -  &   -  &     &   B2C   &       &  Pozadinska boja 2 \\
+        36 &  \$d024  &   -  &   -  &   -  &   -  &   -  &     &   B3C   &       &  Pozadinska boja 3 \\
+        37 &  \$d025  &   -  &   -  &   -  &   -  &   -  &     &   MM0   &       &  Sprajta multiboja 0 \\
+        38 &  \$d026  &   -  &   -  &   -  &   -  &   -  &     &   MM1   &       &  Sprajta multiboja 1 \\
+        39 &  \$d027  &   -  &   -  &   -  &   -  &   -  &     &   M0C   &       &  Boja sprajta 0 \\
+        40 &  \$d028  &   -  &   -  &   -  &   -  &   -  &     &   M1C   &       &  Boja sprajta 1 \\
+        41 &  \$d029  &   -  &   -  &   -  &   -  &   -  &     &   M2C   &       &  Boja sprajta 2 \\
+        42 &  \$d02a  &   -  &   -  &   -  &   -  &   -  &     &   M3C   &       &  Boja sprajta 3 \\
+        43 &  \$d02b  &   -  &   -  &   -  &   -  &   -  &     &   M4C   &       &  Boja sprajta 4 \\
+        44 &  \$d02c  &   -  &   -  &   -  &   -  &   -  &     &   M5C   &       &  Boja sprajta 5 \\
+        45 &  \$d02d  &   -  &   -  &   -  &   -  &   -  &     &   M6C   &       &  Boja sprajta 6 \\
+        45 &  \$d02d  &   -  &   -  &   -  &   -  &   -  &     &   M7C   &       &  Boja sprajta 7 \\
+        \bottomrule
+        

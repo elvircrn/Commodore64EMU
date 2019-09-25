@@ -43,8 +43,6 @@ class CIA1 : public RegisterHolder<0xDC00, 0x10> {
 	u16 timerA{}, timerB{};
 	bool interruptAEnabled{}, interruptBEnabled{};
 
-	SDL_Event &event;
-
 	Keyboard keyboard{};
 
 	inline bool isInterruptAEnabled() {
@@ -80,9 +78,6 @@ class CIA1 : public RegisterHolder<0xDC00, 0x10> {
 	}
 
 public:
-
-	explicit CIA1(SDL_Event &event) : event(event) {
-	}
 
 	inline u8 write(u16 addr, u8 val) {
 		addr = normalize(addr);
@@ -133,12 +128,12 @@ public:
 
 			u8 mask{};
 			for (u8 i = 0; i < 0x8u; i++) {
-				if (keyboard.isKeyPressed(pos, i)) {
+				if (!keyboard.isKeyPressed(pos, i)) {
 					mask |= 1u << i;
 				}
 			}
 
-			return NOT8(mask);
+			return mask;
 		} else {
 			return get(addr);
 		}
@@ -160,7 +155,6 @@ public:
 			// Timer A underflow occurred.
 			if (timerAPrev && !timerA) {
 				if (isInterruptAEnabled()) {
-					SDL_PollEvent(&event);
 					setTimerAUnderflow(true);
 					setInterruptGenerated(true);
 					generateInterrupt();
@@ -177,7 +171,6 @@ public:
 			// Timer B underflow occurred.
 			if (timerBPrev && !timerB) {
 				if (isInterruptBEnabled()) {
-					SDL_PollEvent(&event);
 					setTimerBUnderflow(true);
 					setInterruptGenerated(true);
 					generateInterrupt();

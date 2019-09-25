@@ -140,13 +140,13 @@ class CPU {
 		push8(static_cast<u8>(val >> 0x8u));
 		push8(static_cast<u8>(val & 0xffu));
 	}
-	inline u8 Pop8() {
+	inline u8 pop8() {
 		sp++;
 		return mmu.read(static_cast<u16>(0x0100 + static_cast<u32>(sp)));
 	}
-	inline u16 Pop16() {
-		u8 lo = Pop8();
-		u16 hi = Pop8() << 0x8u;
+	inline u16 pop16() {
+		u8 lo = pop8();
+		u16 hi = pop8() << 0x8u;
 		return hi + lo;
 	}
 
@@ -226,12 +226,12 @@ public:
 	inline bool getFlag(Flags) const;
 
 	inline void updC(u16 r);
-	inline void UpdV(u8, u8, u16);
-	inline void UpdCV(u8, u8, u16);
+	inline void updV(u8 _x, u8 _y, u16 r);
+	inline void updCV(u8 pX, u8 pY, u16 r);
 
-	inline void UpdN(u8);
-	inline void UpdZ(u8);
-	inline void UpdNZ(u8);
+	inline void updN(u8 _x);
+	inline void updZ(u8 _x);
+	inline void updNZ(u8 _x);
 
 	inline bool isNMI() { return nmi; }
 #pragma endregion
@@ -464,7 +464,7 @@ inline bool CPU::getFlag(Flags f) const {
 	return (p & (0x1u << f)) > 0;
 }
 
-inline void CPU::UpdV(u8 _x, u8 _y, u16 r) {
+inline void CPU::updV(u8 _x, u8 _y, u16 r) {
 	V(static_cast<bool>(~(_x ^ _y) & (r ^ _x) & 0x80u));
 }
 
@@ -472,22 +472,22 @@ inline void CPU::updC(u16 r) {
 	C(0xff < r);
 }
 
-inline void CPU::UpdCV(u8 pX, u8 pY, u16 r) {
-	UpdV(pX, pY, r);
+inline void CPU::updCV(u8 pX, u8 pY, u16 r) {
+	updV(pX, pY, r);
 	updC(r);
 }
 
-inline void CPU::UpdN(u8 _x) {
+inline void CPU::updN(u8 _x) {
 	setFlag(Flags::N, static_cast<bool>(_x & 0x80u));
 }
 
-inline void CPU::UpdZ(u8 _x) {
+inline void CPU::updZ(u8 _x) {
 	setFlag(Flags::Z, !_x);
 }
 
-inline void CPU::UpdNZ(u8 _x) {
-	UpdN(_x);
-	UpdZ(_x);
+inline void CPU::updNZ(u8 _x) {
+	updN(_x);
+	updZ(_x);
 }
 
 inline void CPU::setDebug(bool _debug) {

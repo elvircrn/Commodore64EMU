@@ -53,7 +53,7 @@ int runCustomROM(const std::string &customROMPath) {
 	std::vector<u8> customROM{customROMStream.begin(), customROMStream.end()};
 
 	Clock clk{};
-	CIA1 cia1{event};
+	CIA1 cia1{};
 	CIA2 cia2{};
 
 	std::vector<u8> vicIO(0xffff);
@@ -62,7 +62,8 @@ int runCustomROM(const std::string &customROMPath) {
 	CPU cpu{clk, mmu};
 	VIC vic{clk, mmu, screen, cpu};
 
-	cia1.setGenerateInterrupt([&cpu]() {
+	cia1.setGenerateInterrupt([&cpu, &event]() {
+		SDL_PollEvent(&event);
 		cpu.interruptRequest();
 	});
 
@@ -83,6 +84,7 @@ int runCustomROM(const std::string &customROMPath) {
 	cpu.setDebug(dEnabled);
 	Keyboard keyboard;
 	while (true) {
+		mmu.writeRAM16(0x37, 0xa000u);
 		if (!loop.update()) {
 			break;
 		}

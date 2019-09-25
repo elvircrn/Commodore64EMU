@@ -8,7 +8,6 @@ class PRGLoader {
 
 public:
 	static void loadPRG(MMU &mmu, ROM &rom) {
-		mmu.writeRAM16(0x37, 0xa000u);
 		mmu.writeRAM16(0x2b, rom.prgROMOffset);
 
 		u32 lastROMByte = rom.prgROMOffset + rom.customROM.size() - 1;

@@ -146,7 +146,6 @@ public:
 	inline void setGenerateInterrupt(std::function<void()> _generateInterrupt) {
 		this->generateInterrupt = std::move(_generateInterrupt);
 	}
-
 };
 
 #endif //C64EMU_CIA2_H

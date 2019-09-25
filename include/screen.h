@@ -11,8 +11,6 @@
 #include "core.h"
 
 class Screen {
-	SDL_Rect screenRectrangle{0, 0, GraphicsConstants::WINDOW_WIDTH, GraphicsConstants::WINDOW_HEIGHT};
-
 	SDL_Texture *texture;
 	SDL_Renderer *renderer;
 	std::array<u32, GraphicsConstants::WINDOW_WIDTH * GraphicsConstants::WINDOW_HEIGHT> screen{};
